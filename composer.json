@@ -1,0 +1,23 @@
+{
+  "name": "thepurpleblob/railtour",
+  "description": "SRPS Railtour Bookings V2",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Howard Miller",
+      "email": "howard@srps.org.uk"
+    }
+  ],
+  "require": {
+    "j4mie/idiorm": "v1.5.1",
+    "wixel/gump": "1.3",
+    "twig/twig": "1.6.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "thepurpleblob\\core\\": "core",
+      "thepurpleblob\\railtour\\": "src"
+    }
+  }
+}

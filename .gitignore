@@ -1,0 +1,5 @@
+/vendor
+composer.lock
+config.php
+**/.idea/tasks.xml
+**/.idea/workspace.xml
