@@ -34,7 +34,10 @@ if (!$action_name = $paths[2]) {
 }
 
 // try to load controller
-$controller_name = '\\controller\\' . $controller_name . 'Controller';
+$controller_name = '\\thepurpleblob\\' . $CFG->projectname . '\\' . $controller_name . 'Controller';
+if (!class_exists($controller_name)) {
+    throw new Exception("Controller class does not exist - $controller_name");
+}
 $controller = new $controller_name;
 
 // execute specified action

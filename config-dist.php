@@ -8,6 +8,10 @@ $CFG->dsn = "mysql:host=localhost;dbname=santa";
 $CFG->dbuser = '';
 $CFG->dbpass = '';
 
+// Project name
+// (Needs to match composer autoloader \\thepurpleblob\\projectname\\)
+$CFG->projectname = 'railtour';
+
 // paths
 $CFG->www = '';
 
