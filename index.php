@@ -9,16 +9,11 @@ $CFG->basepath = dirname(__FILE__);
 error_reporting(E_ALL);
 ini_set('display_errors', 'stdout');
 
-// If no path is given, just start a booking
+// If no path is given, use the default
 if (isset($_SERVER['PATH_INFO'])) {
     $info = $_SERVER['PATH_INFO'];
 } else {
-    $info = '/booking/start';
-}
-
-// If path is just /admin...
-if ($info=='/admin') {
-    $info = '/admin/index';
+    $info = $CFG->defaultroute;
 }
 
 if ($info) {
@@ -34,7 +29,7 @@ if (!$action_name = $paths[2]) {
 }
 
 // try to load controller
-$controller_name = '\\thepurpleblob\\' . $CFG->projectname . '\\' . $controller_name . 'Controller';
+$controller_name = '\\thepurpleblob\\' . $CFG->projectname . '\\controller\\' . $controller_name . 'Controller';
 if (!class_exists($controller_name)) {
     throw new Exception("Controller class does not exist - $controller_name");
 }

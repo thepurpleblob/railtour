@@ -2,10 +2,7 @@
 
 namespace thepurpleblob\core;
 
-use Assetic\Asset\AssetCollection;
-use Assetic\Asset\FileAsset;
-use Assetic\Asset\HttpAsset;
-use Assetic\Asset\GlobAsset;
+;
 
 class coreController {
 
@@ -77,7 +74,6 @@ class coreController {
         // if exception handler, don't bother with this stuff
         if (!$exception) {
             $this->form = new coreForm();
-            require_once(dirname(__FILE__) . '/GUMP/gump.class.php');
             $this->extendGump();
             $this->gump = new \GUMP();
         }

@@ -12,6 +12,9 @@ $CFG->dbpass = '';
 // (Needs to match composer autoloader \\thepurpleblob\\projectname\\)
 $CFG->projectname = 'railtour';
 
+// Routes (default if none specified)
+$CFG->defaultroute = '/admin/index';
+
 // paths
 $CFG->www = '';
 
