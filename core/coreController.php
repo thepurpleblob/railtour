@@ -10,6 +10,8 @@ class coreController {
 
     protected $form;
 
+    protected $twig;
+
     public function getHeaderAssets() {
         global $CFG;
 
@@ -60,6 +62,16 @@ class coreController {
     }
 
     /**
+     * Get twig resource
+     */
+    private function getTwig() {
+        global $CFG;
+
+        $twigloader = new \Twig_Loader_Filesystem($CFG->dirroot . '/src/view');
+        $this->twig = new \Twig_Environment($twigloader);
+    }
+
+    /**
      * Instantiate class in library
      * @param type $name
      */
@@ -76,6 +88,7 @@ class coreController {
             $this->form = new coreForm();
             $this->extendGump();
             $this->gump = new \GUMP();
+            $this->getTwig();
         }
     }
 
@@ -103,15 +116,15 @@ class coreController {
     public function View($viewname, $variables=null) {
         global $CFG;
 
-        // extract here limits scope
+        // also need the form class in the variables
         if ($variables) {
-            extract($variables);
+            $variables['form'] = $this->form;
+        } else {
+            $variables = array($this->form);
         }
 
-        // also need the form class in scope
-        $form = $this->form;
-
-        require($CFG->basepath . '/view/' . $viewname . '.php');
+        // Render
+        $this->twig->render($viewname, $variables);
     }
 
     /**

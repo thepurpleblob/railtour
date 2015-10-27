@@ -1,0 +1,63 @@
+{# Sidebar template #}
+
+<h4>Admin menu</h4>
+
+{% if app.user %}
+    <p><i>Welcome {{ app.user.username }} (<a href="{{ path('logout') }}">logout</a>)</i></p>
+{% endif %}
+
+<ul id="adminmenu">
+    <li>
+        <a class="btn btn-primary" href="{{ path('admin_service_show', { 'id': serviceid }) }}">
+            Show service
+        </a>
+    </li>
+    {% if app.user.role == 'ROLE_ADMIN' %}
+        <li>
+            <a class="btn btn-warning" href="{{ path('admin_service_edit', { 'id': serviceid }) }}">
+                Edit service
+            </a>
+        </li>
+    {% endif %}
+    {% if serviceid %}
+        {% if app.user.role == 'ROLE_ADMIN' %}
+            <li>
+                <a class="btn btn-warning" href="{{ path('admin_destination', { 'serviceid': serviceid }) }}">
+                    {% if destinations is defined %}
+                        {{ destinations ? 'Edit destinations' : 'New destination' }}
+                    {% else %}
+                        Edit destinations
+                    {% endif %}    
+                </a>
+            </li>
+            <li>
+                <a class="btn btn-warning" href="{{ path('admin_priceband', { 'serviceid': serviceid }) }}">
+                    {% if pricebandgroups is defined %}
+                        {{ pricebandgroups ? 'Edit price bands' : 'New price band' }}
+                    {% else %}
+                        Edit price bands
+                    {% endif %}
+                </a>
+            </li>
+            <li>
+                <a class="btn btn-warning" href="{{ path('admin_joining', { 'serviceid': serviceid }) }}">
+                    {% if joinings is defined %}
+                        {{ joinings ? 'Edit joining stations' : 'New joining station' }}
+                    {% else %}
+                        Edit joining stations
+                    {% endif %}
+                </a>
+            </li>
+        {% endif %}
+        <li>
+            <a class="btn btn-primary" href="{{ path('admin_limits_edit', { 'serviceid': serviceid }) }}">
+                Booking limits
+            </a>
+        </li>
+    {% endif %}
+    <li>
+        <a class="btn btn-success" href="{{ path('admin_service') }}">
+            Return to list
+        </a>
+    </li>
+</ul>

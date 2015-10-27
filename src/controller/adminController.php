@@ -8,7 +8,7 @@ class AdminController extends coreController
 {
     public function indexAction()
     {
-        return $this->render('SRPSBookingBundle:Admin:index.html.twig');
+        $this->View('admin/index.html.twig');
     }
     
     public function displayAction($serviceid)
