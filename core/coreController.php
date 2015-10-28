@@ -124,7 +124,7 @@ class coreController {
         }
 
         // Render
-        $this->twig->render($viewname, $variables);
+        echo $this->twig->render($viewname, $variables);
     }
 
     /**

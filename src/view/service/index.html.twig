@@ -1,0 +1,91 @@
+{% extends 'SRPSBookingBundle:Admin:admin.html.twig' %}
+
+{% block sidebar %}
+
+    {% if app.user %}
+        <p><i>Welcome {{ app.user.username }} (<a href="{{ path('logout') }}">logout</a>)</i></p>
+    {% endif %}
+    
+    <h4>Filter</h4>
+    <form id="services_filter_form" class="form-horizontal" action="{{ path('admin_index') }}"
+        novalidate="novalidate" method="post">
+        <label>Tour season</label>
+        <select id="services_filter_year" name="filter_year">
+            {% for year in years %}
+                <option {{ year==filteryear ? 'selected="selected"' : '' }}>{{ year }}</option>
+            {% endfor %}    
+        </select>
+    </form>
+    
+    <ul id="adminmenu">
+        {% if app.user.role == 'ROLE_ADMIN' %}
+            <li>
+                <a class="btn btn-success" href="{{ path('admin_user_index') }}">
+                    User admin
+                </a>
+            </li> 
+        {% endif %}
+    </ul>    
+{% endblock sidebar %}
+
+{% block content %}
+    <h2>Railtour Services</h2>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Visible</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entity in entities %}
+                <tr>
+                    <td><strong>{{ entity.code }}</strong></td>
+                    <td>{{ entity.name }}</td>
+                    <td>{{ entity.visible ? 'Yes' : 'No' }}</td>
+                    <td>{% if entity.date %}{{ entity.date|date('d/m/Y') }}{% endif %}</td>
+                    <td>
+                        <a class="btn btn-small btn-success" href="{{ path('admin_service_show', { 'id': entity.id }) }}">show</a>
+                        <a class="btn btn-small" href="{{ path('admin_limits_edit', { 'serviceid': entity.id }) }}">Limits</a>
+                        {% if entity.visible and enablebooking %}
+                            <a class="btn btn-small btn-info" href="{{ path('booking', { 'code': entity.code }) }}">Booking</a>
+                        {% else %}
+                            <a class="btn btn-small btn-info disabled">Booking</a>
+                        {% endif %}
+                        <a class="btn btn-small btn-warning" href="{{ path('admin_report_list', { 'serviceid': entity.id }) }}">Report</a>
+                        <a class="btn btn-small btn-warning" href="{{ path('admin_report_export', { 'serviceid': entity.id }) }}">Export</a>
+                    </td>
+                </tr>
+        {% endfor %}
+            </tbody>
+        </table>
+
+        {% if not enablebooking %}
+            <div class="alert">
+                NOTE: Booking is currently disabled on this site
+            </div>
+        {% endif %}
+
+        {% if app.user.role == 'ROLE_ADMIN' %}
+            <div class="btn-group">
+                <a class="btn btn-primary" href="{{ path('admin_service_new') }}">
+                    Add a new service
+                </a>
+            </div>
+        {% endif %}
+{% endblock content %}
+    
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        $('#services_filter_year').change(
+                function() {
+                    $('#services_filter_form').submit();
+                }
+            );
+    </script>    
+{% endblock javascripts %}

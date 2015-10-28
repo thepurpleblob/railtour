@@ -1,0 +1,192 @@
+{% extends 'SRPSBookingBundle:Admin:admin.html.twig' %}
+
+{% block sidebar %}
+    {% include 'SRPSBookingBundle:Admin:sidebar.html.twig' %}
+{% endblock sidebar %}
+
+{% block content %}
+    <h2>Service</h2>
+    <h3>{{entity.name}} ({{ entity.code }})</h3>
+
+    {% if not entity.visible %}
+    <div class="text-error">
+        This service is not currently available for booking. Change <i>Visble</i>
+        to <i>Yes</i> if required.
+    </div>
+    {% endif %}
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Code</th>
+                <td>{{ entity.code }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ entity.name }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ entity.description|raw }}</td>
+            </tr>
+            <tr>
+                <th>Visible</th>
+                <td>{{ entity.visible ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>Date</th>
+                <td>{{ entity.date|date('d/m/Y') }}</td>
+            </tr>
+            <tr>
+                <th>First window/single supplement</th>
+                <td>&pound;{{ entity.singlesupplement | number_format(2) }}</td>
+            </tr>
+            <tr>
+                <th>Display comment field</th>
+                <td>{{ entity.commentbox ? 'Yes' : 'No' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Meals</h3>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>&nbsp;</th>
+                <th>Name</th>
+                <th>Visible</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th class="lead">A</th>
+                <td>{{ entity.mealaname }}</td>
+                <td>{{ entity.mealavisible ? 'Yes' : 'No' }}</td>
+                <td>&pound;{{ entity.mealaprice | number_format(2) }}</td>
+            </tr>
+            <tr>
+                <th class="lead">B</th>
+                <td>{{ entity.mealbname }}</td>
+                <td>{{ entity.mealbvisible ? 'Yes' : 'No' }}</td>
+                <td>&pound;{{ entity.mealbprice | number_format(2) }}</td>
+            </tr>
+            <tr>
+                <th class="lead">C</th>
+                <td>{{ entity.mealcname }}</td>
+                <td>{{ entity.mealcvisible ? 'Yes' : 'No' }}</td>
+                <td>&pound;{{ entity.mealcprice | number_format(2) }}</td>
+            </tr>
+            <tr>
+                <th class="lead">D</th>
+                <td>{{ entity.mealdname }}</td>
+                <td>{{ entity.mealdvisible ? 'Yes' : 'No' }}</td>
+                <td>&pound;{{ entity.mealdprice | number_format(2) }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Destinations</h3>
+    {% if destinations is empty %}
+        <div class="alert alert-block alert-error">
+            There are no destinations. You need to create at least one destination first.
+        </div>
+    {% else %}
+        <table class="table table-condensed table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for destination in destinations %}
+                    <tr>
+                        <td>{{ destination.name }}</td>
+                        <td>{{ destination.description | raw }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <h3>Price bands</h3>
+    {% if pricebandgroups is empty %}
+        <div class="alert alert-block alert-error">
+            There are no price bands. You need to create at least one price band first.
+        </div>
+    {% else %}
+        <table class="table table-condensed table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pricebandgroup in pricebandgroups %}
+                    <tr>
+                        <td>{{ pricebandgroup.name }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <table class="table table-condensed table-priceband">
+                                <thead>
+                                    <tr>
+                                        <th>Destination</th>
+                                        <th>First</th>
+                                        <th>Standard</th>
+                                        <th>Child</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for priceband in pricebandgroup.bandtable %}
+                                    <tr>
+                                        <td>{{ priceband.destination }}</td>
+                                        <td>&pound;{{ priceband.first }}</td>
+                                        <td>&pound;{{ priceband.standard }}</td>
+                                        <td>&pound;{{ priceband.child }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <h3>Joining stations</h3>
+    {% if joinings is empty %}
+        <div class="alert alert-block alert-error">
+            There are no joining stations. You need to add at least one joining station first.
+        </div>
+    {% else %}
+        <table class="table table-condensed table-striped">
+            <thead>
+                <tr>
+                    <th>Station</th>
+                    <th>Price band</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for joining in joinings %}
+                    <tr>
+                        <td>{{ joining.station }}</td>
+                        <td>{{ joining.pricebandname }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <div>
+        <a class="btn btn-success" href="{{ path('admin_service') }}">
+            Back to the list
+        </a>
+        <a class="btn btn-warning" href="{{ path('admin_service_edit', { 'id': entity.id }) }}">
+            Edit
+        </a>
+    </div>
+{% endblock content %}
