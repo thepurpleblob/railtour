@@ -1,0 +1,35 @@
+body {
+    padding: 10px;
+}
+
+ul#adminmenu {
+    list-style-type: none;
+    color: red;
+}
+
+#adminmenu li {
+    margin-bottom: 8px;
+}
+
+#adminmenu li a.btn {
+    width: 120px;
+}
+
+table.table-priceband {
+    margin: 0 40px;
+    font-size: 75%;
+}
+
+div.summary_display {
+    font-family: monospace;
+}
+
+div#pagefooter {
+    padding-top: 20px;
+    text-align: right;
+}
+
+div#sb_info {
+    text-align: center;
+    margin: 15px 6px 15px 0;
+}

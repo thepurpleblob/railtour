@@ -14,17 +14,13 @@ class ServiceController extends coreController
      * Lists all Service entities.
      *
      */
-    public function indexAction()
-    {
-        $em = $this->getDoctrine()->getManager();
+    public function indexAction() {
+        global $CFG;
 
-        $query = $em->createQuery(
-            'SELECT s FROM SRPSBookingBundle:Service s ORDER BY s.date'
-        );
-        $entities = $query->getResult();
-        
+        $entities = \ORM::forTable('Service')->order_by_asc('date')->findMany();
+
         // submitted year
-        $filteryear = $this->getRequest()->request->get('filter_year');        
+        $filteryear = $this->getParam('filter_year');
         
         // get possible years and filter results
         // shouldn't have to do this in PHP but Doctrine sucks badly!
@@ -32,8 +28,8 @@ class ServiceController extends coreController
         $years = array();
         $years['All'] = 'All';        
         foreach ($entities as $service) {
-            $servicedate = $service->getDate();
-            $year = $servicedate->format('Y');
+            $servicedate = $service->date;
+            $year = substr($servicedate, 0, 4);
             $years[$year] = $year;
             if ($filteryear=='All' or $filteryear=='') {
                 $services[] = $service;
@@ -44,9 +40,9 @@ class ServiceController extends coreController
 
 
         // get booking status
-        $enablebooking = $this->container->getParameter('enablebooking');
+        $enablebooking = $CFG->enablebooking;
 
-        return $this->render('SRPSBookingBundle:Service:index.html.twig',
+        $this->View('service/index.html.twig',
             array('entities' => $services,
                   'enablebooking' => $enablebooking,
                   'years' => $years,

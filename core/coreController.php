@@ -89,6 +89,7 @@ class coreController {
             $this->extendGump();
             $this->gump = new \GUMP();
             $this->getTwig();
+            $this->twig->addExtension(new twigextension());
         }
     }
 
@@ -107,6 +108,18 @@ class coreController {
             return false;
         } else {
             return $this->gump->sanitize($_POST);
+        }
+    }
+
+    /**
+     * Get parameter
+     */
+    public function getParam($name, $default=null) {
+        $params = $this->getRequest();
+        if (!isset($params[$name])) {
+            return $default;
+        } else {
+            return $params[$name];
         }
     }
 

@@ -20,6 +20,9 @@ $CFG->www = '';
 
 $CFG->dirroot = '';
 
+// Enable booking
+$CFG->enablebooking = true;
+
 // defaults for limits
 $CFG->default_limit = 100;
 $CFG->default_party = 8;
