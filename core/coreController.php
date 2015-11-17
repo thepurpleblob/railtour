@@ -136,6 +136,12 @@ class coreController {
             $variables = array($this->form);
         }
 
+        // TODO
+        // Some global stuff gets passed in system variable
+        $system = new \stdClass();
+        $system->userrole = 'ROLE_ADMIN';
+        $variables['system'] = $system;
+
         // Render
         echo $this->twig->render($viewname, $variables);
     }
@@ -214,6 +220,16 @@ class coreController {
     		} else
     			throw new \Exception("Session data for '$name' was not found");
     	}
+    }
+
+    /**
+     * Get service (Model) class (from src/service directory)
+     */
+    public function getService($name) {
+        global $CFG;
+
+        $classname = '\\thepurpleblob\\' . $CFG->projectname . '\\service\\' . $name;
+        return new $classname;
     }
 
 }

@@ -1,14 +1,21 @@
-{% extends 'SRPSBookingBundle:Admin:admin.html.twig' %}
+{% extends 'admin/admin.html.twig' %}
 
 {% block sidebar %}
-    {% include 'SRPSBookingBundle:Admin:sidebar.html.twig' %}
+    {% include 'admin/sidebar.html.twig' %}
 {% endblock sidebar %}
 
 {% block content %}
     <h2>Service</h2>
-    <h3>{{entity.name}} ({{ entity.code }})</h3>
+    <h3>{{service.name}} ({{ service.code }})</h3>
 
-    {% if not entity.visible %}
+    {% if system.userrole == 'ROLE_ADMIN' %}
+        <a class="btn btn-warning pull-right" href="{{ path('service/edit', service.id) }}">
+            Edit service
+        </a>
+    {% endif %}
+    <h3>Summary</h3>
+
+    {% if not service.visible %}
     <div class="text-error">
         This service is not currently available for booking. Change <i>Visble</i>
         to <i>Yes</i> if required.
@@ -19,31 +26,31 @@
         <tbody>
             <tr>
                 <th>Code</th>
-                <td>{{ entity.code }}</td>
+                <td>{{ service.code }}</td>
             </tr>
             <tr>
                 <th>Name</th>
-                <td>{{ entity.name }}</td>
+                <td>{{ service.name }}</td>
             </tr>
             <tr>
                 <th>Description</th>
-                <td>{{ entity.description|raw }}</td>
+                <td>{{ service.description|raw }}</td>
             </tr>
             <tr>
                 <th>Visible</th>
-                <td>{{ entity.visible ? 'Yes' : 'No' }}</td>
+                <td>{{ service.visible ? 'Yes' : 'No' }}</td>
             </tr>
             <tr>
                 <th>Date</th>
-                <td>{{ entity.date|date('d/m/Y') }}</td>
+                <td>{{ service.date|date('d/m/Y') }}</td>
             </tr>
             <tr>
                 <th>First window/single supplement</th>
-                <td>&pound;{{ entity.singlesupplement | number_format(2) }}</td>
+                <td>&pound;{{ service.singlesupplement | number_format(2) }}</td>
             </tr>
             <tr>
                 <th>Display comment field</th>
-                <td>{{ entity.commentbox ? 'Yes' : 'No' }}</td>
+                <td>{{ service.commentbox ? 'Yes' : 'No' }}</td>
             </tr>
         </tbody>
     </table>
@@ -62,31 +69,40 @@
         <tbody>
             <tr>
                 <th class="lead">A</th>
-                <td>{{ entity.mealaname }}</td>
-                <td>{{ entity.mealavisible ? 'Yes' : 'No' }}</td>
-                <td>&pound;{{ entity.mealaprice | number_format(2) }}</td>
+                <td>{{ service.mealaname }}</td>
+                <td>{{ service.mealavisible ? 'Yes' : 'No' }}</td>
+                <td>&pound;{{ service.mealaprice | number_format(2) }}</td>
             </tr>
             <tr>
                 <th class="lead">B</th>
-                <td>{{ entity.mealbname }}</td>
-                <td>{{ entity.mealbvisible ? 'Yes' : 'No' }}</td>
-                <td>&pound;{{ entity.mealbprice | number_format(2) }}</td>
+                <td>{{ service.mealbname }}</td>
+                <td>{{ service.mealbvisible ? 'Yes' : 'No' }}</td>
+                <td>&pound;{{ service.mealbprice | number_format(2) }}</td>
             </tr>
             <tr>
                 <th class="lead">C</th>
-                <td>{{ entity.mealcname }}</td>
-                <td>{{ entity.mealcvisible ? 'Yes' : 'No' }}</td>
-                <td>&pound;{{ entity.mealcprice | number_format(2) }}</td>
+                <td>{{ service.mealcname }}</td>
+                <td>{{ service.mealcvisible ? 'Yes' : 'No' }}</td>
+                <td>&pound;{{ service.mealcprice | number_format(2) }}</td>
             </tr>
             <tr>
                 <th class="lead">D</th>
-                <td>{{ entity.mealdname }}</td>
-                <td>{{ entity.mealdvisible ? 'Yes' : 'No' }}</td>
-                <td>&pound;{{ entity.mealdprice | number_format(2) }}</td>
+                <td>{{ service.mealdname }}</td>
+                <td>{{ service.mealdvisible ? 'Yes' : 'No' }}</td>
+                <td>&pound;{{ service.mealdprice | number_format(2) }}</td>
             </tr>
         </tbody>
     </table>
 
+    {% if system.userrole == 'ROLE_ADMIN' %}
+        <a class="btn btn-warning pull-right" href="{{ path('destination/index', service.id) }}">
+            {% if destinations is defined %}
+                {{ destinations ? 'Edit destinations' : 'New destination' }}
+            {% else %}
+                Edit destinations
+            {% endif %}
+        </a>
+    {% endif %}
     <h3>Destinations</h3>
     {% if destinations is empty %}
         <div class="alert alert-block alert-error">
@@ -111,6 +127,15 @@
         </table>
     {% endif %}
 
+    {% if system.userrole == 'ROLE_ADMIN' %}
+        <a class="btn btn-warning pull-right" href="{{ path('priceband/index', service.id) }}">
+            {% if pricebandgroups is defined %}
+                {{ pricebandgroups ? 'Edit price bands' : 'New price band' }}
+            {% else %}
+                Edit price bands
+            {% endif %}
+        </a>
+    {% endif %}
     <h3>Price bands</h3>
     {% if pricebandgroups is empty %}
         <div class="alert alert-block alert-error">
@@ -157,6 +182,15 @@
         </table>
     {% endif %}
 
+    {% if system.userrole == 'ROLE_ADMIN' %}
+        <a class="btn btn-warning pull-right" href="{{ path('joining/index', service.id) }}">
+            {% if joinings is defined %}
+                {{ joinings ? 'Edit joining stations' : 'New joining station' }}
+            {% else %}
+                Edit joining stations
+            {% endif %}
+        </a>
+    {% endif %}
     <h3>Joining stations</h3>
     {% if joinings is empty %}
         <div class="alert alert-block alert-error">
@@ -181,11 +215,16 @@
         </table>
     {% endif %}
 
+    <a class="btn btn-primary pull-right" href="{{ path('limits/edit', service.id) }}">
+        Booking limits
+    </a>
+    <h3>Booking limits</h3>
+
     <div>
-        <a class="btn btn-success" href="{{ path('admin_service') }}">
+        <a class="btn btn-success" href="{{ path('service/index') }}">
             Back to the list
         </a>
-        <a class="btn btn-warning" href="{{ path('admin_service_edit', { 'id': entity.id }) }}">
+        <a class="btn btn-warning" href="{{ path('service/edit', service.id) }}">
             Edit
         </a>
     </div>

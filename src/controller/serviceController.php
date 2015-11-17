@@ -81,40 +81,34 @@ class ServiceController extends coreController
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $service = \ORM::forTable('Service')->findOne($id);
 
-        $entity = $em->getRepository('SRPSBookingBundle:Service')->find($id);
-
-        if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Service entity.');
+        if (!$service) {
+            throw $this->Exception('Unable to find Service entity.');
         }
 
         // Get the other information stored for this service
-        $destinations = $em->getRepository('SRPSBookingBundle:Destination')
-            ->findByServiceid($id);
-        $pricebandgroups = $em->getRepository('SRPSBookingBundle:Pricebandgroup')
-            ->findByServiceid($id);
-        $joinings = $em->getRepository('SRPSBookingBundle:Joining')
-            ->findByServiceid($id);
+        $destinations = \ORM::forTable('Destination')->where('serviceid', $id)->findMany();
+        $pricebandgroups = \ORM::forTable('Pricebandgroup')->where('serviceid', $id)->findMany();
+        $joinings = \ORM::forTable('Joining')->where('serviceid', $id)->findMany();
 
         // iterate over these and get destinations
         // (very inefficiently)
-        $booking = $this->get('srps_booking');
+        $booking = $this->getService('Booking');
         foreach ($pricebandgroups as $band) {
-            $pricebandgroupid = $band->getId();
+            $pricebandgroupid = $band->id;
             $bandtable = $booking->createPricebandTable($pricebandgroupid);
             $band->bandtable = $bandtable;
         }
 
         // add pricebandgroup names
         foreach ($joinings as $joining) {
-            $pricebandgroup = $em->getRepository('SRPSBookingBundle:Pricebandgroup')
-                ->find($joining->getPricebandgroupid());
-            $joining->setPricebandname($pricebandgroup->getName());
+            $pricebandgroup = \ORM::forTable('Pricebandgroup')->findOne($joining->pricebandgroupid);
+            $joining->pricebandname = $pricebandgroup->name;
         }
 
-        return $this->render('SRPSBookingBundle:Service:show.html.twig', array(
-            'entity' => $entity,
+        $this->View('service/show.html.twig', array(
+            'service' => $service,
             'destinations' => $destinations,
             'pricebandgroups' => $pricebandgroups,
             'joinings' => $joinings,
