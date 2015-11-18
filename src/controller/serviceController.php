@@ -159,18 +159,16 @@ class ServiceController extends coreController
      */
     public function editAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
+        $service = \ORM::forTable('Service')->findOne($id);
 
-        $entity = $em->getRepository('SRPSBookingBundle:Service')->find($id);
-
-        if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Service entity.');
+        if (!$service) {
+            throw $this->Exception('Unable to find Service.');
         }
 
         $editForm = $this->createForm(new ServiceType(), $entity);
 
-        return $this->render('SRPSBookingBundle:Service:edit.html.twig', array(
-            'entity'      => $entity,
+        $this->View('service/edit.html.twig', array(
+            'service'      => $service,
             'edit_form'   => $editForm->createView(),
             'serviceid' => $id,
         ));
