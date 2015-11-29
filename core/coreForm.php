@@ -14,17 +14,71 @@ class coreForm {
         }
         return $a;
     }
+
+    /**
+     * Create additional attributes
+     */
+    private function attributes($attrs) {
+        if (!$attrs) {
+            return ' ';
+        }
+        $squash = array();
+        foreach ($attrs as $name => $value) {
+            $squash[] = $name . '="' . htmlspecialchars($value) . '"';
+        }
+        return implode(' ', $squash);
+    }
     
-    public function text($name, $label, $value, $required=false) {
+    public function text($name, $label, $value, $required=false, $attrs=null) {
         $id = $name . 'Text';
         $reqclass = $required ? 'has-feedback has-warning' : '';
         echo '<div class="form-group '.$reqclass.'">';
-        echo '    <label for="'.$id.'" class="col-sm-4 control-label">'.$label.'</label>';
+        if ($label) {
+            echo '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
+        }
         echo '    <div class="col-sm-8">';
         if ($required) {
             echo '    <span class="glyphicon glyphicon-asterisk form-control-feedback"></span>';
         }
-        echo '    <input type="text" class="form-control input-sm" name="'.$name.'" id="'.$id.'" value="'.$value.'" />';
+        echo '    <input type="text" class="form-control input-sm" name="'.$name.'" id="'.$id.'" value="'.$value.'" '.
+            $this->attributes($attrs).'/>';
+
+        echo '</div></div>';
+    }
+
+    public function date($name, $label, $date, $required=false, $attrs=null) {
+        $timestamp = strtotime($date);
+        $localdate = date('d/m/Y', $timestamp);
+        $id = $name . 'Date';
+        $reqclass = $required ? 'has-feedback has-warning' : '';
+        echo '<div class="form-group '.$reqclass.'">';
+        if ($label) {
+            echo '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
+        }
+        echo '    <div class="col-sm-8">';
+        if ($required) {
+            echo '    <span class="glyphicon glyphicon-asterisk form-control-feedback"></span>';
+        }
+        echo '    <input type="text" class="form-control input-sm datepicker" name="'.$name.'" id="'.$id.'" value="'.$localdate.'" '.
+            $this->attributes($attrs).'/>';
+
+        echo '</div></div>';
+    }
+
+    public function textarea($name, $label, $value, $required=false, $attrs=null) {
+        $id = $name . 'Textarea';
+        $reqclass = $required ? 'has-feedback has-warning' : '';
+        echo '<div class="form-group '.$reqclass.'">';
+        if ($label) {
+            echo '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
+        }
+        echo '    <div class="col-sm-8">';
+        if ($required) {
+            echo '    <span class="glyphicon glyphicon-asterisk form-control-feedback"></span>';
+        }
+        echo '    <textarea class="form-control input-sm" name="'.$name.'" id="'.$id.'" '.$this->attributes($attrs).'/>';
+        echo $value;
+        echo '    </textarea>';
 
         echo '</div></div>';
     }
@@ -32,7 +86,9 @@ class coreForm {
     public function password($name, $label) {
         $id = $name . 'Password';
         echo '<div class="form-group">';
-        echo '    <label for="'.$id.'" class="col-sm-4 control-label">'.$label.'</label>';
+        if ($label) {
+            echo '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
+        }
         echo '    <div class="col-sm-8">';
         echo '    <input type="password" class="form-control input-sm" name="'.$name.'" id="'.$id.'" />';
         echo '</div></div>';
@@ -42,7 +98,9 @@ class coreForm {
         $id = $name . 'Select';
         $inputcol = 12 - $labelcol;
         echo '<div class="form-group">';
-        echo '    <label for="'.$id.'" class="col-sm-' . $labelcol . ' control-label">'.$label.'</label>';
+        if ($label) {
+            echo '    <label for="' . $id . '" class="col-sm-' . $labelcol . ' control-label">' . $label . '</label>';
+        }
         echo '    <div class="col-sm-' . $inputcol .'">';
         echo '    <select class="form-control input-sm" name="'.$name.'">';
         if ($choose) {
@@ -58,6 +116,15 @@ class coreForm {
         }
         echo '    </select></div>';
         echo "</div>";
+    }
+
+    public function yesno($name, $label, $yes) {
+        $options = array(
+            0 => 'No',
+            1 => 'Yes',
+        );
+        $selected = $yes ? 1 : 0;
+        $this->select($name, $label, $selected, $options);
     }
     
     public function hidden($name, $value) {

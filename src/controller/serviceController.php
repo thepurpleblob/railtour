@@ -165,11 +165,11 @@ class ServiceController extends coreController
             throw $this->Exception('Unable to find Service.');
         }
 
-        $editForm = $this->createForm(new ServiceType(), $entity);
+        //$editForm = $this->createForm(new ServiceType(), $entity);
 
         $this->View('service/edit.html.twig', array(
             'service'      => $service,
-            'edit_form'   => $editForm->createView(),
+            //'edit_form'   => $editForm->createView(),
             'serviceid' => $id,
         ));
     }
