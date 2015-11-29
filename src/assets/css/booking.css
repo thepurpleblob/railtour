@@ -2,6 +2,11 @@ body {
     padding: 10px;
 }
 
+label.validateError {
+    color: #ff0000;
+    font-weight: normal;
+}
+
 ul#adminmenu {
     list-style-type: none;
     color: red;

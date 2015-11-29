@@ -17,17 +17,18 @@ class ServiceController extends coreController
     public function indexAction() {
         global $CFG;
 
-        $entities = \ORM::forTable('Service')->order_by_asc('date')->findMany();
+        $allservices = \ORM::forTable('Service')->order_by_asc('date')->findMany();
 
         // submitted year
-        $filteryear = $this->getParam('filter_year');
+        $thisyear = date('Y');
+        $filteryear = $this->getParam('filter_year', $thisyear);
         
         // get possible years and filter results
         // shouldn't have to do this in PHP but Doctrine sucks badly!
         $services = array();
         $years = array();
         $years['All'] = 'All';        
-        foreach ($entities as $service) {
+        foreach ($allservices as $service) {
             $servicedate = $service->date;
             $year = substr($servicedate, 0, 4);
             $years[$year] = $year;
@@ -48,29 +49,6 @@ class ServiceController extends coreController
                   'years' => $years,
                   'filteryear' => $filteryear,
                 ));
-    }
-
-    /**
-     * Create the table to display price band group
-     * @param integer $pricebandgroupid
-     */
-    private function createPricebandTable($pricebandgroupid) {
-        $em = $this->getDoctrine()->getManager();
-
-        // get the basic price bands
-        $pricebands = $em->getRepository('SRPSBookingBundle:Priceband')
-            ->findByPricebandgroupid($pricebandgroupid);
-
-        // iterate over these and get destinations
-        // (very inefficiently)
-        foreach ($pricebands as $priceband) {
-            $destinationid = $priceband->getDestinationid();
-            $destination = $em->getRepository('SRPSBookingBundle:Destination')
-                ->find($destinationid);
-            $priceband->setDestination($destination->getName());
-        }
-
-        return $pricebands;
     }
 
     /**
@@ -117,91 +95,94 @@ class ServiceController extends coreController
     }
 
     /**
-     * Displays a form to create a new Service entity.
+     * Displays a form to edit an existing Service entity or create a new one
+     * @param int $id service id
      */
-    public function newAction()
+    public function editAction($id=null)
     {
-        $entity = new Service();
+        if ($id) {
+            $service = \ORM::forTable('Service')->findOne($id);
 
-        $form   = $this->createForm(new ServiceType(), $entity);
-
-        return $this->render('SRPSBookingBundle:Service:new.html.twig', array(
-            'entity' => $entity,
-            'form'   => $form->createView(),
-        ));
-    }
-
-    /**
-     * Creates a new Service entity.
-     */
-    public function createAction(Request $request)
-    {
-        $entity  = new Service();
-        $form = $this->createForm(new ServiceType(), $entity);
-        $form->bind($request);
-
-        if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($entity);
-            $em->flush();
-
-            return $this->redirect($this->generateUrl('admin_service_show', array('id' => $entity->getId())));
+            if (!$service) {
+                throw $this->Exception('Unable to find Service.');
+            }
+        } else {
+            $booking = $this->getService('Booking');
+            $service = $booking->createService();
         }
 
-        return $this->render('SRPSBookingBundle:Service:new.html.twig', array(
-            'entity' => $entity,
-            'form'   => $form->createView(),
-        ));
-    }
+        // hopefully no errors
+        $errors = null;
 
-    /**
-     * Displays a form to edit an existing Service entity.
-     */
-    public function editAction($id)
-    {
-        $service = \ORM::forTable('Service')->findOne($id);
+        // anything submitted?
+        if ($data = $this->getRequest()) {
+            //echo "<pre>"; var_dump($data); die;
 
-        if (!$service) {
-            throw $this->Exception('Unable to find Service.');
+            // Cancel?
+            if (!empty($data['cancel'])) {
+                if ($id) {
+                    $this->redirect('service/show/' . $id);
+                } else {
+                    $this->redirect('service/index');
+                }
+            }
+
+            // Validate
+            $this->gump->validation_rules(array(
+                'code' => 'required',
+                'name' => 'required',
+                'description' => 'required',
+                'visible' => 'required|integer',
+                'date' => 'required',
+                'commentbox' => 'required|integer',
+                'mealaname' => 'required',
+                'mealavisible' => 'required|integer',
+                'mealaprice' => 'required|numeric',
+                'mealbname' => 'required',
+                'mealbvisible' => 'required|boolean',
+                'mealbprice' => 'required|numeric',
+                'mealcname' => 'required',
+                'mealcvisible' => 'required|integer',
+                'mealcprice' => 'required|numeric',
+                'mealdname' => 'required',
+                'mealdvisible' => 'required|integer',
+                'mealdprice' => 'required|numeric',
+            ));
+
+            if ($data = $this->gump->run($data)) {
+                $service->code = $data['code'];
+                $service->name = $data['name'];
+                $service->description = $data['description'];
+                $service->visible = $data['visible'];
+                $dp = date_parse_from_format('d/m/Y', $data['date']);
+                $service->date = $dp['year'] . '-' . $dp['month'] . '-' . $dp['day'];
+                $service->commentbox = $data['commentbox'];
+                $service->mealaname = $data['mealaname'];
+                $service->mealavisible = $data['mealavisible'];
+                $service->mealaprice = $data['mealaprice'];
+                $service->mealbname = $data['mealbname'];
+                $service->mealbvisible = $data['mealbvisible'];
+                $service->mealbprice = $data['mealbprice'];
+                $service->mealcname = $data['mealcname'];
+                $service->mealcvisible = $data['mealcvisible'];
+                $service->mealcprice = $data['mealcprice'];
+                $service->mealdname = $data['mealdname'];
+                $service->mealdvisible = $data['mealdvisible'];
+                $service->mealdprice = $data['mealdprice'];
+                $service->save();
+                $id = $service->id();
+                $this->redirect('service/show/' . $id);
+            } else {
+                $errors = $this->gump->get_readable_errors(true);
+            }
+
+            //echo "<pre>"; var_dump($errors); die;
         }
-
-        //$editForm = $this->createForm(new ServiceType(), $entity);
 
         $this->View('service/edit.html.twig', array(
             'service'      => $service,
-            //'edit_form'   => $editForm->createView(),
             'serviceid' => $id,
-        ));
-    }
-
-    /**
-     * Edits an existing Service entity.
-     */
-    public function updateAction(Request $request, $id)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        $entity = $em->getRepository('SRPSBookingBundle:Service')->find($id);
-
-        if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Service entity.');
-        }
-
-        $editForm = $this->createForm(new ServiceType(), $entity);
-        $editForm->bind($request);
-
-        if ($editForm->isValid()) {
-            $em->persist($entity);
-            $em->flush();
-
-            return $this->redirect($this->generateUrl('admin_service_show', array('id' => $id)));
-        }
-
-        return $this->render('SRPSBookingBundle:Service:edit.html.twig', array(
-            'entity'      => $entity,
-            //'destinations' => $destinations,
-            'edit_form'   => $editForm->createView(),
-            'serviceid' => $id,
+            'errors' => $errors
         ));
     }
 

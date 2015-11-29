@@ -31,34 +31,35 @@ class coreForm {
     
     public function text($name, $label, $value, $required=false, $attrs=null) {
         $id = $name . 'Text';
-        $reqclass = $required ? 'has-feedback has-warning' : '';
+        $reqclass = $required ? 'form-required' : '';
         echo '<div class="form-group '.$reqclass.'">';
         if ($label) {
             echo '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
         }
         echo '    <div class="col-sm-8">';
-        if ($required) {
-            echo '    <span class="glyphicon glyphicon-asterisk form-control-feedback"></span>';
-        }
         echo '    <input type="text" class="form-control input-sm" name="'.$name.'" id="'.$id.'" value="'.$value.'" '.
             $this->attributes($attrs).'/>';
 
         echo '</div></div>';
     }
 
+    /**
+     * @param $name
+     * @param $label
+     * @param $date Probably in MySQL yyyy-mm-dd format
+     * @param bool|false $required
+     * @param null $attrs
+     */
     public function date($name, $label, $date, $required=false, $attrs=null) {
         $timestamp = strtotime($date);
         $localdate = date('d/m/Y', $timestamp);
         $id = $name . 'Date';
-        $reqclass = $required ? 'has-feedback has-warning' : '';
+        $reqclass = $required ? 'form-required' : '';
         echo '<div class="form-group '.$reqclass.'">';
         if ($label) {
             echo '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
         }
         echo '    <div class="col-sm-8">';
-        if ($required) {
-            echo '    <span class="glyphicon glyphicon-asterisk form-control-feedback"></span>';
-        }
         echo '    <input type="text" class="form-control input-sm datepicker" name="'.$name.'" id="'.$id.'" value="'.$localdate.'" '.
             $this->attributes($attrs).'/>';
 
@@ -67,15 +68,12 @@ class coreForm {
 
     public function textarea($name, $label, $value, $required=false, $attrs=null) {
         $id = $name . 'Textarea';
-        $reqclass = $required ? 'has-feedback has-warning' : '';
+        $reqclass = $required ? 'form-required' : '';
         echo '<div class="form-group '.$reqclass.'">';
         if ($label) {
             echo '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
         }
         echo '    <div class="col-sm-8">';
-        if ($required) {
-            echo '    <span class="glyphicon glyphicon-asterisk form-control-feedback"></span>';
-        }
         echo '    <textarea class="form-control input-sm" name="'.$name.'" id="'.$id.'" '.$this->attributes($attrs).'/>';
         echo $value;
         echo '    </textarea>';

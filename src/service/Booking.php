@@ -26,6 +26,35 @@ class Booking
     }
 
     /**
+     * Create new Service
+     */
+    public function createService() {
+        $service = \ORM::for_table('Service')->create();
+        $service->code = '';
+        $service->name = '';
+        $service->description = '';
+        $service->visible = true;
+        $service->date = date('Y-m-d', time());
+        $service->mealaname = 'Breakfast';
+        $service->mealbname = 'Lunch';
+        $service->mealcname = 'Dinner';
+        $service->mealdname = 'Not used';
+        $service->mealaprice = 0;
+        $service->mealbprice = 0;
+        $service->mealcprice = 0;
+        $service->mealdprice = 0;
+        $service->mealavisible = 0;
+        $service->mealbvisible = 0;
+        $service->mealcvisible = 0;
+        $service->mealdvisible = 0;
+        $service->singlesupplement = 10.00;
+        $service->maxparty = 16;
+        $service->commentbox = false;
+
+        return $service;
+    }
+
+    /**
      * Is destination used?
      * Checks if destination can be deleted
      * @param object $destination

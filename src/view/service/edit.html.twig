@@ -7,7 +7,13 @@
 {% block content %}
     <h2>Service edit</h2>
 
-    <form id="service-edit-form" class="form-horizontal" action="{{ path('service/update', service.id) }}" method="post" >
+    {% if errors %}
+        <div class="alert alert-error">
+            {{ errors }}
+        </div>
+    {% endif %}
+
+    <form id="service-edit-form" class="form-horizontal" action="{{ path('service/edit', service.id) }}" method="post" >
         {{ form_text('code', 'Code', service.code, true) }}
         {{ form_text('name', 'Name', service.name, true) }}
         {{ form_textarea('description', 'Description', service.description, true, {'cols': '40', 'rows': '8'}) }}
@@ -29,7 +35,7 @@
                 <tr>
                     <th class="lead">A</th>
                     <td>{{ form_text('mealaname', '', service.mealaname, true) }}</td>
-                    <td>{{ form_yesno('mealavisible', '', service.mealavisible, true) }}</td>
+                    <td>{{ form_yesno('mealavisible', '', service.mealavisible) }}</td>
                     <td>{{ form_text('mealaprice', '', service.mealaprice) }}</td>
                 </tr>
                 <tr>
@@ -59,15 +65,6 @@
         </div>
     </form>
 
-    {#
-    <button class ="btn btn-primary" onclick="$('#service-edit-form').submit();">
-        Save changes
-    </button>
-    <a class="btn btn-warning" href="{{ path('service/show', service.id) }}">
-        Cancel
-    </a>
-    #}
-
 {% endblock content %}
 
 {%block javascripts %}
@@ -79,6 +76,7 @@
             autoclose: true
         });
         $('#service-edit-form').validate({
+            errorClass: "validateError",
             rules: {
                 code: {
                     required: true

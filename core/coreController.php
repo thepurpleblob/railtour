@@ -171,7 +171,10 @@ class coreController {
     /**
      * Redirect to some other location
      */
-    public function redirect($url) {
+    public function redirect($path) {
+        global $CFG;
+
+        $url = $CFG->www . '/index.php/' . $path;
         header("Location: $url");
         die;
     }

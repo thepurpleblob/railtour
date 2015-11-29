@@ -6,17 +6,6 @@
         <p><i>Welcome {{ app.user.username }} (<a href="{{  path('user/logout') }}">logout</a>)</i></p>
     {% endif %}
     
-    <h4>Filter</h4>
-    <form id="services_filter_form" class="form-horizontal" action="{{ path('service/index') }}"
-        novalidate="novalidate" method="post">
-        <label>Tour season</label>
-        <select id="services_filter_year" name="filter_year">
-            {% for year in years %}
-                <option {{ year==filteryear ? 'selected="selected"' : '' }}>{{ year }}</option>
-            {% endfor %}    
-        </select>
-    </form>
-    
     <ul id="adminmenu">
         {% if app.user.role == 'ROLE_ADMIN' %}
             <li>
@@ -30,6 +19,17 @@
 
 {% block content %}
     <h2>Railtour Services</h2>
+
+    <h4>Filter</h4>
+    <form id="services_filter_form" class="form-horizontal" action="{{ path('service/index') }}"
+          novalidate="novalidate" method="post">
+        <label>Tour season</label>
+        <select id="services_filter_year" name="filter_year">
+            {% for year in years %}
+                <option {{ year==filteryear ? 'selected="selected"' : '' }}>{{ year }}</option>
+            {% endfor %}
+        </select>
+    </form>
 
     <table class="table table-striped">
         <thead>
@@ -49,15 +49,15 @@
                     <td>{{ entity.visible ? 'Yes' : 'No' }}</td>
                     <td>{% if entity.date %}{{ entity.date|date('d/m/Y') }}{% endif %}</td>
                     <td>
-                        <a class="btn btn-small btn-success" href="{{ path('service/show', entity.id) }}">show</a>
-                        <a class="btn btn-small" href="{{  path('limits/edit', entity.id) }}">Limits</a>
+                        <a class="btn btn-sm btn-success" href="{{ path('service/show', entity.id) }}">show</a>
+                        <a class="btn btn-sm btn-primary" href="{{  path('limits/edit', entity.id) }}">Limits</a>
                         {% if entity.visible and enablebooking %}
-                            <a class="btn btn-small btn-info" href="{{ path('booking/index', entity.code) }}">Booking</a>
+                            <a class="btn btn-sm btn-info" href="{{ path('booking/index', entity.code) }}">Booking</a>
                         {% else %}
-                            <a class="btn btn-small btn-info disabled">Booking</a>
+                            <a class="btn btn-sm btn-info disabled">Booking</a>
                         {% endif %}
-                        <a class="btn btn-small btn-warning" href="{{ path('report/list', entity.id) }}">Report</a>
-                        <a class="btn btn-small btn-warning" href="{{ path('report/export', entity.id) }}">Export</a>
+                        <a class="btn btn-sm btn-warning" href="{{ path('report/list', entity.id) }}">Report</a>
+                        <a class="btn btn-sm btn-warning" href="{{ path('report/export', entity.id) }}">Export</a>
                     </td>
                 </tr>
         {% endfor %}
@@ -70,9 +70,9 @@
             </div>
         {% endif %}
 
-        {% if app.user.role == 'ROLE_ADMIN' %}
+        {% if system.userrole == 'ROLE_ADMIN' %}
             <div class="btn-group">
-                <a class="btn btn-primary" href="{{ path('service/new') }}">
+                <a class="btn btn-primary" href="{{ path('service/edit') }}">
                     Add a new service
                 </a>
             </div>
