@@ -160,6 +160,35 @@ class DestinationController extends coreController
             throw $this->createNotFoundException('Unable to find Destination entity.');
         }
 
+        // hopefully no errors
+        $errors = null;
+
+        // anything submitted?
+        if ($data = $this->getRequest()) {
+
+            // Cancel?
+            if (!empty($data['cancel'])) {
+                $this->redirect('destination/index/' . $serviceid);
+            }
+
+            // Validate
+            $this->gump->validation_rules(array(
+                'crs' => 'required',
+                'name' => 'required',
+                'description' => 'required',
+            ));
+            if ($data = $this->gump->run($data)) {
+                $destination->crs = $data['crs'];
+                $destination->name = $data['name'];
+                $destination->description = $data['description'];
+                $destination->save();
+                $id = $destination->id();
+                $this->redirect('destination/index/' . $serviceid);
+            } else {
+                $errors = $this->gump->get_readable_errors(true);
+            }
+        }
+
         $this->View('destination/edit.html.twig', array(
             'destination' => $destination,
             'service' => $service,
@@ -242,18 +271,16 @@ class DestinationController extends coreController
      * Ajax function to find name from crs
      */
     public function ajaxAction() {
-       $em = $this->getDoctrine()->getManager();
 
        // Get post variable for CRS
        $crs = $_POST['crstyped'];
 
        // Attempt to find in db
-       $station = $em->getRepository('SRPSBookingBundle:Station')
-           ->findOneByCrs($crs);
+       $station = \ORM::forTable('Station')->where('crs', $crs)->findOne();
        if ($station) {
-           return new Response($station->getName());
+           echo $station->name;
        } else {
-           return new Response('');
+           echo '';
        }
     }
 }

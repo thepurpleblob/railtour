@@ -218,14 +218,8 @@ class ServiceController extends coreController
     public function installAction() {
 
         // Install the list of crs codes and stations
-        $stations = $this->get('srps_stations');
+        $stations = $this->getService('Stations');
 
-        if ($stations->installStations()) {
-            return new Response("<p>The Stations list was installed</p>");
-        }
-        else {
-            return new Response("<p>The Stations list is already populated. No action taken</p>");
-        }
 
     }
 }

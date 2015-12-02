@@ -1,34 +1,24 @@
 <?php
 
-namespace SRPS\BookingBundle\Service;
+namespace thepurpleblob\railtour\service;
 
-use SRPS\BookingBundle\Entity\Station;
 
 class Stations
 {
 
-    protected $em;
-
-    public function __construct($em) {
-        $this->em = $em;
-    }
-
     public function installStations() {
-        $em = $this->em;
 
         // check if table is populated
-        $stations = $em->getRepository('SRPSBookingBundle:Station')
-            ->findAll();
+        $stations = \ORM::forTable('Station')->findMany();
 
         // If it's empty then fill it up
         if (!$stations) {
             $stops = $this->getStations();
             foreach ($stops as $crs => $name) {
-                $station = new Station();
-                $station->setCrs($crs);
-                $station->setName($name);
-                $em->persist($station);
-                $em->flush();
+                $station = \ORM::forTable('Station')->create();
+                $station->crs = $crs;
+                $station->name = $name;
+                $station->save();
             }
             return true;
         }
