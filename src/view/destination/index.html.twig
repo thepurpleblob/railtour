@@ -1,0 +1,42 @@
+{% extends 'admin/admin.html.twig' %}
+
+{% block content %}
+    <h3>Destinations</h3>
+    <h4>{{ service.name }}</h4>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>CRS</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for destination in destinations %}
+                <tr>
+                    <td>{{ destination.name }}</td>
+                    <td>{{ destination.crs }}</td>
+                    <td>{{ destination.description | raw }}</td>
+                    <td>
+                        <a class="btn btn-sm btn-warning" href="{{ path('destination/edit', { 'id': destination.id }) }}">Edit</a>
+                        {% if entity.used == 0 %}
+                            <a class="btn btn-sm btn-danger" href="{{ path('destination/delete', { 'id': destination.id }) }}">Delete</a>
+                        {% else %}
+                            <a class="btn btn-danger disabled">Delete</a>
+                        {% endif %}
+                    </td>
+                </tr>
+        {% endfor %}
+            </tbody>
+        </table>
+
+        <div>
+            <a class="btn btn-primary" href="{{ path('destination/edit', { 'serviceid': service.id }) }}">
+                Add a new destination
+            </a>
+            <a class="btn btn-warning" href="{{ path('service/show', { 'serviceid': service.id }) }}">
+                Back
+            </a>
+        </div>
+{% endblock content %}

@@ -1,5 +1,11 @@
 body {
+    font-family: 'Lato', sans-serif;
     padding: 10px;
+    background-color: #DBE7F3;
+}
+
+#maincontent {
+    background-color: #ffffff;
 }
 
 label.validateError {
@@ -10,6 +16,16 @@ label.validateError {
 ul#adminmenu {
     list-style-type: none;
     color: red;
+}
+
+#services_filter_form, #services_filter_form label {
+    font-size: 120%;
+    font-weight: normal;
+}
+
+#srpsheader .srpsfont {
+    font-size: 30px;
+    padding: 10px 0 0 10px;
 }
 
 #adminmenu li {

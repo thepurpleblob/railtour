@@ -21,7 +21,12 @@ class ServiceController extends coreController
 
         // submitted year
         $thisyear = date('Y');
-        $filteryear = $this->getParam('filter_year', $thisyear);
+        $filteryear = $this->getParam('filter_year', 0);
+        if ($filteryear) {
+            $this->setSession('filteryear', $filteryear);
+        } else {
+            $filteryear = $this->getFromSession('filteryear', $thisyear);
+        }
         
         // get possible years and filter results
         // shouldn't have to do this in PHP but Doctrine sucks badly!
@@ -44,11 +49,31 @@ class ServiceController extends coreController
         $enablebooking = $CFG->enablebooking;
 
         $this->View('service/index.html.twig',
-            array('entities' => $services,
+            array('services' => $services,
                   'enablebooking' => $enablebooking,
                   'years' => $years,
                   'filteryear' => $filteryear,
                 ));
+    }
+
+    /**
+     * flip service visibility
+     * @param $id service id
+     */
+    public function visibleAction($id, $visible) {
+        $service = \ORM::forTable('Service')->findOne($id);
+
+        if (!$service) {
+            throw $this->Exception('Unable to find Service entity.');
+        }
+
+        if (($visible != 1) && ($visible != 0)) {
+            throw $this->Exception('visible parameter must be 0 or 1');
+        }
+        $service->visible = $visible;
+        $service->save();
+
+        $this->redirect('service/index');
     }
 
     /**

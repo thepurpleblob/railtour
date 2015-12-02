@@ -1,26 +1,8 @@
 {% extends 'admin/admin.html.twig' %}
 
-{% block sidebar %}
-
-    {% if app.user %}
-        <p><i>Welcome {{ app.user.username }} (<a href="{{  path('user/logout') }}">logout</a>)</i></p>
-    {% endif %}
-    
-    <ul id="adminmenu">
-        {% if app.user.role == 'ROLE_ADMIN' %}
-            <li>
-                <a class="btn btn-success" href="{{ path('user/index') }}">
-                    User admin
-                </a>
-            </li> 
-        {% endif %}
-    </ul>    
-{% endblock sidebar %}
-
 {% block content %}
-    <h2>Railtour Services</h2>
+    <h3>Railtour Services</h3>
 
-    <h4>Filter</h4>
     <form id="services_filter_form" class="form-horizontal" action="{{ path('service/index') }}"
           novalidate="novalidate" method="post">
         <label>Tour season</label>
@@ -42,22 +24,28 @@
             </tr>
         </thead>
         <tbody>
-        {% for entity in entities %}
+        {% for service in services %}
                 <tr>
-                    <td><strong>{{ entity.code }}</strong></td>
-                    <td>{{ entity.name }}</td>
-                    <td>{{ entity.visible ? 'Yes' : 'No' }}</td>
-                    <td>{% if entity.date %}{{ entity.date|date('d/m/Y') }}{% endif %}</td>
+                    <td><strong>{{ service.code }}</strong></td>
+                    <td>{{ service.name }}</td>
                     <td>
-                        <a class="btn btn-sm btn-success" href="{{ path('service/show', entity.id) }}">show</a>
-                        <a class="btn btn-sm btn-primary" href="{{  path('limits/edit', entity.id) }}">Limits</a>
-                        {% if entity.visible and enablebooking %}
-                            <a class="btn btn-sm btn-info" href="{{ path('booking/index', entity.code) }}">Booking</a>
+                        {% if service.visible %}
+                            <a href="{{ path('service/visible', [service.id, 0]) }}">Yes</a>
+                        {% else %}
+                            <a href="{{ path('service/visible', [service.id, 1]) }}">No</a>
+                        {% endif %}
+                    </td>
+                    <td>{% if service.date %}{{ service.date|date('d/m/Y') }}{% endif %}</td>
+                    <td>
+                        <a class="btn btn-sm btn-success" href="{{ path('service/show', service.id) }}">show</a>
+                        <a class="btn btn-sm btn-primary" href="{{  path('limits/edit', service.id) }}">Limits</a>
+                        {% if service.visible and enablebooking %}
+                            <a class="btn btn-sm btn-info" href="{{ path('booking/index', service.code) }}">Booking</a>
                         {% else %}
                             <a class="btn btn-sm btn-info disabled">Booking</a>
                         {% endif %}
-                        <a class="btn btn-sm btn-warning" href="{{ path('report/list', entity.id) }}">Report</a>
-                        <a class="btn btn-sm btn-warning" href="{{ path('report/export', entity.id) }}">Export</a>
+                        <a class="btn btn-sm btn-warning" href="{{ path('report/list', service.id) }}">Report</a>
+                        <a class="btn btn-sm btn-warning" href="{{ path('report/export', service.id) }}">Export</a>
                     </td>
                 </tr>
         {% endfor %}

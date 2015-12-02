@@ -226,6 +226,15 @@ class coreController {
     }
 
     /**
+     * Set a value in session
+     * @param $name
+     * @param $value
+     */
+    public function setSession($name, $value) {
+        $_SESSION[$name] = $value;
+    }
+
+    /**
      * Get service (Model) class (from src/service directory)
      */
     public function getService($name) {

@@ -6,6 +6,21 @@ class Booking
 {
 
     /**
+     * Get/check the service
+     * @param $id
+     * @return mixed
+     */
+    public function Service($id) {
+        $service = \ORM::forTable('Service')->findOne($id);
+
+        if (!$service) {
+            throw $this->Exception('Unable to find Service entity.');
+        }
+
+        return $service;
+    }
+
+    /**
      * Create the table to display price band group
      * @param integer $pricebandgroupid
      */
@@ -61,11 +76,9 @@ class Booking
      * @return boolean true if used
      */
     public function isDestinationUsed($destination) {
-        $em = $this->em;
 
         // find pricebands that specify this destination
-        $pricebands = $em->getRepository('SRPSBookingBundle:Priceband')
-            ->findByDestinationid($destination->getId());
+        $pricebands = \ORM::forTable('Priceband')->where('destinationid', $destination->id)->findMany();
 
         // if there are non then not used
         if (!$pricebands) {
@@ -74,8 +87,8 @@ class Booking
 
         // otherwise, all prices MUST be 0
         foreach ($pricebands as $priceband) {
-            if (($priceband->getFirst()>0) or ($priceband->getStandard()>0)
-                    and ($priceband->getChild()>0)) {
+            if (($priceband->first>0) or ($priceband->standard>0)
+                    and ($priceband->child>0)) {
                 return true;
             }
         }

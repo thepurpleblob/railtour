@@ -31,7 +31,12 @@ class twigextension extends \Twig_Extension
         global $CFG;
 
         if ($params) {
-            return $CFG->www . '/index.php/' . $path . '/' . $params;
+            if (is_array($params)) {
+                $extra = implode('/', $params);
+            } else {
+                $extra = $params;
+            }
+            return $CFG->www . '/index.php/' . $path . '/' . $extra;
         } else {
             return $CFG->www . '/index.php/' . $path;
         }
