@@ -198,10 +198,8 @@ class ServiceController extends coreController
                 $id = $service->id();
                 $this->redirect('service/show/' . $id);
             } else {
-                $errors = $this->gump->get_readable_errors(true);
+                $errors = $this->gump->get_readable_errors(false);
             }
-
-            //echo "<pre>"; var_dump($errors); die;
         }
 
         $this->View('service/edit.html.twig', array(

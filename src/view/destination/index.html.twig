@@ -19,7 +19,10 @@
                     <td>{{ destination.crs }}</td>
                     <td>{{ destination.description | raw }}</td>
                     <td>
-                        <a class="btn btn-sm btn-warning" href="{{ path('destination/edit', { 'id': destination.id }) }}">Edit</a>
+                        <a class="btn btn-sm btn-warning" href="{{ path('destination/edit', {
+                            'serviceid': service.id,
+                            'id': destination.id
+                        }) }}">Edit</a>
                         {% if entity.used == 0 %}
                             <a class="btn btn-sm btn-danger" href="{{ path('destination/delete', { 'id': destination.id }) }}">Delete</a>
                         {% else %}
@@ -32,7 +35,7 @@
         </table>
 
         <div>
-            <a class="btn btn-primary" href="{{ path('destination/edit', { 'serviceid': service.id }) }}">
+            <a class="btn btn-primary" href="{{ path('destination/edit', { 'serviceid': service.id, 'id': 0 }) }}">
                 Add a new destination
             </a>
             <a class="btn btn-warning" href="{{ path('service/show', { 'serviceid': service.id }) }}">

@@ -7,12 +7,6 @@
 {% block content %}
     <h3>{{service.name}} ({{ service.code }})</h3>
 
-    {% if errors %}
-        <div class="alert alert-error">
-            {{ errors }}
-        </div>
-    {% endif %}
-
     <form id="service-edit-form" class="form-horizontal" action="{{ path('service/edit', service.id) }}" method="post" >
         {{ form_text('code', 'Code', service.code, true) }}
         {{ form_text('name', 'Name', service.name, true) }}
@@ -58,6 +52,8 @@
                 </tr>
             </tbody>
         </table>
+
+        {{ form_errors(errors) }}
 
         <div>
             <input type="submit" name="submit" value="Save" class="btn btn-primary" />

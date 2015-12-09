@@ -124,6 +124,17 @@ class coreForm {
         $selected = $yes ? 1 : 0;
         $this->select($name, $label, $selected, $options);
     }
+
+    public function errors($errors) {
+        if (!$errors) {
+            return;
+        }
+        echo '<ul class="form-errors">';
+        foreach ($errors as $error) {
+            echo '<li class="form-error">' . $error . '</li>';
+        }
+        echo "</ul>";
+    }
     
     public function hidden($name, $value) {
         echo '<input type="hidden" name="'.$name.'" value="'.$value.'" />';

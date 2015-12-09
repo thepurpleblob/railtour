@@ -24,6 +24,7 @@ class twigextension extends \Twig_Extension
             'form_date' => new \Twig_Function_Function('\thepurpleblob\core\twigextension::form_date', array('needs_context' => true)),
             'form_textarea' => new \Twig_Function_Function('\thepurpleblob\core\twigextension::form_textarea', array('needs_context' => true)),
             'form_yesno' => new \Twig_Function_Function('\thepurpleblob\core\twigextension::form_yesno', array('needs_context' => true)),
+            'form_errors' => new \Twig_Function_Function('\thepurpleblob\core\twigextension::form_errors', array('needs_context' => true)),
         );
     }
 
@@ -66,6 +67,11 @@ class twigextension extends \Twig_Extension
     public static function form_yesno($context, $name, $label, $yes) {
         $form = $context['form'];
         $form->yesno($name, $label, $yes);
+    }
+
+    public static function form_errors($context, $errors) {
+        $form = $context['form'];
+        $form->errors($errors);
     }
 
 }

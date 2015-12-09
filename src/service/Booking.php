@@ -70,6 +70,20 @@ class Booking
     }
 
     /**
+     * Create new Destination
+     */
+    public function createDestination($serviceid) {
+        $destination = \ORM::for_table('Destination')->create();
+        $destination->serviceid = $serviceid;
+        $destination->name = '';
+        $destination->crs = '';
+        $destination->description = '';
+        $destination->bookinglimit = 0;
+
+        return $destination;
+    }
+
+    /**
      * Is destination used?
      * Checks if destination can be deleted
      * @param object $destination
