@@ -100,7 +100,7 @@ class ServiceController extends coreController
         $booking = $this->getService('Booking');
         foreach ($pricebandgroups as $band) {
             $pricebandgroupid = $band->id;
-            $bandtable = $booking->createPricebandTable($pricebandgroupid);
+            $bandtable = $booking->getPricebands($id, $pricebandgroupid);
             $band->bandtable = $bandtable;
         }
 
@@ -141,7 +141,6 @@ class ServiceController extends coreController
 
         // anything submitted?
         if ($data = $this->getRequest()) {
-            //echo "<pre>"; var_dump($data); die;
 
             // Cancel?
             if (!empty($data['cancel'])) {

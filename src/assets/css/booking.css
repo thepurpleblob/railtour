@@ -6,6 +6,7 @@ body {
 
 #maincontent {
     background-color: #ffffff;
+    padding-bottom: 20px;
 }
 
 label.validateError {

@@ -1,0 +1,48 @@
+{% extends 'admin/admin.html.twig' %}
+
+{% block content %}
+
+    <h3>Edit pricebands</h3>
+    <h4>{{ service.name }}</h4>
+
+    <form id="priceband-edit-form" class="form-horizontal" action="{{ path('priceband/edit', {
+        'serviceid': serviceid,
+        'pricebandgroupid': pricebandgroup.id}) }}" method="post">
+        
+        <div>
+            {{ form_text('name', 'Name', pricebandgroup.name) }}
+        </div>        
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Destination</th>
+                    <th>First</th>
+                    <th>Standard</th>
+                    <th>Child</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% set count = 1 %}
+            {% for priceband in pricebands %}
+                <tr>
+                    <td>{{ priceband.name }}</td>
+                    <td>{{ form_text('first_' ~ count, '', priceband.first) }}</td>
+                    <td>{{ form_text('standard_' ~ count, '', priceband.standard) }}</td>
+                    <td>{{ form_text('child_' ~ count, '', priceband.child) }}</td>
+                </tr>
+                {% set count = count + 1 %}
+            {% endfor %}        
+            </tbody>
+        </table>
+
+        {{ form_errors(errors) }}
+
+        <div>
+            <input type="submit" name="submit" value="Save" class="btn btn-primary" />
+            <input type="submit" name="cancel" value="Cancel" class="btn btn-warning" />
+        </div>
+    </form>
+
+{% endblock content %}
+ 

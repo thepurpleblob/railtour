@@ -1,0 +1,76 @@
+{% extends 'admin/admin.html.twig' %}
+
+{% block content %}
+    <h2>Price bands</h2>
+    <h4>{{ service.name }}</h4>
+
+    {% if destinations is empty %}
+        <div class="alert alert-block alert-error">
+            There are no destinations. You need to create at least one destination first.
+        </div>
+    {% else %}
+
+        {% if pricebandgroups is empty %}
+            <div class="alert alert-block alert-warning">
+                No price bands have been defined.
+            </div>
+        {% endif %}
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            {% for pricebandgroup in pricebandgroups %}
+                    <tr>
+                        <td><b>{{ pricebandgroup.name }}</b></td>
+                        <td>
+                            <a class="btn btn-warning" href="{{ path('priceband/edit', {
+                                'serviceid': service.id,
+                                'id': pricebandgroup.id }) }}">Edit</a>
+                            {% if band.used == 0 %}
+                                <a class="btn btn-danger" href="{{ path('priceband/delete', { 'pricebandgroupid': pricebandgroup.id }) }}">Delete</a>
+                            {% else %}
+                                <a class="btn btn-danger disabled">Delete</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <table class="table table-condensed table-priceband">
+                                <thead>
+                                    <tr>
+                                        <th>Destination</th>
+                                        <th>First</th>
+                                        <th>Standard</th>
+                                        <th>Child</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for priceband in pricebandgroup.bandtable %}
+                                    <tr>
+                                        <td>{{ priceband.name }}</td>
+                                        <td>&pound;{{ priceband.first }}</td>
+                                        <td>&pound;{{ priceband.standard }}</td>
+                                        <td>&pound;{{ priceband.child }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <div>
+            <a class="btn btn-primary" href="{{ path('priceband/edit', [service.id, 0]) }}">Add a new price band</a>
+            &nbsp;
+            <a class="btn btn-warning" href="{{ path('service/show', service.id) }}">Close</a>
+        </div>
+    {% endif %}
+{% endblock content %}

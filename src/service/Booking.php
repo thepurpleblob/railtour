@@ -21,26 +21,6 @@ class Booking
     }
 
     /**
-     * Create the table to display price band group
-     * @param integer $pricebandgroupid
-     */
-    public function createPricebandTable($pricebandgroupid) {
-
-        // get the basic price bands
-        $pricebands = \ORM::forTable('Priceband')->where('pricebandgroupid', $pricebandgroupid)->findMany();
-
-        // iterate over these and get destinations
-        // (very inefficiently)
-        foreach ($pricebands as $priceband) {
-            $destinationid = $priceband->destinationid;
-            $destination = \ORM::forTable('Destination')->findOne($destinationid);
-            $priceband->destination = $destination->nameame;
-        }
-
-        return $pricebands;
-    }
-
-    /**
      * Create new Service
      */
     public function createService() {
@@ -73,7 +53,7 @@ class Booking
      * Create new Destination
      */
     public function createDestination($serviceid) {
-        $destination = \ORM::for_table('Destination')->create();
+        $destination = \ORM::forTable('Destination')->create();
         $destination->serviceid = $serviceid;
         $destination->name = '';
         $destination->crs = '';
@@ -81,6 +61,75 @@ class Booking
         $destination->bookinglimit = 0;
 
         return $destination;
+    }
+
+    /**
+     * Create new pricebandgroup
+     */
+    public function createPricebandgroup($serviceid) {
+        $pricebandgroup = \ORM::forTable('Pricebandgroup')->create();
+        $pricebandgroup->serviceid = $serviceid;
+        $pricebandgroup->name = '';
+
+        return $pricebandgroup;
+    }
+
+    /**
+     * Get pricebands ordered by destinations (create any new missing ones)
+     */
+    public function getPricebands($serviceid, $pricebandgroupid, $save=true) {
+        $destinations = \ORM::forTable('Destination')->where('serviceid', $serviceid)->order_by_asc('destination.name')->findMany();
+        if (!$destinations) {
+            throw new \Exception('No destinations found for serviceid = ' . $serviceid);
+        }
+        $pricebands = array();
+        foreach ($destinations as $destination) {
+            $priceband = \ORM::forTable('Priceband')->where('destinationid', $destination->id)->findOne();
+            if (!$priceband) {
+                $priceband = \ORM::forTable('Priceband')->create();
+                $priceband->serviceid = $serviceid;
+                $priceband->pricebandgroupid = $pricebandgroupid;
+                $priceband->destinationid = $destination->id;
+                $priceband->first = 0;
+                $priceband->standard = 0;
+                $priceband->child = 0;
+
+                // In some cases we don't want to create it (yet)
+                if ($save) {
+                    $priceband->save();
+                }
+            }
+
+            // Add the destination name as a spurious field
+            $priceband->name = $destination->name;
+            $pricebands[] = $priceband;
+        }
+
+        return $pricebands;
+    }
+
+    /**
+     * Create new pricebands (as required)
+     */
+    public function createPricebands($serviceid) {
+        $pricebands = array();
+        $destinations = \ORM::forTable('Destination')->where('serviceid', $serviceid)->order_by_asc('destination.name')->findMany();
+        if (!$destinations) {
+            throw new \Exception('No destinations found for serviceid = ' . $serviceid);
+        }
+
+        foreach ($destinations as $destination) {
+            $priceband = \ORM::forTable('Priceband')->create();
+            $priceband->name = $destination->name;
+            $priceband->serviceid = $serviceid;
+            $priceband->destinationid = $destination->id;
+            $priceband->first = 0;
+            $priceband->standard = 0;
+            $priceband->child = 0;
+            $pricebands[] = $priceband;
+        }
+
+        return $pricebands;
     }
 
     /**
@@ -116,11 +165,9 @@ class Booking
      * @param object $pricebandgroup
      */
     public function isPricebandUsed($pricebandgroup) {
-        $em = $this->em;
 
         // find joining stations that specify this group
-        $joinings = $em->getRepository('SRPSBookingBundle:Joining')
-            ->findByPricebandgroupid($pricebandgroup->getId());
+        $joinings = \ORM::forTable('Joining')->where('pricebandgroupid', $pricebandgroup->id)->findMany();
 
         // if there are any then it is used
         if ($joinings) {

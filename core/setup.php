@@ -6,7 +6,7 @@ use thepurpleblob\core\coreController;
  * Custom exception handler
  */
 function exception_handler(Exception $e) {
-    echo "<p>$e</p>"; die;
+    echo "<pre>$e</pre>"; die;
     //$controller = new coreController(true);
     //$controller->View('header');
     //$controller->View('exception', array(
