@@ -124,30 +124,17 @@ class PricebandController extends coreController
      */
     public function deleteAction($pricebandgroupid)
     {
-
-        $em = $this->getDoctrine()->getManager();
         
         // Remove pricebands associated with this group
-        $pricebands = $em->getRepository('SRPSBookingBundle:Priceband')
-            ->findByPricebandgroupid($pricebandgroupid);
-        if ($pricebands) {
-            foreach ($pricebands as $priceband)  {
-                $em->remove($priceband);
-            }  
-            $em->flush();
-        }    
+        \ORM::forTable('Priceband')->where('pricebandgroupid', $pricebandgroupid)->deleteMany();
         
         // Remove pricebandgroup
-        $pricebandgroup = $em->getRepository('SRPSBookingBundle:Pricebandgroup')
-            ->find($pricebandgroupid);
-        if ($pricebandgroup) {
-            $serviceid = $pricebandgroup->getServiceid();
-            $em->remove($pricebandgroup);
-            $em->flush();
-            
-            return $this->redirect($this->generateUrl('admin_priceband', array('serviceid' => $serviceid)));          
+        $pricebandgroup = \ORM::forTable('Pricebandgroup')->findOne($pricebandgroupid);
+        if (!$pricebandgroup) {
+            throw new \Exception('No price band group found for id = ' . $pricebandgroupid);
         }
-
-        return $this->redirect($this->generateUrl('admin_service'));
+        $serviceid = $pricebandgroup->serviceid;
+        $pricebandgroup->delete();
+        $this->redirect('priceband/index/' . $serviceid);
     }
 }

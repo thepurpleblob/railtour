@@ -29,7 +29,6 @@ class ServiceController extends coreController
         }
         
         // get possible years and filter results
-        // shouldn't have to do this in PHP but Doctrine sucks badly!
         $services = array();
         $years = array();
         $years['All'] = 'All';        
