@@ -42,6 +42,23 @@ class PricebandController extends coreController
     }
 
     /**
+     * Create rules for javascript validate
+     *
+     */
+    private function js_validate_rules($pricebands) {
+        $count = 1;
+        $rules = array();
+        $rules[] = 'name: {required: true}';
+        foreach ($pricebands as $priceband) {
+            $rules[] = "first_$count: {required: true, number: true}";
+            $rules[] = "standard_$count: {required: true, number: true}";
+            $rules[] = "child_$count: {required: true, number: true}";
+            $count++;
+        }
+        return implode(', ', $rules);
+    }
+
+    /**
      * Displays a form to edit a Priceband entity.
      */
     public function editAction($serviceid, $id)
@@ -114,6 +131,7 @@ class PricebandController extends coreController
             'pricebands' => $pricebands,
             'service' => $service,
             'serviceid' => $serviceid,
+            'jsrules' => $this->js_validate_rules($pricebands),
             'errors' => $errors,
         ));        
     }

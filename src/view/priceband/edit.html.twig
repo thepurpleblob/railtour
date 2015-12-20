@@ -45,4 +45,17 @@
     </form>
 
 {% endblock content %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+
+        $('#priceband-edit-form').validate({
+            errorClass: "validateError",
+            rules: {
+                {{ jsrules }}
+            }
+        });
+    </script>
+{% endblock javascripts %}
  
