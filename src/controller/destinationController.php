@@ -114,9 +114,10 @@ class DestinationController extends coreController
             $destination->delete();
             $this->redirect('destination/index/' . $serviceid);
             return;
+        } else {
+            throw new \Exception('Destination record not found for id = ' . $id);
         }
 
-        return $this->redirect($this->generateUrl('admin_service'));
     }
 
     /**

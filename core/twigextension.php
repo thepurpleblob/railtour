@@ -25,6 +25,7 @@ class twigextension extends \Twig_Extension
             'form_textarea' => new \Twig_Function_Function('\thepurpleblob\core\twigextension::form_textarea', array('needs_context' => true)),
             'form_yesno' => new \Twig_Function_Function('\thepurpleblob\core\twigextension::form_yesno', array('needs_context' => true)),
             'form_errors' => new \Twig_Function_Function('\thepurpleblob\core\twigextension::form_errors', array('needs_context' => true)),
+            'form_select' => new \Twig_Function_Function('\thepurpleblob\core\twigextension::form_select', array('needs_context' => true)),
         );
     }
 
@@ -72,6 +73,11 @@ class twigextension extends \Twig_Extension
     public static function form_errors($context, $errors) {
         $form = $context['form'];
         $form->errors($errors);
+    }
+
+    public static function form_select($context, $name, $label, $selected, $options, $choose='', $labelcol=4) {
+        $form = $context['form'];
+        $form->select($name, $label, $selected, $options, $choose='', $labelcol=4);
     }
 
 }

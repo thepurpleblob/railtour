@@ -1,0 +1,69 @@
+{% extends 'admin/admin.html.twig' %}
+
+
+{% block content %}
+    <h3>Joining station edit</h3>
+    <h4>{{ service.name }}</h4>
+
+    <form id="joining-edit-form" class="form-horizontal" action="{{ path('joining/edit', [serviceid, joining.id]) }}"
+          method="post">
+        {{ form_text('crs', 'CRS', joining.crs) }}
+        {{ form_text('station', 'Station name', joining.station) }}
+        {{ form_select('pricebandgroupid', 'Priceband', form.pricebandgroupid, pricebandgroupoptions) }}
+
+        {% if service.mealavisible %}
+            {{ form_yesno('meala', service.mealaname ~ ' available from this station?', joining.meala) }}
+        {% endif %}
+        {% if service.mealbvisible %}
+            {{ form_yesno('mealb', service.mealbname ~ ' available from this station?', joining.mealb) }}
+        {% endif %}
+        {% if service.mealcvisible %}
+            {{ form_yesno('mealc', service.mealcname ~ ' available from this station?', joining.mealc) }}
+        {% endif %}
+        {% if service.mealdvisible %}
+            {{ form_yesno('meald', service.mealdname ~ ' available from this station?', joining.meald) }}
+        {% endif %}
+
+        {{ form_errors(errors) }}
+
+        <div>
+            <input type="submit" name="submit" value="Save" class="btn btn-primary" />
+            <input type="submit" name="cancel" value="Cancel" class="btn btn-warning" />
+        </div>
+    </form>
+{% endblock content %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        $("#crsText").change(
+            function() {
+                crs = $(this).val();
+                name = $("#stationText").val();
+                //if (!name) {
+                if (true) {
+                    $.ajax({
+                        url: "{{ path('destination/ajax') }}",
+                        data: { 'crstyped': crs },
+                        type: 'post',
+                        success: function(output) {
+                                $("#stationText").val(output);
+                            }
+                    });
+                }
+            }
+        );
+
+        $('#joining-edit-form').validate({
+            errorClass: "validateError",
+            rules: {
+                crs: {
+                    required: true
+                },
+                station: {
+                    required: true
+                }
+            }
+        });
+    </script>
+{% endblock javascripts %}

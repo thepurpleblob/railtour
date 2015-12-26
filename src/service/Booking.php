@@ -75,6 +75,59 @@ class Booking
     }
 
     /**
+     * Create options list for pricebandgroup select dropdown(s)
+     *
+     */
+    public function pricebandgroupOptions($pricebandgroups) {
+        $options = array();
+        foreach ($pricebandgroups as $pricebandgroup) {
+            $options[$pricebandgroup->id] = $pricebandgroup->name;
+        }
+
+        return $options;
+    }
+
+    /**
+     * Create new joining thing
+     */
+    public function createJoining($serviceid, $pricebandgroups) {
+        $joining = \ORM::forTable('Joining')->create();
+        $joining->serviceid = $serviceid;
+        $joining->station = '';
+        $joining->crs = '';
+        $joining->meala = 0;
+        $joining->mealb = 0;
+        $joining->mealc = 0;
+        $joining->meald = 0;
+
+        // find and set to the first pricebandgoup
+        $pricebandgroup = array_shift($pricebandgroups);
+        $joining->pricebandgroupid = $pricebandgroup->id;
+
+        return $joining;
+    }
+
+    /**
+     * Do pricebands exist for service
+     */
+    public function isPricebandsConfigured($serviceid) {
+
+        // presumably we need at least one pricebandgroup
+        $pricebandgroup_count = \ORM::forTable('Pricebandgroup')->where('serviceid', $serviceid)->count();
+        if (!$pricebandgroup_count) {
+            return false;
+        }
+
+        // ...and there must be some pricebands too
+        $priceband_count = \ORM::forTable('Priceband')->where('serviceid', $serviceid)->count();
+        if (!$priceband_count) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Get pricebands ordered by destinations (create any new missing ones)
      */
     public function getPricebands($serviceid, $pricebandgroupid, $save=true) {

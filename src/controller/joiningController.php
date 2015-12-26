@@ -16,32 +16,27 @@ class JoiningController extends coreController
      */
     public function indexAction($serviceid)
     {
+        $booking = $this->getService('Booking');
 
-        $service = $em->getRepository('SRPSBookingBundle:Service')
-            ->find($serviceid);
-
-        $joinings = $em->getRepository('SRPSBookingBundle:Joining')
-            ->findByServiceid($serviceid);
-
-        $pricebands = $em->getRepository('SRPSBookingBundle:Priceband')
-            ->findByServiceid($serviceid);
+        // Fetch basic data
+        $service = $booking->Service($serviceid);
+        $joinings = \ORM::forTable('Joining')->where('serviceid', $serviceid)->findMany();
 
         // add pricebandgroup names
         foreach ($joinings as $joining) {
-            $pricebandgroup = $em->getRepository('SRPSBookingBundle:Pricebandgroup')
-                ->find($joining->getPricebandgroupid());
-            $joining->setPricebandname($pricebandgroup->getName());
+            $pricebandgroup = \ORM::forTable('Pricebandgroup')->findOne($joining->pricebandgroupid);
+            if (!$pricebandgroup) {
+                throw new \Exception('No pricebandgroup found for id = ' . $joining->pricebandgroupid);
+            }
+            $joining->pricebandname = $pricebandgroup->name;
         }
 
-        // We just want to know if the pricebands are set up
-        $setup = !empty($pricebands);
-
-        return $this->render('SRPSBookingBundle:Joining:index.html.twig',
+        return $this->View('joining/index.html.twig',
             array(
                 'joinings' => $joinings,
                 'service' => $service,
                 'serviceid' => $serviceid,
-                'setup' => $setup
+                'setup' => $booking->isPricebandsConfigured($serviceid),
                 ));
     }
 
@@ -74,41 +69,77 @@ class JoiningController extends coreController
     /**
      * Edits an existing Joining entity.
      */
-    public function editAction($serviceid, $joiningid, Request $request)
+    public function editAction($serviceid, $joiningid)
     {
-        $em = $this->getDoctrine()->getManager();
+        $booking = $this->getService('Booking');
+
+        // Fetch basic data
+        $service = $booking->Service($serviceid);
+
+        // Price bands
+        $pricebandgroups = \ORM::forTable('pricebandgroup')->where('serviceid', $serviceid)->findMany();
+        if (!$pricebandgroups) {
+            throw new \Exception('No pricebandgroups found for serviceid = ' . $serviceid);
+        }
+
+        // Find/create joining to edit
         if ($joiningid) {
-            $joining = $em->getRepository('SRPSBookingBundle:Joining')
-                ->find($joiningid);
+            $joining = \ORM::forTable('Joining')->findOne($joiningid);
+            if (!$joining) {
+                throw new \Exception('Unable to find joining, id = ' . $joiningid);
+            }
+            if ($joining->serviceid != $serviceid) {
+                throw new \Exception('Service ID mismatch for joining id = ' . $joiningid . ', service id = ' . $serviceid);
+            }
         } else {
-            $joining = new Joining;
+            $joining = $booking->createJoining($serviceid, $pricebandgroups);
         }
 
-        // Service
-        $service = $em->getRepository('SRPSBookingBundle:Service')
-            ->find($serviceid);
-        $joining->setServiceid($serviceid);
+        // hopefully no errors
+        $errors = null;
 
-        $pricebandgroups = $em->getRepository('SRPSBookingBundle:Pricebandgroup')
-            ->findByServiceid($serviceid);
+        // anything submitted?
+        if ($data = $this->getRequest()) {
 
-        $joiningtype = new JoiningType($pricebandgroups, $service);
-        $editForm = $this->createForm($joiningtype, $joining);
-        $editForm->handleRequest($request);
+            // Cancel?
+            if (!empty($data['cancel'])) {
+                $this->redirect('joining/index/' . $serviceid);
+            }
 
-        if ($editForm->isValid()) {
-            $joining->setCrs(strtoupper($joining->getCrs()));
-            $em->persist($joining);
-            $em->flush();
-
-            return $this->redirect($this->generateUrl('admin_joining', array('serviceid' => $serviceid)));
+            // Validate
+            $this->gump->validation_rules(array(
+                'crs' => 'required',
+                'station' => 'required',
+            ));
+            if ($data = $this->gump->run($data)) {
+                $joining->crs = $data['crs'];
+                $joining->station = $data['station'];
+                $joining->pricebandgroupid = $data['pricebandgroupid'];
+                if (isset($data['meala'])) {
+                    $joining->meala = $data['meala'];
+                }
+                if (isset($data['mealb'])) {
+                    $joining->mealb = $data['mealb'];
+                }
+                if (isset($data['mealc'])) {
+                    $joining->mealc = $data['mealc'];
+                }
+                if (isset($data['meald'])) {
+                    $joining->meald = $data['meald'];
+                }
+                $joining->save();
+                $this->redirect('joining/index/' . $serviceid);
+            }  else {
+                $errors = $this->gump->get_readable_errors();
+            }
         }
 
-        return $this->render('SRPSBookingBundle:Joining:edit.html.twig', array(
+        return $this->View('joining/edit.html.twig', array(
             'joining' => $joining,
-            'form' => $editForm->createView(),
             'service' => $service,
             'serviceid' => $serviceid,
+            'errors' => $errors,
+            'pricebandgroupoptions' => $booking->pricebandgroupOptions($pricebandgroups),
         ));
     }
 
@@ -119,18 +150,14 @@ class JoiningController extends coreController
     public function deleteAction($joiningid)
     {
 
-        $em = $this->getDoctrine()->getManager();
-        $joining = $em->getRepository('SRPSBookingBundle:Joining')
-            ->find($joiningid);
-
-        if ($joining) {
-            $serviceid = $joining->getServiceid();
-            $em->remove($joining);
-            $em->flush();
-
-            return $this->redirect($this->generateUrl('admin_joining', array('serviceid' => $serviceid)));
+        $joining = \ORM::forTable('Joining')->findOne($joiningid);
+        if (!$joining) {
+            throw new \Exception('Unable to find joining, id = ' . $joiningid);
         }
 
-        return $this->redirect($this->generateUrl('admin_service'));
+        $serviceid = $joining->serviceid;
+        $joining->delete();
+
+        $this->redirect('joining/index/' . $serviceid);
     }
 }

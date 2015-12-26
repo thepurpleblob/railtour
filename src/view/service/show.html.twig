@@ -54,170 +54,176 @@
         </tbody>
     </table>
 
-    <h3>Meals</h3>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>&nbsp;</th>
-                <th>Name</th>
-                <th>Visible</th>
-                <th>Price</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <th class="lead">A</th>
-                <td>{{ service.mealaname }}</td>
-                <td>{{ service.mealavisible ? 'Yes' : 'No' }}</td>
-                <td>&pound;{{ service.mealaprice | number_format(2) }}</td>
-            </tr>
-            <tr>
-                <th class="lead">B</th>
-                <td>{{ service.mealbname }}</td>
-                <td>{{ service.mealbvisible ? 'Yes' : 'No' }}</td>
-                <td>&pound;{{ service.mealbprice | number_format(2) }}</td>
-            </tr>
-            <tr>
-                <th class="lead">C</th>
-                <td>{{ service.mealcname }}</td>
-                <td>{{ service.mealcvisible ? 'Yes' : 'No' }}</td>
-                <td>&pound;{{ service.mealcprice | number_format(2) }}</td>
-            </tr>
-            <tr>
-                <th class="lead">D</th>
-                <td>{{ service.mealdname }}</td>
-                <td>{{ service.mealdvisible ? 'Yes' : 'No' }}</td>
-                <td>&pound;{{ service.mealdprice | number_format(2) }}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    {% if system.userrole == 'ROLE_ADMIN' %}
-        <a class="btn btn-warning pull-right" href="{{ path('destination/index', service.id) }}">
-            {% if destinations is defined %}
-                {{ destinations ? 'Edit destinations' : 'New destination' }}
-            {% else %}
-                Edit destinations
-            {% endif %}
-        </a>
-    {% endif %}
-    <h3>Destinations</h3>
-    {% if destinations is empty %}
-        <div class="alert alert-block alert-error">
-            There are no destinations. You need to create at least one destination first.
+    <div class="accordion">
+        <h3>Meals</h3>
+        <div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>Name</th>
+                        <th>Visible</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th class="lead">A</th>
+                        <td>{{ service.mealaname }}</td>
+                        <td>{{ service.mealavisible ? 'Yes' : 'No' }}</td>
+                        <td>&pound;{{ service.mealaprice | number_format(2) }}</td>
+                    </tr>
+                    <tr>
+                        <th class="lead">B</th>
+                        <td>{{ service.mealbname }}</td>
+                        <td>{{ service.mealbvisible ? 'Yes' : 'No' }}</td>
+                        <td>&pound;{{ service.mealbprice | number_format(2) }}</td>
+                    </tr>
+                    <tr>
+                        <th class="lead">C</th>
+                        <td>{{ service.mealcname }}</td>
+                        <td>{{ service.mealcvisible ? 'Yes' : 'No' }}</td>
+                        <td>&pound;{{ service.mealcprice | number_format(2) }}</td>
+                    </tr>
+                    <tr>
+                        <th class="lead">D</th>
+                        <td>{{ service.mealdname }}</td>
+                        <td>{{ service.mealdvisible ? 'Yes' : 'No' }}</td>
+                        <td>&pound;{{ service.mealdprice | number_format(2) }}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-    {% else %}
-        <table class="table table-condensed table-striped">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for destination in destinations %}
-                    <tr>
-                        <td>{{ destination.name }}</td>
-                        <td>{{ destination.description | raw }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
 
-    {% if system.userrole == 'ROLE_ADMIN' %}
-        <a class="btn btn-warning pull-right" href="{{ path('priceband/index', service.id) }}">
-            {% if pricebandgroups is defined %}
-                {{ pricebandgroups ? 'Edit price bands' : 'New price band' }}
+        {% if system.userrole == 'ROLE_ADMIN' %}
+            <a class="btn btn-warning pull-right" href="{{ path('destination/index', service.id) }}">
+                {% if destinations is defined %}
+                    {{ destinations ? 'Edit destinations' : 'New destination' }}
+                {% else %}
+                    Edit destinations
+                {% endif %}
+            </a>
+        {% endif %}
+        <h3>Destinations</h3>
+        <div>
+            {% if destinations is empty %}
+                <div class="alert alert-block alert-error">
+                    There are no destinations. You need to create at least one destination first.
+                </div>
             {% else %}
-                Edit price bands
+                <table class="table table-condensed table-striped">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for destination in destinations %}
+                            <tr>
+                                <td>{{ destination.name }} <span class="badge">{{ destination.crs }}</span></td>
+                                <td>{{ destination.description | raw }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             {% endif %}
-        </a>
-    {% endif %}
-    <h3>Price bands</h3>
-    {% if pricebandgroups is empty %}
-        <div class="alert alert-block alert-error">
-            There are no price bands. You need to create at least one price band first.
         </div>
-    {% else %}
-        <table class="table table-condensed table-striped">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for pricebandgroup in pricebandgroups %}
-                    <tr>
-                        <td>{{ pricebandgroup.name }}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="3">
-                            <table class="table table-condensed table-priceband">
-                                <thead>
-                                    <tr>
-                                        <th>Destination</th>
-                                        <th>First</th>
-                                        <th>Standard</th>
-                                        <th>Child</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                {% for priceband in pricebandgroup.bandtable %}
-                                    <tr>
-                                        <td>{{ priceband.name }}</td>
-                                        <td>&pound;{{ priceband.first }}</td>
-                                        <td>&pound;{{ priceband.standard }}</td>
-                                        <td>&pound;{{ priceband.child }}</td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
 
-    {% if system.userrole == 'ROLE_ADMIN' %}
-        <a class="btn btn-warning pull-right" href="{{ path('joining/index', service.id) }}">
-            {% if joinings is defined %}
-                {{ joinings ? 'Edit joining stations' : 'New joining station' }}
-            {% else %}
-                Edit joining stations
-            {% endif %}
+        {% if system.userrole == 'ROLE_ADMIN' %}
+            <a class="btn btn-warning pull-right" href="{{ path('priceband/index', service.id) }}">
+                {% if pricebandgroups is defined %}
+                    {{ pricebandgroups ? 'Edit price bands' : 'New price band' }}
+                {% else %}
+                    Edit price bands
+                {% endif %}
+            </a>
+        {% endif %}
+        <h3>Price bands</h3>
+        {% if pricebandgroups is empty %}
+            <div class="alert alert-block alert-error">
+                There are no price bands. You need to create at least one price band first.
+            </div>
+        {% else %}
+            <table class="table table-condensed table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pricebandgroup in pricebandgroups %}
+                        <tr>
+                            <td>{{ pricebandgroup.name }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <table class="table table-condensed table-priceband">
+                                    <thead>
+                                        <tr>
+                                            <th>Destination</th>
+                                            <th>First</th>
+                                            <th>Standard</th>
+                                            <th>Child</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for priceband in pricebandgroup.bandtable %}
+                                        <tr>
+                                            <td>{{ priceband.name }}</td>
+                                            <td>&pound;{{ priceband.first }}</td>
+                                            <td>&pound;{{ priceband.standard }}</td>
+                                            <td>&pound;{{ priceband.child }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+        {% if system.userrole == 'ROLE_ADMIN' %}
+            <a class="btn btn-warning pull-right" href="{{ path('joining/index', service.id) }}">
+                {% if joinings is defined %}
+                    {{ joinings ? 'Edit joining stations' : 'New joining station' }}
+                {% else %}
+                    Edit joining stations
+                {% endif %}
+            </a>
+        {% endif %}
+        <h3>Joining stations</h3>
+        {% if joinings is empty %}
+            <div class="alert alert-block alert-error">
+                There are no joining stations. You need to add at least one joining station first.
+            </div>
+        {% else %}
+            <table class="table table-condensed table-striped">
+                <thead>
+                    <tr>
+                        <th>Station</th>
+                        <th>Price band</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for joining in joinings %}
+                        <tr>
+                            <td>{{ joining.station }} <span class="badge">{{ joining.crs }}</span></td>
+                            <td>{{ joining.pricebandname }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+        <a class="btn btn-primary pull-right" href="{{ path('limits/edit', service.id) }}">
+            Booking limits
         </a>
-    {% endif %}
-    <h3>Joining stations</h3>
-    {% if joinings is empty %}
-        <div class="alert alert-block alert-error">
-            There are no joining stations. You need to add at least one joining station first.
-        </div>
-    {% else %}
-        <table class="table table-condensed table-striped">
-            <thead>
-                <tr>
-                    <th>Station</th>
-                    <th>Price band</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for joining in joinings %}
-                    <tr>
-                        <td>{{ joining.station }}</td>
-                        <td>{{ joining.pricebandname }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+        <h3>Booking limits</h3>
 
-    <a class="btn btn-primary pull-right" href="{{ path('limits/edit', service.id) }}">
-        Booking limits
-    </a>
-    <h3>Booking limits</h3>
+    </div> <!-- accordion wrapper -->
 
     <div>
         <a class="btn btn-success" href="{{ path('service/index') }}">
