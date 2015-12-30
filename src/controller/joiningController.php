@@ -41,32 +41,6 @@ class JoiningController extends coreController
     }
 
     /**
-     * Displays a form to create a new Destination entity.
-     */
-    public function newAction($serviceid)
-    {
-        $joining = new Joining();
-        $joining->setServiceid($serviceid);
-
-        $em = $this->getDoctrine()->getManager();
-        $service = $em->getRepository('SRPSBookingBundle:Service')
-            ->find($serviceid);
-
-        $pricebandgroups = $em->getRepository('SRPSBookingBundle:Pricebandgroup')
-            ->findByServiceid($serviceid);
-
-        $joiningtype = new JoiningType($pricebandgroups, $service);
-        $form   = $this->createForm($joiningtype, $joining);
-
-        return $this->render('SRPSBookingBundle:Joining:edit.html.twig', array(
-            'joining' => $joining,
-            'service' => $service,
-            'serviceid' => $serviceid,
-            'form'   => $form->createView(),
-        ));
-    }
-
-    /**
      * Edits an existing Joining entity.
      */
     public function editAction($serviceid, $joiningid)

@@ -1,0 +1,174 @@
+{% extends 'admin/admin.html.twig' %}
+
+{% block content %}
+    <h3>Booking limits edit</h3>
+    <h4>{{ service.name }}</h4>
+
+    <form id="limits-edit-form" class="form-horizontal" action="{{ path('limits/edit', serviceid) }}" method="post">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Set</th>
+                    <th>Booked</th>
+                    <th>Pending</th>
+                    <th>Remaining</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>First</td>
+                    <td>
+                        {{ form_text('first', '', limits.first) }}
+                    </td>
+                    <td>{{ count.bookedfirst }}</td>
+                    <td>{{ count.pendingfirst }}</td>
+                    <td>{{ count.remainingfirst }}</td>
+                </tr>
+                <tr>
+                    <td>Standard</td>
+                    <td>
+                        {{ form_text('standard', '', limits.standard) }}
+                    </td>
+                    <td>{{ count.bookedstandard }}</td>
+                    <td>{{ count.pendingstandard }}</td>
+                    <td>{{ count.remainingstandard }}</td>
+                </tr>
+                <tr>
+                    <td><b>Meal A</b> ({{ service.mealaname }})</td>
+                    <td>
+                        {{ form_text('meala', '', limits.meala) }}
+                    </td>
+                    <td>{{ count.bookedmeala }}</td>
+                    <td>{{ count.pendingmeala }}</td>
+                    <td>{{ count.remainingmeala }}</td>
+                </tr>
+                <tr>
+                    <td><b>Meal B</b> ({{ service.mealbname }})</td>
+                    <td>
+                        {{ form_text('mealb', '', limits.mealb) }}
+                    </td>
+                    <td>{{ count.bookedmealb }}</td>
+                    <td>{{ count.pendingmealb }}</td>
+                    <td>{{ count.remainingmealb }}</td>
+                </tr>
+                <tr>
+                    <td><b>Meal C</b> ({{ service.mealcname }})</td>
+                    <td>
+                        {{ form_text('mealc', '', limits.mealc) }}
+                    </td>
+                    <td>{{ count.bookedmealc }}</td>
+                    <td>{{ count.pendingmealc }}</td>
+                    <td>{{ count.remainingmealc }}</td>
+                </tr>
+                <tr>
+                    <td><b>Meal D</b> ({{ service.mealdname }})</td>
+                    <td>
+                        {{ form_text('meald', '', limits.meald) }}
+                    </td>
+                    <td>{{ count.bookedmeald }}</td>
+                    <td>{{ count.pendingmeald }}</td>
+                    <td>{{ count.remainingmeald }}</td>
+                </tr>
+                <tr>
+                    <td>First Singles/Window</td>
+                    <td>
+                        {{ form_text('firstsingles', '', limits.firstsingles) }}
+                    </td>
+                    <td>{{ count.bookedfirstsingles }}</td>
+                    <td>{{ count.pendingfirstsingles }}</td>
+                    <td>{{ count.remainingfirstsingles }}</td>
+                </tr>
+                {% for crs, destinationlimit in destinationlimits %}
+                    {% set destinationcount = attribute(count.destinations, crs) %}
+                    <tr>
+                        <td>
+                            <b>Destination</b> {{ destinationcount.name }}<br />
+                            <small class="text-info">0 entry disables limit</small>
+                        </td>
+                        <td>
+                            {{ form_text('destination_' ~ crs, '', destinationlimit) }}
+                        </td>
+                        <td>{{ destinationcount.booked }}</td>
+                        <td>{{ destinationcount.pending }}</td>
+                        <td>{{ destinationcount.remaining }}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td>Maximum party size</td>
+                    <td>
+                        {{ form_text('maxparty', '', limits.maxparty) }}
+                    </td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td>Maximum party size in first<br /><small class="text-info">Only applied if non-zero</small></td>
+                    <td>
+                        {{ form_text('maxpartyfirst', '', limits.maxpartyfirst) }}
+                    </td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+            </tbody>
+        </table>
+
+        {{ form_errors(errors) }}
+
+        <div>
+            <input type="submit" name="submit" value="Set limits" class="btn btn-primary" />
+            <input type="submit" name="cancel" value="Cancel" class="btn btn-warning" />
+        </div>
+    </form>
+{% endblock content %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $('#limits-edit-form').validate({
+            errorClass: "validateError",
+            rules: {
+                first: {
+                    required: true,
+                    number: true
+                },
+                standard: {
+                    required: true,
+                    number: true
+                },
+                meala: {
+                    required: true,
+                    number: true
+                },
+                mealb: {
+                    required: true,
+                    number: true
+                },
+                mealc: {
+                    required: true,
+                    number: true
+                },
+                meald: {
+                    required: true,
+                    number: true
+                },
+                firstsingles: {
+                    required: true,
+                    number: true
+                },
+                maxparty: {
+                    required: true,
+                    number: true
+                },
+                maxpartyfirst: {
+                    required: true,
+                    number: true
+                },
+                {{ jsvalidate }}
+            }
+        });
+    </script>
+{% endblock javascripts %}

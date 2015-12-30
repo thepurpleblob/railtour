@@ -2,6 +2,9 @@
 
 namespace thepurpleblob\railtour\service;
 
+// Lifetime of incomplete purchases in seconds
+define('PURCHASE_LIFETIME', 3600);
+
 class Booking
 {
 
@@ -14,7 +17,7 @@ class Booking
         $service = \ORM::forTable('Service')->findOne($id);
 
         if (!$service) {
-            throw $this->Exception('Unable to find Service entity.');
+            throw $this->Exception('Unable to find Service record for id = ' . $id);
         }
 
         return $service;
@@ -186,6 +189,32 @@ class Booking
     }
 
     /**
+     * Get limits
+     * (may need to create a new record
+     */
+    public function getLimits($serviceid) {
+        $limits = \ORM::forTable('Limits')->where('serviceid', $serviceid)->findOne();
+
+        // Its's possible that the limits for this service don't exist (yet)
+        if (!$limits) {
+            $limits = \ORM::forTable('Limits')->create();
+            $limits->serviceid = $serviceid;
+            $limits->first = 0;
+            $limits->standard = 0;
+            $limits->firstsingles = 0;
+            $limits->meala = 0;
+            $limits->mealb = 0;
+            $limits->mealc = 0;
+            $limits->meald = 0;
+            $limits->maxparty = 0;
+            $limits->maxpartyfirst = 0;
+            $limits->save();
+        }
+
+        return $limits;
+    }
+
+    /**
      * Is destination used?
      * Checks if destination can be deleted
      * @param object $destination
@@ -231,34 +260,31 @@ class Booking
     }
 
     /**
+     * Clear incomple purchases that are time expired
+     */
+    public function deleteOldPurchases() {
+        $oldtime = time() - PURCHASE_LIFETIME;
+        \ORM::forTable('Purchase')
+            ->where('completed', 0)
+            ->where_gt('timestamp', $oldtime)
+            ->delete_many();
+    }
+
+    /**
      * Clear the current session data and delete any expired purchases
      */
     public function cleanPurchases() {
         $em = $this->em;
 
-        // Get the session
+        // TODO (fix) Get the session
         $session = new Session();
-//        if (!$session->isStarted()) {
-//            $session->start();
-//        }
 
-        // remove the key and the purchaseid
+        // TODO (fix) remove the key and the purchaseid
         $session->remove('key');
         $session->remove('purchaseid');
 
-        // get incomplete purchases older than 1 hour
-        $oldtime = time() - 3600;
-        $query = $em->createQuery("SELECT p FROM SRPSBookingBundle:Purchase p
-            WHERE p.completed=0 AND p.timestamp < :oldtime")
-            ->setParameter('oldtime', $oldtime);
-        $purchases = $query->getResult();
-
-        if ($purchases) {
-            foreach ($purchases as $purchase) {
-                $em->remove($purchase);
-            }
-            $em->flush();
-        }
+        // get incomplete purchases
+        $this->deleteOldPurchases();
     }
 
     /**
@@ -358,165 +384,205 @@ class Booking
      * Count the purchases and work out what's left. Major PITA this
      */
     public function countStuff($serviceid, $currentpurchase=null) {
-        $em = $this->em;
 
-        // Clear incomplete purchases older than 1 hour
-        $oldtime = time() - 3600;
-        $query = $em->createQuery("SELECT p FROM SRPSBookingBundle:Purchase p
-            WHERE p.completed=0 AND p.timestamp < :oldtime")
-            ->setParameter('oldtime', $oldtime);
-        $purchases = $query->getResult();
-        if ($purchases) {
-            foreach ($purchases as $purchase) {
-                $em->remove($purchase);
-            }
-            $em->flush();
-        }
+        // get incomplete purchases
+        $this->deleteOldPurchases();
 
         // Always a chance the limits don't exist yet
-        $limits = $em->getRepository('SRPSBookingBundle:Limits')
-            ->findOneByServiceid($serviceid);
-        if (!$limits) {
-            $limits = new Limits();
-            $limits->setServiceid($serviceid);
-            $em->persist($limits);
-            $em->flush();
-        }
+        $limits = $this->getLimits($serviceid);
 
         // Create counts entity
-        $count = new Count();
+        $count = new \stdClass();
 
         // get first class booked
-        $fbquery = $em->createQuery("SELECT (SUM(p.adults)+SUM(p.children)) AS a FROM SRPSBookingBundle:Purchase p
-            WHERE p.completed=1 AND p.class='F' AND p.status='OK' AND p.serviceid=$serviceid ");
-        $fbtotal = $fbquery->getResult();
-        $count->setBookedfirst($this->zero($fbtotal[0]['a']));
+        $fbtotal = \ORM::forTable('Purchase')
+            ->select_expr('SUM(adults + children)', 'fb')
+            ->where(array(
+                'completed' => 1,
+                'class' => 'F',
+                'status' => 'OK',
+                'serviceid' => $serviceid,
+            ))
+            ->findOne();
+        $count->bookedfirst = $this->zero($fbtotal->fb);
 
         // get first class in progress
-        $fpquery = $em->createQuery("SELECT (SUM(p.adults)+SUM(p.children)) AS a FROM SRPSBookingBundle:Purchase p
-            WHERE p.completed=0 AND p.class='F' AND p.serviceid=$serviceid ");
-        $fptotal = $fpquery->getResult();
-        $count->setPendingfirst($this->zero($fptotal[0]['a']));
+        $fptotal = \ORM::forTable('Purchase')
+            ->select_expr('SUM(adults + children)', 'fp')
+            ->where(array(
+                'completed' => 0,
+                'class' => 'F',
+                'status' => 'OK',
+                'serviceid' => $serviceid,
+            ))
+            ->findOne();
+        $count->pendingfirst = $this->zero($fptotal->fp);
 
-        // if we have a purchase object then remove any current count from pending
+        // if we have a purchase in progress, adjust current pending count
         if ($currentpurchase) {
-            if ($currentpurchase->getClass()=='F') {
-                $pf = $count->getPendingfirst();
-                $pf = $pf - $currentpurchase->getAdults() - $currentpurchase->getChildren();
+            if ($currentpurchase->class == 'F') {
+                $pf = $count->pendingfirst;
+                $pf = $pf - $currentpurchase->adults - $currentpurchase->children;
                 $pf = $pf < 0 ? 0 : $pf;
-                $count->setPendingfirst($pf);
+                $count->pendingfirst = $pf;
             }
         }
 
-        // firct class remainder is simply
-        $count->setRemainingfirst($limits->getFirst() - $count->getBookedfirst() - $count->getPendingfirst());
+        // firct class remainder is simply...
+        $count->remainingfirst = $limits->first - $count->bookedfirst - $count->pendingfirst;
 
         // get standard class booked
-        $sbquery = $em->createQuery("SELECT (SUM(p.adults)+SUM(p.children)) AS a FROM SRPSBookingBundle:Purchase p
-            WHERE p.completed=1 AND p.class='S' AND p.status='OK' AND p.serviceid=$serviceid ");
-        $sbtotal = $sbquery->getResult();
-        $count->setBookedstandard($this->zero($sbtotal[0]['a']));
+        $sbtotal = \ORM::forTable('Purchase')
+            ->select_expr('SUM(adults + children)', 'sb')
+            ->where(array(
+                'completed' => 1,
+                'class' => 'S',
+                'status' => 'OK',
+                'serviceid' => $serviceid,
+            ))
+            ->findOne();
+        $count->bookedstandard = $this->zero($sbtotal->sb);
 
         // get standard class in progress
-        $spquery = $em->createQuery("SELECT (SUM(p.adults)+SUM(p.children)) AS a FROM SRPSBookingBundle:Purchase p
-            WHERE p.completed=0 AND p.class='S' AND p.serviceid=$serviceid ");
-        $sptotal = $spquery->getResult();
-        $count->setPendingstandard($this->zero($sptotal[0]['a']));
+        $sptotal = \ORM::forTable('Purchase')
+            ->select_expr('SUM(adults + children)', 'sp')
+            ->where(array(
+                'completed' => 0,
+                'class' => 'S',
+                'status' => 'OK',
+                'serviceid' => $serviceid,
+            ))
+            ->findOne();
+        $count->pendingstandard = $this->zero($sptotal->sp);
 
         // if we have a purchase object then remove any current count from pending
         if ($currentpurchase) {
             if ($currentpurchase->getClass()=='S') {
-                $ps = $count->getPendingstandard();
-                $ps = $ps - $currentpurchase->getAdults() - $currentpurchase->getChildren();
+                $ps = $count->pendingstandard;
+                $ps = $ps - $currentpurchase->adults - $currentpurchase->children;
                 $ps = $ps < 0 ? 0 : $ps;
-                $count->setPendingstandard($ps);
+                $count->pendingstandard = $ps;
             }
         }
 
         // standard class remainder is simply
-        $count->setRemainingstandard($limits->getStandard() - $count->getBookedstandard() - $count->getPendingstandard());
+        $count->remainingstandard = $limits->standard - $count->bookedstandard - $count->pendingstandard;
 
         // get first supplements booked. Note field is a boolean and applies to
         // all persons in booking (which is only asked for parties of one or two)
-        $supquery = $em->createQuery("SELECT (SUM(p.adults)+SUM(p.children)) AS a FROM SRPSBookingBundle:Purchase p
-            WHERE p.completed=1 AND p.class='F' AND p.status='OK' AND p.seatsupplement>0 AND p.serviceid=$serviceid ");
-        $suptotal = $supquery->getResult();
-        $count->setBookedfirstsingles($this->zero($suptotal[0]['a']));
+        $suptotal = \ORM::forTable('Purchase')
+            ->select_expr('SUM(adults + children)', 'sup')
+            ->where(array(
+                'completed' => 1,
+                'class' => 'F',
+                'status' => 'OK',
+                'serviceid' => $serviceid,
+            ))
+            ->where_gt('seatsupplement', 0)
+            ->findOne();
+        $count->bookedfirstsingles = $this->zero($suptotal->sup);
 
         // get first supplements in progress. Note field is a boolean and applies to
         // all persons in booking (which is only asked for parties of one or two)
-        $sppquery = $em->createQuery("SELECT (SUM(p.adults)+SUM(p.children)) AS a FROM SRPSBookingBundle:Purchase p
-            WHERE p.completed=0 AND p.class='F' AND p.seatsupplement=1 AND p.serviceid=$serviceid ");
-        $spptotal = $sppquery->getResult();
-        $count->setPendingfirstsingles($this->zero($spptotal[0]['a']));
+        $supptotal = \ORM::forTable('Purchase')
+            ->select_expr('SUM(adults + children)', 'supp')
+            ->where(array(
+                'completed' => 0,
+                'class' => 'F',
+                'status' => 'OK',
+                'serviceid' => $serviceid,
+            ))
+            ->where_gt('seatsupplement', 0)
+            ->findOne();
+        $count->pendingfirstsingles = $this->zero($supptotal->supp);
 
         // First suppliements remainder
-        $count->setRemainingfirstsingles($limits->getFirstsingles() - $count->getBookedfirstsingles() - $count->getPendingfirstsingles());
+        $count->remainingfirstsingles = $limits->firstsingles - $count->bookedfirstsingles - $count->pendingfirstsingles;
 
         // Get booked meals
-        $mbquery = $em->createQuery("SELECT SUM(p.meala) AS a, SUM(p.mealb) AS b,
-            SUM(p.mealc) AS c, SUM(p.meald) AS d FROM SRPSBookingBundle:Purchase p
-            WHERE p.completed=1 AND p.status='OK' AND p.serviceid=$serviceid ");
-        $mbtotal = $mbquery->getResult();
-        $count->setBookedmeala($this->zero($mbtotal[0]['a']));
-        $count->setBookedmealb($this->zero($mbtotal[0]['b']));
-        $count->setBookedmealc($this->zero($mbtotal[0]['c']));
-        $count->setBookedmeald($this->zero($mbtotal[0]['d']));
+        $bmeals = \ORM::forTable('Purchase')
+            ->select_expr('SUM(meala)', 'suma')
+            ->select_expr('SUM(mealb)', 'sumb')
+            ->select_expr('SUM(mealc)', 'sumc')
+            ->select_expr('SUM(meald)', 'sumd')
+            ->where(array(
+                'completed' => 1,
+                'status' => 'OK',
+                'serviceid' => $serviceid,
+            ))
+            ->findOne();
+        $count->bookedmeala = $this->zero($bmeals->suma);
+        $count->bookedmealb = $this->zero($bmeals->sumb);
+        $count->bookedmealc = $this->zero($bmeals->sumc);
+        $count->bookedmeald = $this->zero($bmeals->sumd);
 
         // Get pending meals
-        $mpquery = $em->createQuery("SELECT SUM(p.meala) AS a, SUM(p.mealb) AS b,
-            SUM(p.mealc) AS c, SUM(p.meald) AS d FROM SRPSBookingBundle:Purchase p
-            WHERE p.completed=0 AND p.serviceid=$serviceid ");
-        $mptotal = $mpquery->getResult();
-        $count->setPendingmeala($this->zero($mptotal[0]['a']));
-        $count->setPendingmealb($this->zero($mptotal[0]['b']));
-        $count->setPendingmealc($this->zero($mptotal[0]['c']));
-        $count->setPendingmeald($this->zero($mptotal[0]['d']));
+        $pmeals = \ORM::forTable('Purchase')
+            ->select_expr('SUM(meala)', 'suma')
+            ->select_expr('SUM(mealb)', 'sumb')
+            ->select_expr('SUM(mealc)', 'sumc')
+            ->select_expr('SUM(meald)', 'sumd')
+            ->where(array(
+                'completed' => 0,
+                'status' => 'OK',
+                'serviceid' => $serviceid,
+            ))
+            ->findOne();
+        $count->pendingmeala = $this->zero($pmeals->suma);
+        $count->pendingmealb = $this->zero($pmeals->sumb);
+        $count->pendingmealc = $this->zero($pmeals->sumc);
+        $count->pendingmeald = $this->zero($pmeals->sumd);
 
         // Get remaining meals
-        //$rma = $limits->getMeala() - $count->getBookedmeala() - $count->getPendingmeala();
-        //$count->setRemainingmeala($rma);
-        $count->setRemainingmeala($limits->getMeala() - $count->getBookedmeala() - $count->getPendingmeala());
-        $count->setRemainingmealb($limits->getMealb() - $count->getBookedmealb() - $count->getPendingmealb());
-        $count->setRemainingmealc($limits->getMealc() - $count->getBookedmealc() - $count->getPendingmealc());
-        $count->setRemainingmeald($limits->getMeald() - $count->getBookedmeald() - $count->getPendingmeald());
+        $count->remainingmeala = $limits->meala - $count->bookedmeala - $count->pendingmeala;
+        $count->remainingmealb = $limits->mealb - $count->bookedmealb - $count->pendingmealb;
+        $count->remainingmealc = $limits->mealc - $count->bookedmealc - $count->pendingmealc;
+        $count->remainingmeald = $limits->meald - $count->bookedmeald - $count->pendingmeald;
 
         // Get counts for destination limits
-        $destinations = $em->getRepository('SRPSBookingBundle:Destination')
-            ->findByServiceid($serviceid);
+        $destinations = \ORM::forTable('Destination')->where('serviceid', $serviceid)->findMany();
         $destinationcounts = array();
         foreach ($destinations as $destination) {
-            $name = $destination->getName();
-            $crs = $destination->getCrs();
+            $name = $destination->name;
+            $crs = $destination->crs;
             $destinationcount = new \stdClass();
             $destinationcount->name = $name;
 
             // bookings for this destination
-            $dbquery = $em->createQuery("SELECT SUM(p.adults) AS a, SUM(p.children) AS c FROM SRPSBookingBundle:Purchase p
-                 WHERE p.completed=1 AND p.status='OK' AND p.serviceid=$serviceid
-                 AND p.destination='$crs'");
-            $dbresult = $dbquery->getResult();
-            $dbcount = $this->zero($dbresult[0]['a']) + $this->zero($dbresult[0]['c']);
-            $destinationcount->booked = $dbcount;
+            $dtotal = \ORM::forTable('Purchase')
+                ->select_expr('SUM(adults + children)', 'dt')
+                ->where(array(
+                    'completed' => 1,
+                    'destination' => $crs,
+                    'status' => 'OK',
+                    'serviceid' => $serviceid,
+                ))
+                ->findOne();
+            $destinationcount->booked = $this->zero($dtotal->dt);
 
             // pending bookings for this destination
-            $dpquery = $em->createQuery("SELECT SUM(p.adults) AS a, SUM(p.children) AS c FROM SRPSBookingBundle:Purchase p
-                 WHERE p.completed=0 AND p.serviceid=$serviceid
-                 AND p.destination='$crs'");
-            $dpresult = $dpquery->getResult();
-            $dpcount = $this->zero($dpresult[0]['a']) + $this->zero($dpresult[0]['c']);
+            $ptotal = \ORM::forTable('Purchase')
+                ->select_expr('SUM(adults + children)', 'pt')
+                ->where(array(
+                    'completed' => 0,
+                    'destination' => $crs,
+                    'status' => 'OK',
+                    'serviceid' => $serviceid,
+                ))
+                ->findOne();
+            $dpcount = $this->zero($ptotal->pt);
 
             // if we have a purchase object then remove any current count from pending
             if ($currentpurchase) {
-                if ($currentpurchase->getDestination()==$crs) {
-                    $dpcount = $dpcount - $currentpurchase->getAdults() - $currentpurchase->getChildren();
+                if ($currentpurchase->destination == $crs) {
+                    $dpcount = $dpcount - $currentpurchase->adults - $currentpurchase->children;
                     $dpcount = $dpcount < 0 ? 0 : $dpcount;
                 }
             }
             $destinationcount->pending = $dpcount;
 
             // limit=0 means the limit is not being used
-            $dlimit = $destination->getBookinglimit();
+            $dlimit = $destination->bookinglimit;
             $destinationcount->limit = $dlimit;
             if ($dlimit==0) {
                 $destinationcount->remaining = '-';
@@ -526,7 +592,7 @@ class Booking
 
             $destinationcounts[$crs] = $destinationcount;
         }
-        $count->setDestinations($destinationcounts);
+        $count->destinations = $destinationcounts;
 
         return $count;
     }

@@ -83,7 +83,8 @@ class ServiceController extends coreController
      */
     public function showAction($id)
     {
-        $service = \ORM::forTable('Service')->findOne($id);
+        $booking = $this->getService('Booking');
+        $service = $booking->Service($id);
 
         if (!$service) {
             throw $this->Exception('Unable to find Service entity.');
@@ -93,10 +94,10 @@ class ServiceController extends coreController
         $destinations = \ORM::forTable('Destination')->where('serviceid', $id)->findMany();
         $pricebandgroups = \ORM::forTable('Pricebandgroup')->where('serviceid', $id)->findMany();
         $joinings = \ORM::forTable('Joining')->where('serviceid', $id)->findMany();
+        $limits = \ORM::forTable('Limits')->where('serviceid', $id)->findOne();
 
         // iterate over these and get destinations
         // (very inefficiently)
-        $booking = $this->getService('Booking');
         foreach ($pricebandgroups as $band) {
             $pricebandgroupid = $band->id;
             $bandtable = $booking->getPricebands($id, $pricebandgroupid);
@@ -114,6 +115,7 @@ class ServiceController extends coreController
             'destinations' => $destinations,
             'pricebandgroups' => $pricebandgroups,
             'joinings' => $joinings,
+            'limits' => $limits,
             'serviceid' => $id,
         ));
     }

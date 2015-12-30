@@ -1,14 +1,10 @@
 {% extends 'admin/admin.html.twig' %}
 
-{% block sidebar %}
-    {% include 'admin/sidebar.html.twig' %}
-{% endblock sidebar %}
-
 {% block content %}
     <h3>{{service.name}} ({{ service.code }})</h3>
 
     {% if system.userrole == 'ROLE_ADMIN' %}
-        <a class="btn btn-warning pull-right" href="{{ path('service/edit', service.id) }}">
+        <a class="btn btn-info btn-sm pull-right" href="{{ path('service/edit', service.id) }}">
             Edit service
         </a>
     {% endif %}
@@ -96,7 +92,7 @@
         </div>
 
         {% if system.userrole == 'ROLE_ADMIN' %}
-            <a class="btn btn-warning pull-right" href="{{ path('destination/index', service.id) }}">
+            <a class="btn btn-info btn-sm pull-right" href="{{ path('destination/index', service.id) }}">
                 {% if destinations is defined %}
                     {{ destinations ? 'Edit destinations' : 'New destination' }}
                 {% else %}
@@ -131,7 +127,7 @@
         </div>
 
         {% if system.userrole == 'ROLE_ADMIN' %}
-            <a class="btn btn-warning pull-right" href="{{ path('priceband/index', service.id) }}">
+            <a class="btn btn-info btn-sm pull-right" href="{{ path('priceband/index', service.id) }}">
                 {% if pricebandgroups is defined %}
                     {{ pricebandgroups ? 'Edit price bands' : 'New price band' }}
                 {% else %}
@@ -186,7 +182,7 @@
         {% endif %}
 
         {% if system.userrole == 'ROLE_ADMIN' %}
-            <a class="btn btn-warning pull-right" href="{{ path('joining/index', service.id) }}">
+            <a class="btn btn-info btn-sm pull-right" href="{{ path('joining/index', service.id) }}">
                 {% if joinings is defined %}
                     {{ joinings ? 'Edit joining stations' : 'New joining station' }}
                 {% else %}
@@ -218,19 +214,62 @@
             </table>
         {% endif %}
 
-        <a class="btn btn-primary pull-right" href="{{ path('limits/edit', service.id) }}">
+        <a class="btn btn-info btn-sm pull-right" href="{{ path('limits/edit', service.id) }}">
             Booking limits
         </a>
         <h3>Booking limits</h3>
+        <table class="table table-condensed table-striped">
+            <thead>
+                <tr>
+                    <th>Limit</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Seats in first</td>
+                    <td>{{ limits.first }}</td>
+                </tr>
+                <tr>
+                    <td>Seats in standard</td>
+                    <td>{{ limits.standard }}</td>
+                </tr>
+                <tr>
+                    <td>Single seat supplements</td>
+                    <td>{{ limits.firstsingles }}
+                </td>
+                <tr>
+                    <td>{{ service.mealaname | default('Meal A') }}</td>
+                    <td>{{ limits.meala }}</td>
+                </tr>
+                <tr>
+                    <td>{{ service.mealbname | default('Meal B') }}</td>
+                    <td>{{ limits.mealb }}</td>
+                </tr>
+                <tr>
+                    <td>{{ service.mealcname | default('Meal C') }}</td>
+                    <td>{{ limits.mealc }}</td>
+                </tr>
+                <tr>
+                    <td>{{ service.mealdname | default('Meal D') }}</td>
+                    <td>{{ limits.meald }}</td>
+                </tr>
+                <tr>
+                    <td>Maximum party (standard)</td>
+                    <td>{{ limits.maxparty }}</td>
+                </tr>
+                <tr>
+                    <td>Maximum party (first)</td>
+                    <td>{{ limits.maxpartyfirst }}</td>
+                </tr>
+            </tbody>
+        </table>
 
     </div> <!-- accordion wrapper -->
 
     <div>
         <a class="btn btn-success" href="{{ path('service/index') }}">
             Back to the list
-        </a>
-        <a class="btn btn-warning" href="{{ path('service/edit', service.id) }}">
-            Edit
         </a>
     </div>
 {% endblock content %}
