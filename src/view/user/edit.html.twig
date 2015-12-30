@@ -1,0 +1,20 @@
+{% extends 'SRPSBookingBundle:Admin:admin.html.twig' %}
+
+{% form_theme form 'SRPSBookingBundle:Admin:fields.html.twig' %}
+
+{% block content %}
+    <h2>User edit</h2>
+
+    <form id="user-edit-form" class="form-horizontal" action="{{ path('admin_user_edit', { 'username': user.username }) }}" 
+          novalidate="novalidate" method="post" {{ form_enctype(form) }}>
+        {{ form_rest(form) }} 
+    </form>
+
+    <button class ="btn btn-primary" onclick="$('#user-edit-form').submit();">
+        Save changes
+    </button>
+    <a class="btn btn-warning" href="{{ path('admin_user_index') }}">
+        Cancel
+    </a>
+{% endblock content %}
+    

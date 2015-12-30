@@ -1,0 +1,50 @@
+{% extends 'SRPSBookingBundle:Admin:admin.html.twig' %}
+
+{% block sidebar %}
+    {% include 'SRPSBookingBundle:User:sidebar.html.twig' %}
+{% endblock sidebar %}
+
+{% block content %}
+    <h2>Railtour Users</h2>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Role</th>
+                <th>Active?</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+                <tr>
+                    <td><strong>{{ user.username }}</strong></td>
+                    <td>{{ user.firstname }}</td>
+                    <td>{{ user.lastname }}</td>     
+                    <td>{{ user.role }}</td>                      
+                    <td>{{ user.active ? 'Yes' : 'No' }}</td>
+                    <td>
+                        <a class="btn btn-primary" href="{{ path('admin_user_edit', { 'username': user.username }) }}">
+                            <i class="fa fa-edit"></i> Edit</a>
+                        {% if user.username == 'admin' %}
+                            <a class="btn btn-danger disabled">
+                                <i class="fa fa-trash-o"></i> Delete</a>
+                        {% else %}
+                            <a class="btn btn-danger" href="{{ path('admin_user_delete', { 'username': user.username }) }}">
+                                <i class="fa fa-trash-o"></i> Delete</a>
+                        {% endif %}
+                    </td>
+                </tr>
+        {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="btn-group">
+            <a class="btn btn-primary" href="{{ path('admin_user_new') }}">
+                Add a new user
+            </a>
+        </div>
+{% endblock content %}

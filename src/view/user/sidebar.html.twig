@@ -1,0 +1,22 @@
+{# Sidebar template #}
+
+<h4>User menu</h4>
+
+{% if app.user %}
+    <p>
+        <i>Welcome <b>{{ app.user.username }}</b></i> 
+    </p>
+{% endif %}
+
+<div id="adminmenu">
+    <p>
+        <a class="btn btn-primary" href="{{ path('admin_service') }}">
+            <i class="fa fa-cogs"></i> Service admin
+        </a>
+    </p>    
+    <p>
+        <a href="{{ path('logout') }}" class="btn btn-danger btn-sm" role="button">
+            <i class="fa fa-sign-out"></i> Logout
+        </a>
+    </p> 
+</div>

@@ -19,8 +19,6 @@ class LimitsController extends coreController
         $booking = $this->getService('Booking');
         $service = $booking->Service($serviceid);
 
-        // $username = $this->get('security.context')->getToken()->getUser()->getUsername();
-
         $limits = $booking->getLimits($serviceid);
 
         // Get destinations (for destination limits)

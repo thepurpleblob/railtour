@@ -1,0 +1,33 @@
+{% extends 'admin/admin.html.twig' %}
+
+{% block content %}   
+    
+    <h2>SRPS Railtours</h2>
+    
+   
+    <div class="row-fluid">
+        {% if error %}
+            <div>{{ error.message }}</div>
+        {% endif %}
+
+        <form action="{{ path('login_check') }}" method="post" role="form">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" class="form-control" id="username" name="_username" value="{{ last_username }}" />
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" class="form-control" id="password" name="_password" />
+            </div>
+
+            {#
+                If you want to control the URL the user
+                is redirected to on success (more details below)
+                <input type="hidden" name="_target_path" value="/account" />
+            #}
+
+            <button type="submit" class="btn btn-default"><i class="fa fa-user fa-lg"></i>login</button>
+        </form>
+    </div>
+{% endblock content %}
