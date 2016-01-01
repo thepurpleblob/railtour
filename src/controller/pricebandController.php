@@ -17,6 +17,8 @@ class PricebandController extends coreController
      */
     public function indexAction($serviceid)
     {
+        $this->require_login('ROLE_ADMIN', 'priceband/index/' . $serviceid);
+
         $booking = $this->getService('Booking');
         $service = $booking->Service($serviceid);
         
@@ -63,6 +65,8 @@ class PricebandController extends coreController
      */
     public function editAction($serviceid, $id)
     {
+        $this->require_login('ROLE_ADMIN', 'priceband/index/' . $serviceid);
+
         $booking = $this->getService('Booking');
 
         // Get pricebandgroup and pricebands (new ones if no $id)
@@ -142,6 +146,7 @@ class PricebandController extends coreController
      */
     public function deleteAction($pricebandgroupid)
     {
+        $this->require_login('ROLE_ADMIN', 'priceband/index/' . $serviceid);
         
         // Remove pricebands associated with this group
         \ORM::forTable('Priceband')->where('pricebandgroupid', $pricebandgroupid)->deleteMany();

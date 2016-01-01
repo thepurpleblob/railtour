@@ -9,6 +9,11 @@ body {
     padding-bottom: 20px;
 }
 
+div#srpsuser {
+    text-align: right;
+    padding-top: 8px;
+}
+
 label.validateError {
     color: #ff0000;
     font-weight: normal;

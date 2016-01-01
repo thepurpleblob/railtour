@@ -17,6 +17,8 @@ class ServiceController extends coreController
     public function indexAction() {
         global $CFG;
 
+        $this->require_login('ROLE_ORGANISER');
+
         $allservices = \ORM::forTable('Service')->order_by_asc('date')->findMany();
 
         // submitted year
@@ -60,6 +62,9 @@ class ServiceController extends coreController
      * @param $id service id
      */
     public function visibleAction($id, $visible) {
+
+        $this->require_login('ROLE_ORGANISER');
+
         $service = \ORM::forTable('Service')->findOne($id);
 
         if (!$service) {
@@ -83,6 +88,8 @@ class ServiceController extends coreController
      */
     public function showAction($id)
     {
+        $this->require_login('ROLE_ORGANISER', 'service/show/' . $id);
+
         $booking = $this->getService('Booking');
         $service = $booking->Service($id);
 
@@ -126,6 +133,8 @@ class ServiceController extends coreController
      */
     public function editAction($id=null)
     {
+        $this->require_login('ROLE_ADMIN', 'service/show/' . $id);
+
         if ($id) {
             $service = \ORM::forTable('Service')->findOne($id);
 

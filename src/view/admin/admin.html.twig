@@ -16,9 +16,17 @@
     <div class="container-fluid">
         <div class="row">
             <div id="maincontent" class="col-md-10 col-md-offset-1">
-                <div id="srpsheader">
-                    <img src="{{ asset('images/srps_coach.png') }}">
-                    <span class="srpsfont">S.R.P.S. RAILTOURS</span>
+                <div id="header_wrapper" class="row">
+                    <div id="srpsheader" class="col-md-8">
+                        <img src="{{ asset('images/srps_coach.png') }}">
+                        <span class="srpsfont">S.R.P.S. RAILTOURS</span>
+                    </div>
+                    <div id="srpsuser" class="col-md-4">
+                        {% if system.fullname %}
+                            Logged in as <b>{{ system.fullname }}</b><br />
+                            <a class="btn btn-primary btn-xs" href="{{ path('user/logout') }}">Logout</a>
+                        {% endif %}
+                    </div>
                 </div>
                 {% block content %}{% endblock content %}
             </div>

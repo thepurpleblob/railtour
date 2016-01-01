@@ -1,20 +1,45 @@
-{% extends 'SRPSBookingBundle:Admin:admin.html.twig' %}
-
-{% form_theme form 'SRPSBookingBundle:Admin:fields.html.twig' %}
+{% extends 'admin/admin.html.twig' %}
 
 {% block content %}
-    <h2>User edit</h2>
+    <h3>User edit</h3>
 
-    <form id="user-edit-form" class="form-horizontal" action="{{ path('admin_user_edit', { 'username': user.username }) }}" 
-          novalidate="novalidate" method="post" {{ form_enctype(form) }}>
-        {{ form_rest(form) }} 
+    <form id="user-edit-form" class="form-horizontal" action="{{ path('user/edit', user.username) }}" method="post">
+        {{ form_text('firstname', 'First name', user.firstname) }}
+        {{ form_text('lastname', 'Last name', user.lastname) }}
+        {{ form_password('password', 'Password') }}
+        {{ form_select('role', 'Role', user.role, rolechoice) }}
+        {{ form_yesno('is_active', 'Active account?', user.is_active) }}
+
+        {{ form_errors(errors) }}
+
+        <div>
+            <input type="submit" name="submit" value="Save" class="btn btn-primary" />
+            <input type="submit" name="cancel" value="Cancel" class="btn btn-warning" />
+        </div>
     </form>
 
-    <button class ="btn btn-primary" onclick="$('#user-edit-form').submit();">
-        Save changes
-    </button>
-    <a class="btn btn-warning" href="{{ path('admin_user_index') }}">
-        Cancel
-    </a>
 {% endblock content %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $('#user-edit-form').validate({
+            errorClass: "validateError",
+            rules: {
+                firstname: {
+                    required: true
+                },
+                lastname: {
+                    required: true
+                },
+                password: {
+                    required: true
+                },
+                role: {
+                    required: true
+                }
+            }
+        });
+    </script>
+{% endblock javascripts %}
     

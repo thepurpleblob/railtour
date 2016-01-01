@@ -14,6 +14,7 @@ $CFG->projectname = 'railtour';
 
 // Routes (default if none specified)
 $CFG->defaultroute = '/admin/index';
+$CFG->logoutpath = 'service/index';
 
 // paths
 $CFG->www = '';

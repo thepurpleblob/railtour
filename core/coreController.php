@@ -126,7 +126,8 @@ class coreController {
     /**
      * render a view
      */
-    public function View($viewname, $variables=null) {
+    public function View($viewname, $variables=null)
+    {
         global $CFG;
 
         // also need the form class in the variables
@@ -138,8 +139,15 @@ class coreController {
 
         // TODO
         // Some global stuff gets passed in system variable
+        $user = $this->getUser();
         $system = new \stdClass();
-        $system->userrole = 'ROLE_ADMIN';
+        if ($user) {
+            $system->userrole = $user->role;
+            $system->fullname = $user->firstname . ' ' . $user->lastname;
+        } else {
+            $system->userrole = '';
+            $system->fullname = '';
+        }
         $variables['system'] = $system;
 
         // Render
@@ -181,12 +189,14 @@ class coreController {
 
     /**
      * Check for login/security
+     * Current role posibilities are ROLE_ADMIN and ROLE_ORGANISER
+     *
      */
-    public function require_login($role, $wantsurl) {
+    public function require_login($role, $wantsurl = '') {
         if (!empty($_SESSION['user'])) {
             $user = $_SESSION['user'];
-            if ($role=='admin') {
-                if ($user->role == 'admin') {
+            if ($role =='ROLE_ADMIN') {
+                if ($user->role == 'ROLE_ADMIN') {
                     return true;
                 } else {
                     $this->redirect($this->Url('user/roleerror'));
@@ -197,7 +207,7 @@ class coreController {
         }
 
         $_SESSION['wantsurl'] = $wantsurl;
-        $this->redirect($this->Url('user/login'));
+        $this->redirect('user/login');
     }
 
     /**

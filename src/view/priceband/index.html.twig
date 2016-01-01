@@ -29,13 +29,13 @@
                     <tr>
                         <td><b>{{ pricebandgroup.name }}</b></td>
                         <td>
-                            <a class="btn btn-warning" href="{{ path('priceband/edit', {
+                            <a class="btn btn-warning btn-sm" href="{{ path('priceband/edit', {
                                 'serviceid': service.id,
                                 'id': pricebandgroup.id }) }}">Edit</a>
                             {% if band.used == 0 %}
-                                <a class="btn btn-danger" href="{{ path('priceband/delete', { 'pricebandgroupid': pricebandgroup.id }) }}">Delete</a>
+                                <a class="btn btn-danger btn-sm" href="{{ path('priceband/delete', { 'pricebandgroupid': pricebandgroup.id }) }}">Delete</a>
                             {% else %}
-                                <a class="btn btn-danger disabled">Delete</a>
+                                <a class="btn btn-danger btn-sm disabled">Delete</a>
                             {% endif %}
                         </td>
                     </tr>

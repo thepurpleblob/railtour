@@ -16,6 +16,8 @@ class JoiningController extends coreController
      */
     public function indexAction($serviceid)
     {
+        $this->require_login('ROLE_ADMIN', 'joining/index/' . $serviceid);
+
         $booking = $this->getService('Booking');
 
         // Fetch basic data
@@ -45,6 +47,8 @@ class JoiningController extends coreController
      */
     public function editAction($serviceid, $joiningid)
     {
+        $this->require_login('ROLE_ADMIN', 'joining/index/' . $serviceid);
+
         $booking = $this->getService('Booking');
 
         // Fetch basic data
@@ -123,6 +127,7 @@ class JoiningController extends coreController
      */
     public function deleteAction($joiningid)
     {
+        $this->require_login('ROLE_ADMIN', 'joining/index/' . $serviceid);
 
         $joining = \ORM::forTable('Joining')->findOne($joiningid);
         if (!$joining) {

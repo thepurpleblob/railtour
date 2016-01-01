@@ -16,6 +16,8 @@ class DestinationController extends coreController
      */
     public function indexAction($serviceid)
     {
+        $this->require_login('ROLE_ADMIN', 'destination/index/' . $serviceid);
+
         $booking = $this->getService('Booking');
 
         $service = $booking->Service($serviceid);
@@ -39,6 +41,8 @@ class DestinationController extends coreController
      * Displays a form to edit an existing Destination entity.
      */
     public function editAction($serviceid, $id) {
+
+        $this->require_login('ROLE_ADMIN', 'destination/index/' . $serviceid);
 
         $booking = $this->getService('Booking');
 
@@ -102,6 +106,8 @@ class DestinationController extends coreController
      */
     public function deleteAction($id)
     {
+        $this->require_login('ROLE_ADMIN', 'destination/index/' . $serviceid);
+
         $booking = $this->getService('Booking');
 
         // delete pricebands associated with this

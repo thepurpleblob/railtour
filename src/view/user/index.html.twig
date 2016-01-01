@@ -1,11 +1,7 @@
-{% extends 'SRPSBookingBundle:Admin:admin.html.twig' %}
-
-{% block sidebar %}
-    {% include 'SRPSBookingBundle:User:sidebar.html.twig' %}
-{% endblock sidebar %}
+{% extends 'admin/admin.html.twig' %}
 
 {% block content %}
-    <h2>Railtour Users</h2>
+    <h3>Railtour Admin Users</h3>
 
     <table class="table table-striped">
         <thead>
@@ -25,16 +21,13 @@
                     <td>{{ user.firstname }}</td>
                     <td>{{ user.lastname }}</td>     
                     <td>{{ user.role }}</td>                      
-                    <td>{{ user.active ? 'Yes' : 'No' }}</td>
+                    <td>{{ user.is_active ? 'Yes' : 'No' }}</td>
                     <td>
-                        <a class="btn btn-primary" href="{{ path('admin_user_edit', { 'username': user.username }) }}">
-                            <i class="fa fa-edit"></i> Edit</a>
+                        <a class="btn btn-primary btn-sm" href="{{ path('user/edit', user.username) }}">Edit</a>
                         {% if user.username == 'admin' %}
-                            <a class="btn btn-danger disabled">
-                                <i class="fa fa-trash-o"></i> Delete</a>
+                            <a class="btn btn-danger btn-sm disabled">Delete</a>
                         {% else %}
-                            <a class="btn btn-danger" href="{{ path('admin_user_delete', { 'username': user.username }) }}">
-                                <i class="fa fa-trash-o"></i> Delete</a>
+                            <a class="btn btn-danger btn-sm" href="{{ path('user/delete', user.username) }}">Delete</a>
                         {% endif %}
                     </td>
                 </tr>
@@ -43,7 +36,7 @@
         </table>
 
         <div class="btn-group">
-            <a class="btn btn-primary" href="{{ path('admin_user_new') }}">
+            <a class="btn btn-primary" href="{{ path('user/new') }}">
                 Add a new user
             </a>
         </div>

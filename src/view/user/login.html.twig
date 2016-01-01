@@ -2,32 +2,31 @@
 
 {% block content %}   
     
-    <h2>SRPS Railtours</h2>
-    
+    <h3>SRPS Railtours</h3>
+
+    <div class="alert alert-info">
+        Enter your username and password to login.
+    </div>
    
     <div class="row-fluid">
         {% if error %}
             <div>{{ error.message }}</div>
         {% endif %}
 
-        <form action="{{ path('login_check') }}" method="post" role="form">
+        <form action="{{ path('user/login') }}" method="post">
             <div class="form-group">
                 <label for="username">Username:</label>
-                <input type="text" class="form-control" id="username" name="_username" value="{{ last_username }}" />
+                <input type="text" class="form-control" id="username" name="username" value="{{ last_username }}" />
             </div>
 
             <div class="form-group">
                 <label for="password">Password:</label>
-                <input type="password" class="form-control" id="password" name="_password" />
+                <input type="password" class="form-control" id="password" name="password" />
             </div>
 
-            {#
-                If you want to control the URL the user
-                is redirected to on success (more details below)
-                <input type="hidden" name="_target_path" value="/account" />
-            #}
+            {{ form_errors(errors) }}
 
-            <button type="submit" class="btn btn-default"><i class="fa fa-user fa-lg"></i>login</button>
+            <button type="submit" class="btn btn-default">login</button>
         </form>
     </div>
 {% endblock content %}
