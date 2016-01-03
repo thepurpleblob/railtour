@@ -1,0 +1,20 @@
+{% extends 'SRPSBookingBundle:Booking:booking.html.twig' %}
+
+{% block content %}
+    <h2>SRPS Railtours Online Booking</h2>
+
+    <h3 class="text-error">"{{ service.name }}" Booking closed</h3>
+
+    <p class="text-warning">
+        Booking for this tour is currently closed. Please call our booking line
+        on <b>0131 202 1033</b> for up to date information.
+    </p>
+
+
+    <div>
+        <a class="btn btn-warning" href="http://www.srps.org.uk/railtours">
+            Return to Railtours site
+        </a>
+    </div>
+
+{% endblock content %}

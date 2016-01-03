@@ -1,0 +1,27 @@
+{% extends 'SRPSBookingBundle:Booking:booking.html.twig' %}
+
+{% form_theme form 'SRPSBookingBundle:Admin:fields.html.twig' %}
+
+{% block content %}
+    <h2>SRPS Railtours Online Booking</h2>
+
+    <h3 class="text-error">Your personal details</h3>
+
+    <p>
+        Please provide your contact details and address for delivery of
+        your Railtour tickets. Make sure you provide a working email and/or
+        telephone contact so we can get in touch with you if we need to.
+    </p>
+
+    <form id="personal-form" class="form-horizontal" action="{{ path('booking_personal') }}"
+          novalidate="novalidate" method="post" {{ form_enctype(form) }}>
+      {{ form_rest(form) }}
+    </form>
+
+    <div>
+        <a class="btn btn-primary" onclick="$('#personal-form').submit();">
+            Next step
+        </a>
+    </div>
+
+{% endblock content %}

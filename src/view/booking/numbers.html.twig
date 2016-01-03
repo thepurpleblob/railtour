@@ -1,0 +1,36 @@
+{% extends 'SRPSBookingBundle:Booking:booking.html.twig' %}
+
+{% form_theme form 'SRPSBookingBundle:Admin:fields.html.twig' %}
+
+{% block content %}
+    <h2>SRPS Railtours Online Booking</h2>
+
+    <h3 class="text-error">People in your party...</h3>
+
+    <p>
+        Tell us how many adults and children (14 and under) are travelling in
+        your party. Do not include infants who travel free but will not
+        be allocated a seat.
+    </p>
+
+    <p class="alert">
+        Your party can have a maximum of {{ maxparty }} persons.
+    </p>
+
+    <form id="numbers-form" class="form-horizontal" action="{{ path('booking_numbers', {'code': code}) }}"
+          novalidate="novalidate" method="post" {{ form_enctype(form) }}>
+      {{ form_row(form.adults) }}
+      {{ form_row(form.children) }}
+      {{ form_rest(form) }}
+    </form>
+
+    <div>
+        <a class="btn btn-primary" onclick="$('#numbers-form').submit();">
+            Next step
+        </a>
+        <a class="btn btn-warning" href="http://railtours.srps.org.uk/">
+            Cancel
+        </a>
+    </div>
+
+{% endblock content %}

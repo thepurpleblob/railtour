@@ -17,7 +17,20 @@ class Booking
         $service = \ORM::forTable('Service')->findOne($id);
 
         if (!$service) {
-            throw $this->Exception('Unable to find Service record for id = ' . $id);
+            throw new \Exception('Unable to find Service record for id = ' . $id);
+        }
+
+        return $service;
+    }
+
+    /**
+     * Get the service given the service 'code'
+     */
+    public function serviceFromCode($code) {
+        $service = \ORM::forTable('Service')->where('code', $code)->findOne();
+
+        if (!$service) {
+            throw new \Exception('Unable to find Service record for code = ' . $code);
         }
 
         return $service;
@@ -212,6 +225,20 @@ class Booking
         }
 
         return $limits;
+    }
+
+    /**
+     * Basic checks to ensure booking can procede
+     * TODO: Fix the date shit so it works!
+     */
+    public function canProceedWithBooking($service, $count) {
+        $today = new \DateTime('today midnight');
+        $seatsavailable =
+            (($count->remainingfirst > 0) or ($count->remainingstandard > 0));
+        $isvisible = ($service->visible);
+        $isindate = ($service->date > $today);
+
+        return ($seatsavailable and $isvisible and $isindate);
     }
 
     /**

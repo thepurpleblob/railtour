@@ -1,0 +1,26 @@
+{% extends 'SRPSBookingBundle:Booking:booking.html.twig' %}
+
+{% form_theme form 'SRPSBookingBundle:Admin:fields.html.twig' %}
+
+{% block content %}
+    <h2>SRPS Railtours Online Booking</h2>
+
+    <h3 class="text-error">Joining station...</h3>
+
+    <p>
+        Tell us which station you will be joining the train at.
+    </p>
+
+    <form id="joining-form" class="form-horizontal" action="{{ path('booking_joining') }}"
+          novalidate="novalidate" method="post" {{ form_enctype(form) }}>
+      {{ form_row(form.joining) }}
+      {{ form_rest(form) }}
+    </form>
+
+    <div>
+        <a class="btn btn-primary" onclick="$('#joining-form').submit();">
+            Next step
+        </a>
+    </div>
+
+{% endblock content %}
