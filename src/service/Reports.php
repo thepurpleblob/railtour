@@ -1,14 +1,8 @@
 <?php
 
-namespace SRPS\BookingBundle\Service;
+namespace thepurpleblob\railtour\service;
 
 class Reports {
-    
-    protected $em;
-    
-    public function _construct($em) {
-        $this->em = $em;
-    }
     
     private function clean($string, $length=255) {
         
@@ -40,55 +34,55 @@ class Reports {
             $l[] = 'O';
             
             // Tour ref
-            $l[] = $this->clean($p->getCode());
+            $l[] = $this->clean($p->code);
             
             // Bkg ref
-            $l[] = $this->clean($p->getBookingref());
+            $l[] = $this->clean($p->bookingref);
             
             // Surname
-            $l[] = $this->clean($p->getSurname(), 20);
+            $l[] = $this->clean($p->surname, 20);
             
             // Title
-            $l[] = $this->clean($p->getTitle(), 12);
+            $l[] = $this->clean($p->title, 12);
             
             // First names
-            $l[] = $this->clean($p->getFirstname(), 20);
+            $l[] = $this->clean($p->firstname, 20);
             
             // Address line 1
-            $l[] = $this->clean($p->getAddress1(), 25);
+            $l[] = $this->clean($p->address1, 25);
             
             // Address line 2
-            $l[] = $this->clean($p->getAddress2(), 25);
+            $l[] = $this->clean($p->address2, 25);
             
             // Address line 3
-            $l[] = $this->clean($p->getCity(), 25);
+            $l[] = $this->clean($p->city, 25);
             
             // Address line 4
-            $l[] = $this->clean($p->getCounty(), 25);
+            $l[] = $this->clean($p->county, 25);
             
             // Post code
-            $l[] = $this->clean($p->getPostcode(), 8);
+            $l[] = $this->clean($p->postcode, 8);
             
             // Phone No
-            $l[] = $this->clean($p->getPhone(), 15);
+            $l[] = $this->clean($p->phone, 15);
             
             // Email
-            $l[] = $this->clean($p->getEmail(), 50);
+            $l[] = $this->clean($p->email, 50);
             
             // Start
-            $l[] = $this->clean($p->getJoining());
+            $l[] = $this->clean($p->joining);
             
             // Destination
-            $l[] = $this->clean($p->getDestination());
+            $l[] = $this->clean($p->destination);
             
             // Class
-            $l[] = $this->clean($p->getClass(), 1);
+            $l[] = $this->clean($p->class, 1);
             
             // Adults
-            $l[] = $this->clean($p->getAdults());
+            $l[] = $this->clean($p->adults);
             
             // Children
-            $l[] = $this->clean($p->getChildren());
+            $l[] = $this->clean($p->children);
             
             // OAP (not used)
             $l[] = '0';
@@ -97,29 +91,28 @@ class Reports {
             $l[] = '0';
             
             // Meal A
-            $l[] = $this->clean($p->getMeala());
+            $l[] = $this->clean($p->meala);
             
             // Meal B
-            $l[] = $this->clean($p->getMealb());
+            $l[] = $this->clean($p->mealb);
             
             // Meal C
-            $l[] = $this->clean($p->getMealc());
+            $l[] = $this->clean($p->mealc);
             
             // Meal D
-            $l[] = $this->clean($p->getMeald());
+            $l[] = $this->clean($p->meald);
             
             // Comment
-            $l[] = $this->clean($p->getComment(), 39);
+            $l[] = $this->clean($p->comment, 39);
             
             // Payment
-            $l[] = $this->clean(intval($p->getPayment() * 100));
+            $l[] = $this->clean(intval($p->payment * 100));
             
             // Booking Date
-            $bookingdate = $p->getDate();
-            $l[] = $this->clean($bookingdate->format('Ymd'));
+            $l[] = $this->clean($p->date);
             
             // Seat supplement
-            $l[] = $p->isSeatsupplement() ? 'Y' : 'N';
+            $l[] = $p->seatsupplement ? 'Y' : 'N';
             
             // Card Payment
             $l[] = 'Y';

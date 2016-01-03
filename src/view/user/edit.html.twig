@@ -3,7 +3,10 @@
 {% block content %}
     <h3>User edit</h3>
 
-    <form id="user-edit-form" class="form-horizontal" action="{{ path('user/edit', user.username) }}" method="post">
+    <form id="user-edit-form" class="form-horizontal" action="{{ path('user/edit', username) }}" method="post">
+        {% if not username %}
+            {{ form_text('username', 'Username', '') }}
+        {% endif %}
         {{ form_text('firstname', 'First name', user.firstname) }}
         {{ form_text('lastname', 'Last name', user.lastname) }}
         {{ form_password('password', 'Password') }}
@@ -26,13 +29,15 @@
         $('#user-edit-form').validate({
             errorClass: "validateError",
             rules: {
+                {% if not username %}
+                    username: {
+                        required: true
+                    },
+                {% endif %}
                 firstname: {
                     required: true
                 },
                 lastname: {
-                    required: true
-                },
-                password: {
                     required: true
                 },
                 role: {

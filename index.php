@@ -13,7 +13,7 @@ ini_set('display_errors', 'stdout');
 if (isset($_SERVER['PATH_INFO'])) {
     $info = $_SERVER['PATH_INFO'];
 } else {
-    $info = $CFG->defaultroute;
+    $info = '/' . $CFG->defaultroute;
 }
 
 if ($info) {

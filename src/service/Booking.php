@@ -274,14 +274,10 @@ class Booking
      * Clear the current session data and delete any expired purchases
      */
     public function cleanPurchases() {
-        $em = $this->em;
-
-        // TODO (fix) Get the session
-        $session = new Session();
 
         // TODO (fix) remove the key and the purchaseid
-        $session->remove('key');
-        $session->remove('purchaseid');
+        unset($_SESSION['key']);
+        unset($_SESSION['purchaseid']);
 
         // get incomplete purchases
         $this->deleteOldPurchases();

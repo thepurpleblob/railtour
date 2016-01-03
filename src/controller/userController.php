@@ -101,7 +101,8 @@ class UserController extends coreController
         $this->redirect($CFG->defaultroute);
     }
     
-    public function editAction($username) {
+    public function editAction($username = '')
+    {
 
         $this->require_login('ROLE_ADMIN', 'user/index');
 
@@ -111,10 +112,19 @@ class UserController extends coreController
             'ROLE_ORGANISER' => 'ROLE_ORGANISER',
         );
 
-        // find the user
-        $user = \ORM::forTable('srps_users')->where('username', $username)->findOne();
-        if (!$user) {
-            throw new \Exception("User $username not found in db");
+        // find/create the user
+        if (!empty($username)) {
+            $user = \ORM::forTable('srps_users')->where('username', $username)->findOne();
+            if (!$user) {
+                throw new \Exception("User $username not found in db");
+            }
+        } else {
+            $user = \ORM::forTable('srps_users')->create();
+            $user->username = '';
+            $user->firstname = '';
+            $user->lastname = '';
+            $user->role = 'ROLE_ORGANISER';
+            $user->is_active = 1;
         }
 
         // hopefully no errors
@@ -129,18 +139,27 @@ class UserController extends coreController
             }
 
             // Validate
-            $this->gump->validation_rules(array(
+            $rules = array(
                 'firstname' => 'required',
                 'lastname' => 'required',
                 'role' => 'required',
-                'password' => 'required',
-            ));
+            );
+            if (!$username) {
+                $rules['username'] = 'required';
+            }
+            $this->gump->validation_rules($rules);
 
             if ($data = $this->gump->run($data)) {
+                if (empty($user->username)) {
+                    $user->username = $data['username'];
+                }
                 $user->firstname = $data['firstname'];
                 $user->lastname = $data['lastname'];
                 $user->role = $data['role'];
                 $user->is_active = $data['is_active'];
+                if (!empty($data['password'])) {
+                    $user->password = md5($data['password']);
+                }
                 $user->save();
                 $this->redirect('user/index');
             } else {
@@ -151,43 +170,14 @@ class UserController extends coreController
         
         // display form
         return $this->View('user/edit.html.twig', array(
+            'username' => $username,
             'user' => $user,
             'rolechoice' => $rolechoice,
             'errors' => $errors,
         ));        
     }
-
-    public function newAction(Request $request) {
-        
-        $em = $this->getDoctrine()->getManager();
-        
-        // create empty user
-        $user = new User();
-        
-        // Create form
-        $usertype = new UserType(false);
-        $form = $this->createForm($usertype, $user);
-        
-        // submitted?
-        $form->handleRequest($request);
-            if ($form->isValid()) {
-
-                $em->persist($user);
-                $em->flush();
-
-                return $this->redirect($this->generateUrl('admin_user_index'));
-            }
-        
-        // display form
-        return $this->render('SRPSBookingBundle:User:new.html.twig', array(
-            'user' => $user,
-            'form' => $form->createView(),
-        ));        
-    }    
     
     public function deleteAction($username) {
-        
-        $em = $this->getDoctrine()->getManager();
         
         // check it isn't admin
         if ('admin'==$username) {
@@ -195,17 +185,15 @@ class UserController extends coreController
         }
         
         // find the user
-        $user = $em->getRepository('SRPSBookingBundle:User')
-            ->findOneBy(array('username'=>$username));  
+        $user = \ORM::forTable('srps_users')->where('username', $username)->findOne();
         if (!$user) {
             throw new \Exception("User $username not found in db");
         }
         
         // Delete the user
-        $em->remove($user);
-        $em->flush();
+        $user->delete();
 
-        return $this->redirect($this->generateUrl('admin_user_index'));
+        return $this->redirect('user/index');
     }    
 }
 
