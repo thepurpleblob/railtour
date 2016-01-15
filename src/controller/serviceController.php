@@ -219,6 +219,20 @@ class ServiceController extends coreController
     }
 
     /**
+     * Duplicate a complete service
+     */
+    public function duplicateAction($serviceid) {
+        $this->require_login('ROLE_ADMIN', 'service/show/' . $id);
+
+        $booking = $this->getService('Booking');
+        $service = $booking->Service($id);
+
+        $newservice = $booking->duplicate($service);
+
+        $this->redirect('service/show/' . $newservice->id);
+    }
+
+    /**
      * Calls routines to set the system up
      * (hidden)
      */
