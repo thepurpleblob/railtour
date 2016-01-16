@@ -105,6 +105,9 @@ class Booking
 
     /**
      * Create new joining thing
+     * @param $serviceid int
+     * @param $pricebandgroups array
+     * @return object new (empty) joining object
      */
     public function createJoining($serviceid, $pricebandgroups) {
         $joining = \ORM::forTable('Joining')->create();
@@ -390,8 +393,29 @@ class Booking
                     throw new \Exception('No pricebandgroup mapping exists for id = ' . $priceband->pricebandgroupid);
                 }
                 $newpriceband = \ORM::forTable('priceband')->create();
+                $newpriceband->serviceid = $newserviceid;
+                if (empty($destmap[$priceband->destinationid])) {
+                    throw new \Exception('No destination mapping exists for id = ' . $priceband->destinationid);
+                }
+                $newpriceband->destinationid = $destmap[$priceband->destinationid];
+                if (empty($pbmap[$priceband->pricebandgroupid])) {
+                    throw new \Exception('No pricebandgroup mapping exists for id = ' . $priceband->pricebandgroupid);
+                }
+                $newpriceband->pricebandgroupid = $pbmap[$priceband->pricebandgroupid];
+                $newpriceband->save();
             }
         }
+
+        // duplicate limits
+        $limits = \ORM::forTable('limits')->where('serviceid', $serviceid)->findOne();
+        if ($limits) {
+            $newlimits = \ORM::forTable('limits')->create();
+            $this->duplicateRecord($limits, $newlimits);
+            $newlimits->serviceid = $newserviceid;
+            $newlimits->save();
+        }
+
+        return $newservice;
     }
 
     /**
@@ -694,7 +718,7 @@ class Booking
             if ($dlimit==0) {
                 $destinationcount->remaining = '-';
             } else {
-                $destinationcount->remaining = $dlimit - $dbcount - $dpcount;
+                $destinationcount->remaining = $dlimit - $destinationcount->booked - $dpcount;
             }
 
             $destinationcounts[$crs] = $destinationcount;

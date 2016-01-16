@@ -68,7 +68,7 @@ class ServiceController extends coreController
         $service = \ORM::forTable('Service')->findOne($id);
 
         if (!$service) {
-            throw $this->Exception('Unable to find Service entity.');
+            throw new \Exception('Unable to find Service entity.');
         }
 
         if (($visible != 1) && ($visible != 0)) {
@@ -94,7 +94,7 @@ class ServiceController extends coreController
         $service = $booking->Service($id);
 
         if (!$service) {
-            throw $this->Exception('Unable to find Service entity.');
+            throw new \Exception('Unable to find Service entity.');
         }
 
         // Get the other information stored for this service
@@ -139,7 +139,7 @@ class ServiceController extends coreController
             $service = \ORM::forTable('Service')->findOne($id);
 
             if (!$service) {
-                throw $this->Exception('Unable to find Service.');
+                throw new \Exception('Unable to find Service.');
             }
         } else {
             $booking = $this->getService('Booking');
@@ -222,14 +222,14 @@ class ServiceController extends coreController
      * Duplicate a complete service
      */
     public function duplicateAction($serviceid) {
-        $this->require_login('ROLE_ADMIN', 'service/show/' . $id);
+        $this->require_login('ROLE_ADMIN', 'service/show/' . $serviceid);
 
         $booking = $this->getService('Booking');
-        $service = $booking->Service($id);
+        $service = $booking->Service($serviceid);
 
         $newservice = $booking->duplicate($service);
 
-        $this->redirect('service/show/' . $newservice->id);
+        $this->redirect('service/edit/' . $newservice->id);
     }
 
     /**
