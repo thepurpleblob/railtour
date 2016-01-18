@@ -336,9 +336,9 @@ class Booking
         // duplicate service
         $newservice = \ORM::forTable('service')->create();
         $this->duplicateRecord($service, $newservice);
-        $service->code = "CHANGE";
-        $service->date = date("Y-m-d");
-        $service->visible = 0;
+        $newservice->code = "CHANGE";
+        $newservice->date = date("Y-m-d");
+        $newservice->visible = 0;
         $newservice->save();
         $newserviceid = $newservice->id();
 
@@ -393,6 +393,7 @@ class Booking
                     throw new \Exception('No pricebandgroup mapping exists for id = ' . $priceband->pricebandgroupid);
                 }
                 $newpriceband = \ORM::forTable('priceband')->create();
+                $this->duplicateRecord($priceband, $newpriceband);
                 $newpriceband->serviceid = $newserviceid;
                 if (empty($destmap[$priceband->destinationid])) {
                     throw new \Exception('No destination mapping exists for id = ' . $priceband->destinationid);
@@ -416,6 +417,38 @@ class Booking
         }
 
         return $newservice;
+    }
+
+    /**
+     * Delete complete service
+     */
+    public function deleteService($service) {
+
+        // Check there are no purchases. We should not have got here if there
+        // are, but we'll check anyway
+        if (\ORM::forTable('purchase')->where('serviceid', $serviceid)->count()) {
+            throw new \Exception('Trying to delete service with purchases. id = ' . $serviceid);
+        }
+
+        $serviceid = $service->id;
+
+        // Delete limits
+        \ORM::forTable('limits')->where('serviceid', $serviceid)->delete_many();
+
+        // Delete pricebands
+        \ORM::forTable('priceband')->where('serviceid', $serviceid)->delete_many();
+
+        // Delete joining stations
+        \ORM::forTable('joining')->where('serviceid', $serviceid)->delete_many();
+
+        // Delete pricebandgroups
+        \ORM::forTable('pricebandgroup')->where('serviceid', $serviceid)->delete_many();
+
+        // Delete destinations
+        \ORM::forTable('destination')->where('serviceid', $serviceid)->delete_many();
+
+        // Finally, delete the service
+        $service->delete();
     }
 
     /**
