@@ -426,7 +426,7 @@ class Booking
 
         // Check there are no purchases. We should not have got here if there
         // are, but we'll check anyway
-        if (\ORM::forTable('purchase')->where('serviceid', $serviceid)->count()) {
+        if (\ORM::forTable('purchase')->where('serviceid', $service->id)->count()) {
             throw new \Exception('Trying to delete service with purchases. id = ' . $serviceid);
         }
 

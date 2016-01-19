@@ -17,9 +17,9 @@ $CFG->defaultroute = '/admin/index';
 $CFG->logoutpath = 'service/index';
 
 // paths
-$CFG->www = '';
+$CFG->www = 'http://localhost/railtour';
 
-$CFG->dirroot = '';
+$CFG->dirroot = '/var/www/railtour';
 
 // Enable booking
 $CFG->enablebooking = true;
