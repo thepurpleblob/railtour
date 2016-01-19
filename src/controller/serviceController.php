@@ -68,7 +68,7 @@ class ServiceController extends coreController
         $service = \ORM::forTable('Service')->findOne($id);
 
         if (!$service) {
-            throw $this->Exception('Unable to find Service entity.');
+            throw new \Exception('Unable to find Service entity.');
         }
 
         if (($visible != 1) && ($visible != 0)) {
@@ -94,7 +94,7 @@ class ServiceController extends coreController
         $service = $booking->Service($id);
 
         if (!$service) {
-            throw $this->Exception('Unable to find Service entity.');
+            throw new \Exception('Unable to find Service entity.');
         }
 
         // Get the other information stored for this service
@@ -139,7 +139,7 @@ class ServiceController extends coreController
             $service = \ORM::forTable('Service')->findOne($id);
 
             if (!$service) {
-                throw $this->Exception('Unable to find Service.');
+                throw new \Exception('Unable to find Service.');
             }
         } else {
             $booking = $this->getService('Booking');
@@ -173,7 +173,7 @@ class ServiceController extends coreController
                 'mealavisible' => 'required|integer',
                 'mealaprice' => 'required|numeric',
                 'mealbname' => 'required',
-                'mealbvisible' => 'required|boolean',
+                'mealbvisible' => 'required|integer',
                 'mealbprice' => 'required|numeric',
                 'mealcname' => 'required',
                 'mealcvisible' => 'required|integer',
@@ -204,6 +204,7 @@ class ServiceController extends coreController
                 $service->mealdvisible = $data['mealdvisible'];
                 $service->mealdprice = $data['mealdprice'];
                 $service->save();
+
                 $id = $service->id();
                 $this->redirect('service/show/' . $id);
             } else {
@@ -215,6 +216,52 @@ class ServiceController extends coreController
             'service'      => $service,
             'serviceid' => $id,
             'errors' => $errors
+        ));
+    }
+
+    /**
+     * Duplicate a complete service
+     */
+    public function duplicateAction($serviceid) {
+        $this->require_login('ROLE_ADMIN', 'service/show/' . $serviceid);
+
+        $booking = $this->getService('Booking');
+        $service = $booking->Service($serviceid);
+
+        $newservice = $booking->duplicate($service);
+
+        $this->redirect('service/edit/' . $newservice->id);
+    }
+
+    /**
+     * Delete a service provided that there are no purchases
+     */
+    public function deleteAction($serviceid) {
+        $this->require_login('ROLE_ADMIN', 'service/show/' . $serviceid);
+
+        $booking = $this->getService('Booking');
+        $service = $booking->Service($serviceid);
+
+        // If there are purchases, we're out of here
+        if (\ORM::forTable('purchase')->where('serviceid', $serviceid)->count()) {
+            $haspurchases = true;
+        } else {
+            $haspurchases = false;
+
+            // anything submitted?
+            if ($data = $this->getRequest()) {
+
+                // Delete?
+                if (!empty($data['delete'])) {
+                    $booking->deleteService($service);
+                }
+                $this->redirect('service/index');
+            }
+        }
+
+        $this->View('service/delete.html.twig', array(
+            'service' => $service,
+            'haspurchases' => $haspurchases,
         ));
     }
 

@@ -17,16 +17,16 @@ function exception_handler(Exception $e) {
 
 // MAIN SETUP STUFF
 
-// establish database connection
-//require_once('idiorm/idiorm.php');
+// Configure Idiorm
 ORM::configure($CFG->dsn);
 ORM::configure('username', $CFG->dbuser);
 ORM::configure('password', $CFG->dbpass);
+ORM::configure('logging', true);
 
-// set exception handler
+// Set exception handler
 set_exception_handler('exception_handler');
 
-// start the session
+// Start the session
 ini_set('session.gc_maxlifetime', 7200);
 session_set_cookie_params(7200);
 session_name('SRPS_Santas');

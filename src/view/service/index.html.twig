@@ -37,15 +37,16 @@
                     </td>
                     <td>{% if service.date %}{{ service.date|date('d/m/Y') }}{% endif %}</td>
                     <td>
-                        <a class="btn btn-sm btn-success" href="{{ path('service/show', service.id) }}">show</a>
+                        <a class="btn btn-sm btn-success" href="{{ path('service/show', service.id) }}">Show</a>
                         <a class="btn btn-sm btn-primary" href="{{  path('limits/edit', service.id) }}">Limits</a>
                         {% if service.visible and enablebooking %}
-                            <a class="btn btn-sm btn-info" href="{{ path('booking/index', service.code) }}">Booking</a>
+                            <a class="btn btn-sm btn-info" href="{{ path('booking/index', service.code) }}">Book</a>
                         {% else %}
-                            <a class="btn btn-sm btn-info disabled">Booking</a>
+                            <a class="btn btn-sm btn-info disabled">Book</a>
                         {% endif %}
-                        <a class="btn btn-sm btn-warning" href="{{ path('report/list', service.id) }}">Report</a>
-                        <a class="btn btn-sm btn-warning" href="{{ path('report/export', service.id) }}">Export</a>
+                        <a class="btn btn-sm btn-warning" href="{{ path('report/list', service.id) }}">Report/Export</a>
+                        <a class="btn btn-sm btn-danger" href="{{ path('service/duplicate', service.id) }}">Duplicate</a>
+                        <a class="btn btn-sm btn-danger" href="{{ path('service/delete', service.id) }}">Delete</a>
                     </td>
                 </tr>
         {% endfor %}
