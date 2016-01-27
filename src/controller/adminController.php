@@ -6,6 +6,13 @@ use thepurpleblob\core\coreController;
 
 class AdminController extends coreController
 {
+    // default (no route) page shows available services
+    public function mainAction() {
+
+        $booking = $this->getService('Booking');
+
+    }
+
     public function indexAction()
     {
         $this->View('admin/index.html.twig');
