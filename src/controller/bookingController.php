@@ -8,6 +8,7 @@ class BookingController extends coreController
 {
     public function indexAction($code)
     {
+        // Basics
         $booking = $this->getService('Booking');
 
         // Clear session and delete expired purchases
@@ -30,43 +31,30 @@ class BookingController extends coreController
         }
 
         if ($booking->canProceedWithBooking($service, $count)) {
-            return $this->View('booking/index.html.twig', array(
+            $this->View('booking/index.html.twig', array(
                 'code' => $code,
                 'maxparty' => $maxparty,
                 'service' => $service
             ));
         } else {
-             return $this->View('booking/closed.html.twig', array(
+             $this->View('booking/closed.html.twig', array(
                 'code' => $code,
                 'service' => $service
             ));
         }
     }
 
-    public function numbersAction($code, Request $request)
+    public function numbersAction($serviceid)
     {
-        $em = $this->getDoctrine()->getManager();
-        $booking = $this->get('srps_booking');
+        // Basics
+        $booking = $this->getService('Booking');
+        $service = $booking->Service($serviceid);
 
-        // Get the service object
-        $service = $em->getRepository('SRPSBookingBundle:Service')
-            ->findOneByCode($code);
-        if (!$service) {
-            throw $this->createNotFoundException('Unable to find code ' . $code);
-        }
-
-        // Get the limits for this service
-        $limits = $em->getRepository('SRPSBookingBundle:Limits')
-            ->findOneByServiceid($service->getId());
-        if (!$limits) {
-            throw $this->createNotFoundException('Unable to find limits for serviceid ' . $service->getId());
-        }
-
-        // get the booking ref prefix
-        $bookingrefprefix = $this->container->getParameter('bookingrefprefix');
+        // Get the limits for this service:
+        $limits = $booking->getLimits($serviceid);
 
         // Grab current purchase
-        $purchase = $booking->getPurchase($service->getId(), $code, $bookingrefprefix);
+        $purchase = $booking->getPurchase($serviceid, $code, $bookingrefprefix);
 
         // create form
         $numberstype = new NumbersType($limits->getMaxparty());

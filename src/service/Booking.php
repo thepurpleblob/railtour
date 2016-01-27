@@ -27,13 +27,17 @@ class Booking
      * Get the service given the service 'code'
      */
     public function serviceFromCode($code) {
-        $service = \ORM::forTable('Service')->where('code', $code)->findOne();
+        $services = \ORM::forTable('Service')->where('code', $code)->findMany();
 
-        if (!$service) {
+        if (!$services) {
             throw new \Exception('Unable to find Service record for code = ' . $code);
         }
 
-        return $service;
+        if (count($services) > 1) {
+            throw new \Exception('More than one service defined with code = ' . $code);
+        }
+
+        return reset($services);
     }
 
     /**
@@ -235,7 +239,7 @@ class Booking
      * TODO: Fix the date shit so it works!
      */
     public function canProceedWithBooking($service, $count) {
-        $today = new \DateTime('today midnight');
+        $today = date('Y-m-d');
         $seatsavailable =
             (($count->remainingfirst > 0) or ($count->remainingstandard > 0));
         $isvisible = ($service->visible);
@@ -427,7 +431,7 @@ class Booking
         // Check there are no purchases. We should not have got here if there
         // are, but we'll check anyway
         if (\ORM::forTable('purchase')->where('serviceid', $service->id)->count()) {
-            throw new \Exception('Trying to delete service with purchases. id = ' . $serviceid);
+            throw new \Exception('Trying to delete service with purchases. id = ' . $service->id);
         }
 
         $serviceid = $service->id;

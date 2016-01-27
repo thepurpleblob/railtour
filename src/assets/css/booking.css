@@ -59,3 +59,18 @@ div#sb_info {
     text-align: center;
     margin: 15px 6px 15px 0;
 }
+
+.alert-large {
+    font-size: 145%;
+    font-weight: bold;
+    padding-bottom: 10px;
+}
+
+#booking-warning {
+    color: #212121;
+}
+
+.srpsnavbar {
+    background-color: #212121;
+    color: #ffffff;
+}

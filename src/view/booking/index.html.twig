@@ -1,34 +1,43 @@
 {% extends 'booking/booking.html.twig' %}
 
 {% block content %}
-    <h2>SRPS Railtours Online Booking</h2>
+    <div class="srpsnavbar">
+        SRPS Railtours Online Booking "{{ service.name }}"
+    </div>
 
-    <h3 class="text-error">Important booking information - please read first</h3>
+    <div class="row">
 
-    <p class="text-warning">
-        Only use this service if all members of your party are taking the same
-        trip in the same class.
-    </p>
+        <div id="booking-warning" class="col-md-6 alert alert-danger">
+            <p class="alert-large">Important booking information. Please read first.</p>
 
-    <p>
-        Please do <b>not</b> use this online booking service if you have any
-        special requirements. Such requirements include:
-    </p>
+            <div>
+                <p>
+                    Only use this service if all members of your party are taking the same
+                    trip in the same class.
+                </p>
 
-    <ul>
-        <li>limited mobility,</li>
-        <li>dietary requirements,</li>
-        <li>groups of more than {{ maxparty }} persons,</li>
-        <li>any other special requests</li>
-    </ul>
+                <p>
+                    Please do <b>not</b> use this online booking service if you have any
+                    special requirements. Such requirements include:
+                </p>
 
-    <p>
-        In these cases, or if you have any other queries, please phone our
-        booking line on <strong>0131 202 1033 (7pm to 9pm)</strong>.
-    </p>
+                <ul>
+                    <li>limited mobility,</li>
+                    <li>dietary requirements,</li>
+                    <li>groups of more than {{ maxparty }} persons,</li>
+                    <li>any other special requests</li>
+                </ul>
+            </div>
+
+            <p>
+                In these cases, or if you have any other queries, please phone our
+                booking line on <strong>0131 202 1033 (7pm to 9pm)</strong>.
+            </p>
+        </div> <!-- class="col-md.." -->
+    </div> <!-- class="row" -->
 
     <div>
-        <a class="btn btn-primary" href="{{ path('booking_numbers', {'code': code}) }}">
+        <a class="btn btn-primary" href="{{ path('booking/numbers', service.id) }}">
             Book tour '{{ service.name }}'
         </a>
         <a class="btn btn-warning" href="http://www.srps.org.uk/railtours">
