@@ -44,7 +44,7 @@ class Booking
      * Create new Service
      */
     public function createService() {
-        $service = \ORM::for_table('Service')->create();
+        $service = \ORM::for_table('service')->create();
         $service->code = '';
         $service->name = '';
         $service->description = '';
@@ -67,6 +67,18 @@ class Booking
         $service->commentbox = false;
 
         return $service;
+    }
+
+    /**
+     * Get services available to book
+     */
+    public function availableServices() {
+
+        // Get 'likely' candidates
+        $services = \ORM::for_table('service')->where(array(
+            'visible' => true,
+        ))
+
     }
 
     /**
@@ -294,7 +306,7 @@ class Booking
     }
 
     /**
-     * Clear incomple purchases that are time expired
+     * Clear incomplete purchases that are time expired
      */
     public function deleteOldPurchases() {
         $oldtime = time() - PURCHASE_LIFETIME;
