@@ -75,10 +75,18 @@ class Booking
     public function availableServices() {
 
         // Get 'likely' candidates
-        $services = \ORM::for_table('service')->where(array(
-            'visible' => true,
-        ))
+        $potentialservices = \ORM::for_table('service')->where('visible', true)->findMany();
 
+        // We need to do more checks to see if it is really available
+        $services = array();
+        foreach ($potentialservices as $service) {
+            $count = $this->countStuff($service->id);
+            if ($this->canProceedWithBooking($service, $count)) {
+                $services[$service->id] = $service;
+            }
+        }
+
+        return $services;
     }
 
     /**
