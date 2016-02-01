@@ -245,12 +245,12 @@ class coreController {
     }
 
     /**
-     * Get service (Model) class (from src/service directory)
+     * Get library (Business rules?) class (from src/library directory)
      */
-    public function getService($name) {
+    public function getLibrary($name) {
         global $CFG;
 
-        $classname = '\\thepurpleblob\\' . $CFG->projectname . '\\service\\' . $name;
+        $classname = '\\thepurpleblob\\' . $CFG->projectname . '\\library\\' . $name;
         return new $classname;
     }
 

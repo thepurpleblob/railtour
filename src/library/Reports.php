@@ -1,6 +1,6 @@
 <?php
 
-namespace thepurpleblob\railtour\service;
+namespace thepurpleblob\railtour\library;
 
 class Reports {
     

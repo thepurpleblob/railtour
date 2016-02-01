@@ -19,7 +19,7 @@ class PricebandController extends coreController
     {
         $this->require_login('ROLE_ADMIN', 'priceband/index/' . $serviceid);
 
-        $booking = $this->getService('Booking');
+        $booking = $this->getLibrary('Booking');
         $service = $booking->Service($serviceid);
         
         // Get the Pricebandgroup
@@ -67,7 +67,7 @@ class PricebandController extends coreController
     {
         $this->require_login('ROLE_ADMIN', 'priceband/index/' . $serviceid);
 
-        $booking = $this->getService('Booking');
+        $booking = $this->getLibrary('Booking');
 
         // Get pricebandgroup and pricebands (new ones if no $id)
         if ($id) {

@@ -10,7 +10,7 @@ class reportController extends coreController
     {
         $this->require_login('ROLE_ORGANISER', 'service/show/' . $serviceid);
 
-        $booking = $this->getService('Booking');
+        $booking = $this->getLibrary('Booking');
         $service = $booking->Service($serviceid);
 
         // Clear session and delete expired purchases
@@ -35,7 +35,7 @@ class reportController extends coreController
     {
         $this->require_login('ROLE_ORGANISER');
 
-        $booking = $this->getService('Booking');
+        $booking = $this->getLibrary('Booking');
 
         // Get the purchase record
         $purchase = \ORM::forTable('Purchase')->findOne($purchaseid);
@@ -57,8 +57,8 @@ class reportController extends coreController
      */
     public function exportAction($serviceid) {
 
-        $reports = $this->getService('Reports');
-        $booking = $this->getService('Booking');
+        $reports = $this->getLibrary('Reports');
+        $booking = $this->getLibrary('Booking');
         
         // Get the service object
         $service = $booking->Service($serviceid);

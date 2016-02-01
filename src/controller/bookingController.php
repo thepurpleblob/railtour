@@ -9,7 +9,7 @@ class BookingController extends coreController
     public function indexAction($code)
     {
         // Basics
-        $booking = $this->getService('Booking');
+        $booking = $this->getLibrary('Booking');
 
         // Clear session and delete expired purchases
         $booking->cleanPurchases();
@@ -47,7 +47,7 @@ class BookingController extends coreController
     public function numbersAction($serviceid)
     {
         // Basics
-        $booking = $this->getService('Booking');
+        $booking = $this->getLibrary('Booking');
         $service = $booking->Service($serviceid);
 
         // Get the limits for this service:

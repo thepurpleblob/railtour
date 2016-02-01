@@ -18,7 +18,7 @@ class JoiningController extends coreController
     {
         $this->require_login('ROLE_ADMIN', 'joining/index/' . $serviceid);
 
-        $booking = $this->getService('Booking');
+        $booking = $this->getLibrary('Booking');
 
         // Fetch basic data
         $service = $booking->Service($serviceid);
@@ -49,7 +49,7 @@ class JoiningController extends coreController
     {
         $this->require_login('ROLE_ADMIN', 'joining/index/' . $serviceid);
 
-        $booking = $this->getService('Booking');
+        $booking = $this->getLibrary('Booking');
 
         // Fetch basic data
         $service = $booking->Service($serviceid);

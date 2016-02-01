@@ -16,7 +16,7 @@ class LimitsController extends coreController
      */
     public function editAction($serviceid)
     {
-        $booking = $this->getService('Booking');
+        $booking = $this->getLibrary('Booking');
         $service = $booking->Service($serviceid);
 
         $limits = $booking->getLimits($serviceid);

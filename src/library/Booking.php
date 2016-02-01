@@ -1,6 +1,6 @@
 <?php
 
-namespace thepurpleblob\railtour\service;
+namespace thepurpleblob\railtour\library;
 
 // Lifetime of incomplete purchases in seconds
 define('PURCHASE_LIFETIME', 3600);

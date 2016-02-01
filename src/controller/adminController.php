@@ -9,7 +9,7 @@ class AdminController extends coreController
     // default (no route) page shows available services
     public function mainAction() {
 
-        $booking = $this->getService('Booking');
+        $booking = $this->getLibrary('Booking');
 
         // Find available services
         $services = $booking->availableServices();

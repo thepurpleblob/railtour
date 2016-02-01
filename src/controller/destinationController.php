@@ -18,7 +18,7 @@ class DestinationController extends coreController
     {
         $this->require_login('ROLE_ADMIN', 'destination/index/' . $serviceid);
 
-        $booking = $this->getService('Booking');
+        $booking = $this->getLibrary('Booking');
 
         $service = $booking->Service($serviceid);
 
@@ -44,7 +44,7 @@ class DestinationController extends coreController
 
         $this->require_login('ROLE_ADMIN', 'destination/index/' . $serviceid);
 
-        $booking = $this->getService('Booking');
+        $booking = $this->getLibrary('Booking');
 
         if ($id) {
             $destination = \ORM::forTable('Destination')->findOne($id);
@@ -108,7 +108,7 @@ class DestinationController extends coreController
     {
         $this->require_login('ROLE_ADMIN', 'destination/index/' . $serviceid);
 
-        $booking = $this->getService('Booking');
+        $booking = $this->getLibrary('Booking');
 
         // delete pricebands associated with this
         \ORM::for_table('Priceband')->where('destinationid', $id)->delete_many();

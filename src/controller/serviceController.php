@@ -90,7 +90,7 @@ class ServiceController extends coreController
     {
         $this->require_login('ROLE_ORGANISER', 'service/show/' . $id);
 
-        $booking = $this->getService('Booking');
+        $booking = $this->getLibrary('Booking');
         $service = $booking->Service($id);
 
         if (!$service) {
@@ -142,7 +142,7 @@ class ServiceController extends coreController
                 throw new \Exception('Unable to find Service.');
             }
         } else {
-            $booking = $this->getService('Booking');
+            $booking = $this->getLibrary('Booking');
             $service = $booking->createService();
         }
 
@@ -225,7 +225,7 @@ class ServiceController extends coreController
     public function duplicateAction($serviceid) {
         $this->require_login('ROLE_ADMIN', 'service/show/' . $serviceid);
 
-        $booking = $this->getService('Booking');
+        $booking = $this->getLibrary('Booking');
         $service = $booking->Service($serviceid);
 
         $newservice = $booking->duplicate($service);
@@ -239,7 +239,7 @@ class ServiceController extends coreController
     public function deleteAction($serviceid) {
         $this->require_login('ROLE_ADMIN', 'service/show/' . $serviceid);
 
-        $booking = $this->getService('Booking');
+        $booking = $this->getLibrary('Booking');
         $service = $booking->Service($serviceid);
 
         // If there are purchases, we're out of here
@@ -272,7 +272,7 @@ class ServiceController extends coreController
     public function installAction() {
 
         // Install the list of crs codes and stations
-        $stations = $this->getService('Stations');
+        $stations = $this->getLibrary('Stations');
 
 
     }
