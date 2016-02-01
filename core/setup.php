@@ -29,6 +29,6 @@ set_exception_handler('exception_handler');
 // Start the session
 ini_set('session.gc_maxlifetime', 7200);
 session_set_cookie_params(7200);
-session_name('SRPS_Santas');
+session_name('SRPS_Railtour');
 session_start();
 

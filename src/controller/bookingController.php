@@ -54,7 +54,7 @@ class BookingController extends coreController
         $limits = $booking->getLimits($serviceid);
 
         // Grab current purchase
-        $purchase = $booking->getPurchase($serviceid, $code, $bookingrefprefix);
+        $purchase = $booking->getPurchase($serviceid);
 
         // create form
         $numberstype = new NumbersType($limits->getMaxparty());
