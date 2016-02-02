@@ -255,6 +255,22 @@ class Booking
     }
 
     /**
+     * Get the maximum party size in theory.
+     * We have to use this before we know the first/standard choice
+     * (even though they can, effectively, have different limits)
+     * @param $limits limits object
+     * @return int
+     */
+    public function getMaxparty($limits) {
+        $maxparty = $limits->maxparty;
+        if ($limits->maxpartyfirst and ($limits->maxpartyfirst > $maxparty)) {
+            $maxparty = $limits->maxpartyfirst;
+        }
+
+        return $maxparty;
+    }
+
+    /**
      * Basic checks to ensure booking can procede
      * TODO: Fix the date shit so it works!
      */
@@ -520,6 +536,8 @@ class Booking
                  // if record id isn't there then this is an exception
                 throw new \Exception('Purchase id is missing in session');
             }
+        } else {
+            $key = '';
         }
 
         // If we get here, there is no session set up, so
@@ -543,6 +561,7 @@ class Booking
         $purchase->code = $service->code;
         $purchase->created = time();
         $purchase->timestamp = time();
+        $purchase->type = 0;
         $purchase->save();
 
         // id should be set automagically

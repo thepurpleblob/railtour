@@ -6,6 +6,10 @@ use thepurpleblob\core\coreController;
 
 class BookingController extends coreController
 {
+    /**
+     * Opening page for booking.
+     * @param $code unique (hopefully) tour code
+     */
     public function indexAction($code)
     {
         // Basics
@@ -25,10 +29,7 @@ class BookingController extends coreController
         $limits = $booking->getLimits($serviceid);
 
         // get acting maxparty (best estimate to display to punter)
-        $maxparty = $limits->maxparty;
-        if ($limits->maxpartyfirst and ($limits->maxpartyfirst>$maxparty)) {
-            $maxparty = $limits->maxpartyfirst;
-        }
+        $maxparty = $booking->getMaxparty($limits);
 
         if ($booking->canProceedWithBooking($service, $count)) {
             $this->View('booking/index.html.twig', array(
@@ -44,6 +45,12 @@ class BookingController extends coreController
         }
     }
 
+    /**
+     * First 'proper' booking page.
+     * Ask for numbers of travellers. Also sets up purchase record
+     * and session data.
+     * @param $serviceid
+     */
     public function numbersAction($serviceid)
     {
         // Basics
@@ -56,43 +63,54 @@ class BookingController extends coreController
         // Grab current purchase
         $purchase = $booking->getPurchase($serviceid);
 
-        // create form
-        $numberstype = new NumbersType($limits->getMaxparty());
-        $form   = $this->createForm($numberstype, $purchase);
-
         // get acting maxparty
-        $maxparty = $limits->getMaxparty();
-        if ($limits->getMaxpartyfirst() and ($limits->getMaxpartyfirst()>$maxparty)) {
-            $maxparty = $limits->getMaxpartyfirst();
+        $maxparty = $booking->getMaxparty($limits);
+
+        // hopefully no errors
+        $errors = null;
+
+        // anything submitted?
+        if ($data = $this->getRequest()) {
+
+            // Cancel?
+            if (!empty($data['cancel'])) {
+                $this->redirect('joining/index/' . $serviceid);
+            }
+
+            // Validate
+            $this->gump->validation_rules(array(
+                'adults' => 'required',
+                'children' => 'required',
+            ));
+            if ($data = $this->gump->run($data)) {
+
+                // check numbers
+                $adults = $data['adults'];
+                $children = $data['children'];
+                if (($adults + $children) > $maxparty) {
+                    $errors[] = 'Total number of travellers must be ' . $maxparty . ' or fewer';
+                } else if (($adults<1) or ($adults>$maxparty) or ($children<0) or ($children>$maxparty)) {
+                    $errors[] = 'Value supplied out of range.';
+                } else {
+                    $purchase->adults = $adults;
+                    $purchase->children = $children;
+                    $purchase->save();
+
+                    $this->redirect('booking/joining');
+                }
+
+            }  else {
+                $errors = array_merge($errors, $this->gump->get_readable_errors());
+            }
         }
 
-        // submitted?
-        $form->handleRequest($request);
-        if ($form->isValid()) {
-
-            // check numbers
-            $adults = $purchase->getAdults();
-            $children = $purchase->getChildren();
-            if (($adults + $children) > $maxparty) {
-                $form->get('adults')->addError(new FormError('Total party size is more than '.$maxparty));
-            } else if (($adults<1) or ($adults>$maxparty) or ($children<0) or ($children>$maxparty)) {
-                $form->get('adults')->addError(new FormError('Value supplied out of range.'));
-            } else {
-                $em->persist($purchase);
-                $em->flush();
-
-                return $this->redirect($this->generateUrl('booking_joining'));
-            }
-        }    
-
         // display form
-        return $this->render('SRPSBookingBundle:Booking:numbers.html.twig', array(
+        $this->View('booking/numbers.html.twig', array(
             'purchase' => $purchase,
-            'code' => $code,
             'service' => $service,
             'limits' => $limits,
             'maxparty' => $maxparty,
-            'form'   => $form->createView(),
+            'errors' => $errors,
         ));
     }
 
