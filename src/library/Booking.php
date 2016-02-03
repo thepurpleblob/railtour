@@ -492,10 +492,59 @@ class Booking
     }
 
     /**
-     * Get the purchase record from database
+     * Get the purchase record from database, or create a new one
+     * @param int $purchaseid 0 to create new one
+     * @param object
+     * @return object purchase - existing or new
      */
-    public function getPurchaseRecord($purchaseid) {
-        if (!$purchase = \ORM::forTable('purchase')->findOne($purchaseid)) {
+    public function getPurchaseRecord($purchaseid, $service = null) {
+        if (!$purchaseid) {
+            if (!$service) {
+                throw new \Exception('A service object must be supplied to create new purchase');
+            }
+            $purchase = \ORM::forTable('purchase')->create();
+            $purchase->created = time();
+            $purchase->timestamp = time();
+            $purchase->serviceid = $service->id;
+            $purchase->type = 0;
+            $purchase->code = $service->code;
+            $purchase->bookingref = '';
+            $purchase->completed = 0;
+            $purchase->manual = 0;
+            $purchase->title = '';
+            $purchase->firstname = '';
+            $purchase->surname = '';
+            $purchase->address1 = '';
+            $purchase->address2 = '';
+            $purchase->city = '';
+            $purchase->county = '';
+            $purchase->postcode = '';
+            $purchase->phone = '';
+            $purchase->email = '';
+            $purchase->joining = '';
+            $purchase->destination = '';
+            $purchase->class = '';
+            $purchase->adults = 0;
+            $purchase->children = 0;
+            $purchase->meala = 0;
+            $purchase->mealb = 0;
+            $purchase->mealc = 0;
+            $purchase->meald = 0;
+            $purchase->payment = 0;
+            $purchase->seatsupplement = 0;
+            $purchase->comment = '';
+            $purchase->date = date('Y-m-d');
+            $purchase->status = '';
+            $purchase->statusdetail = '';
+            $purchase->cardtype = '';
+            $purchase->last4digits = 0;
+            $purchase->bankauthcode = 0;
+            $purchase->declinecode = 0;
+            $purchase->emailsent = 0;
+            $purchase->eticket = 0;
+            $purchase->einfo = 0;
+            $purchase->save();
+        } else if (!$purchase = \ORM::forTable('purchase')->findOne($purchaseid)) {
             throw new \Exception('Cannot find purchase record for id=' . $purchaseid);
         }
 
@@ -519,7 +568,7 @@ class Booking
 
                 // if it exists then the key must match (security I think)
                 if ($purchase->seskey != $key) {
-                    throw new \Exception('Purchase key does not match session');
+                    throw new \Exception('Purchase key (' . $purchase->seskey .') does not match session (' . $key . ')');
                 } else {
 
                     // if it has a sagapay status then something is wrong
@@ -555,22 +604,15 @@ class Booking
         $key = sha1(microtime(true).mt_rand(10000,90000));
 
         // create the new purchase object
-        $purchase = \ORM::forTable('purchase')->create();
-        $purchase->serviceid = $serviceid;
-        $purchase->seskey = $key;
-        $purchase->code = $service->code;
-        $purchase->created = time();
-        $purchase->timestamp = time();
-        $purchase->type = 0;
-        $purchase->save();
+        $purchase = $this->getPurchaseRecord(0, $service);
 
         // id should be set automagically
         $id = $purchase->id();
         $_SESSION['key'] = $key;
         $_SESSION['purchaseid'] = $id;
 
-        // we can add the booking ref (generated from id) - it should get
-        // just need another persist to make sure
+        // we can add the booking ref (generated from id) and key
+        $purchase->seskey = $key;
         $purchase->bookingref = $CFG->sage_prefix . $id;
         $purchase->save();
 
@@ -899,6 +941,24 @@ class Booking
         $sage->crypt = '';
 
         return $sage;
+    }
+
+    /**
+     * @param $max maximum value of numeric choices
+     * @param $none if true add 'None' in 0th place
+     * @return array
+     */
+    public function choices($max, $none) {
+        if ($none) {
+            $choices = array(0 => 'None');
+        } else {
+            $choices = array();
+        }
+        for ($i=1; $i <= $max; $i++) {
+            $choices[$i] = "$i";
+        }
+
+        return $choices;
     }
 
 }

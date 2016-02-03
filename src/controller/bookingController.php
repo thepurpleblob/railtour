@@ -66,6 +66,10 @@ class BookingController extends coreController
         // get acting maxparty
         $maxparty = $booking->getMaxparty($limits);
 
+        // Choices
+        $choices_adult = $booking->choices($maxparty, false);
+        $choices_children = $booking->choices($maxparty, true);
+
         // hopefully no errors
         $errors = null;
 
@@ -74,13 +78,17 @@ class BookingController extends coreController
 
             // Cancel?
             if (!empty($data['cancel'])) {
-                $this->redirect('joining/index/' . $serviceid);
+                $this->redirect('admin/main');
             }
 
             // Validate
             $this->gump->validation_rules(array(
-                'adults' => 'required',
-                'children' => 'required',
+                'adults' => 'required|integer|min_numeric,1|max_numeric,' . $maxparty,
+                'children' => 'required|integer|min_numeric,0|max_numeric,' . $maxparty,
+            ));
+            $this->gump->set_field_names(array(
+                'adults' => 'Number of adults',
+                'children' => 'Number of children',
             ));
             if ($data = $this->gump->run($data)) {
 
@@ -110,29 +118,25 @@ class BookingController extends coreController
             'service' => $service,
             'limits' => $limits,
             'maxparty' => $maxparty,
+            'choices_adult' => $choices_adult,
+            'choices_children' => $choices_children,
             'errors' => $errors,
         ));
     }
 
-    public function joiningAction(Request $request)
+    /**
+     * Joining station
+     */
+    public function joiningAction()
     {
-        $em = $this->getDoctrine()->getManager();
-        $booking = $this->get('srps_booking');
-
-        // Grab current purchase
+        // Basics
+        $booking = $this->getLibrary('Booking');
         $purchase = $booking->getPurchase();
-
-        // Get the service object
-        $code = $purchase->getCode();
-        $service = $em->getRepository('SRPSBookingBundle:Service')
-            ->findOneByCode($code);
-        if (!$service) {
-            throw $this->createNotFoundException('Unable to find code ' . $code);
-        }
+        $serviceid = $purchase->serviceid;
+        $service = $booking->Service($serviceid);
 
         // get the joining stations
-        $stations = $em->getRepository('SRPSBookingBundle:Joining')
-            ->findByServiceid($service->getId());
+        $stations = \ORM::forTable('joining')->where('serviceid', $service->id)->findMany();
         if (!$stations) {
             throw new \Exception('No joining stations found for this service');
         }
@@ -140,16 +144,53 @@ class BookingController extends coreController
         // If there is only one then there is nothing to do
         if (count($stations)==1) {
             $station = array_pop($stations);
-            $purchase->setJoining($station->getCrs());
-            $em->persist($purchase);
-            $em->flush();
+            $purchase->joining = $station->crs;
+            $purchase->save();
 
-            return $this->redirect($this->generateUrl('booking_destination'));
+            $this->redirect('booking/destination');
         }
 
-        // create form
-        $joiningtype = new JoiningType($stations);
-        $form   = $this->createForm($joiningtype, $purchase);
+        // hopefully no errors
+        $errors = null;
+
+        // anything submitted?
+        if ($data = $this->getRequest()) {
+
+            // Cancel?
+            if (!empty($data['back'])) {
+                $this->redirect('booking/numbers');
+            }
+
+            // Validate
+            $this->gump->validation_rules(array(
+                'adults' => 'required|integer|min_numeric,1|max_numeric,' . $maxparty,
+                'children' => 'required|integer|min_numeric,0|max_numeric,' . $maxparty,
+            ));
+            $this->gump->set_field_names(array(
+                'adults' => 'Number of adults',
+                'children' => 'Number of children',
+            ));
+            if ($data = $this->gump->run($data)) {
+
+                // check numbers
+                $adults = $data['adults'];
+                $children = $data['children'];
+                if (($adults + $children) > $maxparty) {
+                    $errors[] = 'Total number of travellers must be ' . $maxparty . ' or fewer';
+                } else if (($adults<1) or ($adults>$maxparty) or ($children<0) or ($children>$maxparty)) {
+                    $errors[] = 'Value supplied out of range.';
+                } else {
+                    $purchase->adults = $adults;
+                    $purchase->children = $children;
+                    $purchase->save();
+
+                    $this->redirect('booking/joining');
+                }
+
+            }  else {
+                $errors = array_merge($errors, $this->gump->get_readable_errors());
+            }
+        }
 
         // submitted?
         $form->handleRequest($request);
@@ -167,11 +208,11 @@ class BookingController extends coreController
         }
 
         // display form
-        return $this->render('SRPSBookingBundle:Booking:joining.html.twig', array(
+        $this->View('booking/joining.html.twig', array(
             'purchase' => $purchase,
-            'code' => $code,
+            'code' => $purchase->code,
             'service' => $service,
-            'form'   => $form->createView(),
+            'errors' => $errors,
         ));
     }
 

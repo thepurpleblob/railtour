@@ -17,19 +17,39 @@
         Your party can have a maximum of {{ maxparty }} persons.
     </p>
 
-    <form id="numbers-form" class="form-horizontal" action="{{ path('booking/numbers', code) }}"
-          novalidate="novalidate" method="post" {{ form_enctype(form) }}>
-      {{ form_text('adults', 'Number of adults', purchase.adults) }}
-      {{ form_text('children', 'Number of children', purchase.children) }}
+    <form id="numbers-form" class="form-horizontal" action="{{ path('booking/numbers', service.id) }}" method="post">
+        {{ form_select('adults', 'Number of adults', purchase.adults, choices_adult) }}
+        {{ form_select('children', 'Number of children', purchase.children, choices_children) }}
+
+        {{ form_errors(errors) }}
+
+        <div>
+            <input type="submit" name="next" value="Next step" class="btn btn-primary" />
+            <input type="submit" name="cancel" value="Cancel" class="btn btn-warning" />
+        </div>
     </form>
-
-    <div>
-        <a class="btn btn-primary" onclick="$('#numbers-form').submit();">
-            Next step
-        </a>
-        <a class="btn btn-warning" href="http://railtours.srps.org.uk/">
-            Cancel
-        </a>
-    </div>
-
 {% endblock content %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $('#numbers-form').validate({
+            errorClass: "validateError",
+            rules: {
+                adults: {
+                    required: true,
+                    number: true,
+                    min: 1,
+                    max: {{ maxparty }}
+                },
+                children: {
+                    required: true,
+                    number: true,
+                    min: 0,
+                    max: {{ maxparty }}
+                }
+            }
+        });
+    </script>
+{% endblock javascripts %}

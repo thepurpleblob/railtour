@@ -1,9 +1,9 @@
-{% extends 'SRPSBookingBundle:Booking:booking.html.twig' %}
-
-{% form_theme form 'SRPSBookingBundle:Admin:fields.html.twig' %}
+{% extends 'booking/booking.html.twig' %}
 
 {% block content %}
-    <h2>SRPS Railtours Online Booking</h2>
+    <div class="srpsnavbar">
+        SRPS Railtours Online Booking &nbsp;<span class="navdot glyphicon glyphicon-record"></span>&nbsp; {{ service.name }}
+    </div>
 
     <h3 class="text-error">Joining station...</h3>
 
@@ -11,8 +11,7 @@
         Tell us which station you will be joining the train at.
     </p>
 
-    <form id="joining-form" class="form-horizontal" action="{{ path('booking_joining') }}"
-          novalidate="novalidate" method="post" {{ form_enctype(form) }}>
+    <form id="joining-form" class="form-horizontal" action="{{ path('booking/joining') }}" method="post">
       {{ form_row(form.joining) }}
       {{ form_rest(form) }}
     </form>
