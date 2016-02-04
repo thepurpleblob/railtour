@@ -285,6 +285,25 @@ class Booking
     }
 
     /**
+     * Get a list of joining stations indexed by CRS
+     * @param $serviceid
+     * @return array stations
+     * @throws \Exception
+     */
+    public function getJoiningStations($serviceid) {
+        $joinings = \ORM::forTable('joining')->where('serviceid', $serviceid)->findMany();
+        if (!$joinings) {
+            throw new \Exception('No joining stations found for service id = ' . $serviceid);
+        }
+        $stations = array();
+        foreach ($joinings as $joining) {
+            $stations[$joining->crs] = $joining->station;
+        }
+
+        return $stations;
+    }
+
+    /**
      * Is destination used?
      * Checks if destination can be deleted
      * @param object $destination
@@ -504,6 +523,7 @@ class Booking
             }
             $purchase = \ORM::forTable('purchase')->create();
             $purchase->created = time();
+            $purchase->seskey = '';
             $purchase->timestamp = time();
             $purchase->serviceid = $service->id;
             $purchase->type = 0;

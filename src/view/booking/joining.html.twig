@@ -12,14 +12,30 @@
     </p>
 
     <form id="joining-form" class="form-horizontal" action="{{ path('booking/joining') }}" method="post">
-      {{ form_row(form.joining) }}
-      {{ form_rest(form) }}
+        <div class="errorlabel"></div>
+        {{ form_radio('joining', '', purchase.joining, stations) }}
+
+        {{ form_errors(errors) }}
+
+        <div>
+            <input type="submit" name="next" value="Next step" class="btn btn-primary" />
+            <input type="submit" name="back" value="Back" class="btn btn-warning" formnovalidate />
+        </div>
     </form>
-
-    <div>
-        <a class="btn btn-primary" onclick="$('#joining-form').submit();">
-            Next step
-        </a>
-    </div>
-
 {% endblock content %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $('#joining-form').validate({
+            errorClass: "validateError",
+            errorLabelContainer: ".errorlabel",
+            rules: {
+                joining: {
+                    required: true
+                }
+            }
+        });
+    </script>
+{% endblock javascripts %}

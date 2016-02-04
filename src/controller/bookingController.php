@@ -136,15 +136,12 @@ class BookingController extends coreController
         $service = $booking->Service($serviceid);
 
         // get the joining stations
-        $stations = \ORM::forTable('joining')->where('serviceid', $service->id)->findMany();
-        if (!$stations) {
-            throw new \Exception('No joining stations found for this service');
-        }
+        $stations = $booking->getJoiningStations($serviceid);
 
         // If there is only one then there is nothing to do
         if (count($stations)==1) {
-            $station = array_pop($stations);
-            $purchase->joining = $station->crs;
+            reset($stations);
+            $purchase->joining = key($stations);
             $purchase->save();
 
             $this->redirect('booking/destination');
@@ -158,58 +155,33 @@ class BookingController extends coreController
 
             // Cancel?
             if (!empty($data['back'])) {
-                $this->redirect('booking/numbers');
+                $this->redirect('booking/numbers/' . $serviceid);
             }
 
             // Validate
             $this->gump->validation_rules(array(
-                'adults' => 'required|integer|min_numeric,1|max_numeric,' . $maxparty,
-                'children' => 'required|integer|min_numeric,0|max_numeric,' . $maxparty,
+                'joining' => 'required',
             ));
             $this->gump->set_field_names(array(
-                'adults' => 'Number of adults',
-                'children' => 'Number of children',
+                'joining' => 'Joining station',
             ));
             if ($data = $this->gump->run($data)) {
 
-                // check numbers
-                $adults = $data['adults'];
-                $children = $data['children'];
-                if (($adults + $children) > $maxparty) {
-                    $errors[] = 'Total number of travellers must be ' . $maxparty . ' or fewer';
-                } else if (($adults<1) or ($adults>$maxparty) or ($children<0) or ($children>$maxparty)) {
-                    $errors[] = 'Value supplied out of range.';
-                } else {
-                    $purchase->adults = $adults;
-                    $purchase->children = $children;
-                    $purchase->save();
-
-                    $this->redirect('booking/joining');
+                // check crs is valid
+                $joining = trim($data['joining']);
+                if (empty($stations[$joining])) {
+                    throw new \Exception('No CRS code returned from form');
                 }
-
-            }  else {
-                $errors = array_merge($errors, $this->gump->get_readable_errors());
-            }
-        }
-
-        // submitted?
-        $form->handleRequest($request);
-        if ($form->isValid()) {
-
-            // check that we have a value of some sort
-            if (!$purchase->getJoining()) {
-                $form->get('joining')->addError(new FormError('You must choose a joining station'));
-            } else {
-                $em->persist($purchase);
-                $em->flush();
-
-                return $this->redirect($this->generateUrl('booking_destination'));
+                $purchase->joining = $joining;
+                $purchase->save();
+                $this->redirect('booking/destination');
             }
         }
 
         // display form
         $this->View('booking/joining.html.twig', array(
             'purchase' => $purchase,
+            'stations' => $stations,
             'code' => $purchase->code,
             'service' => $service,
             'errors' => $errors,

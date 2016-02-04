@@ -116,6 +116,31 @@ class coreForm {
         echo "</div>";
     }
 
+    public function radio($name, $label, $selected, $options, $labelcol=4) {
+        $id = $name . 'Radio';
+        $inputcol = 12 - $labelcol;
+        echo '<div class="form-group">';
+        if ($label) {
+            echo '    <label for="' . $id . '" class="col-sm-' . $labelcol . ' control-label">' . $label . '</label>';
+        }
+        echo '    <div class="col-sm-' . $inputcol .'">';
+        foreach ($options as $value => $option) {
+            if ($value == $selected) {
+                $checked = 'checked';
+            } else {
+                $checked = '';
+            }
+            echo '<div class="radio">';
+            echo '<label>';
+            echo '<input type="radio" name="' . $name .'" id="optionsRadios1" value="' . $value . '" ' . $checked . '>';
+            echo $option;
+            echo '</label>';
+            echo '</div>';
+        }
+        echo '    </div>';
+        echo "</div>";
+    }
+
     public function yesno($name, $label, $yes) {
         $options = array(
             0 => 'No',
