@@ -304,6 +304,25 @@ class Booking
     }
 
     /**
+     * Get a list of destination stations indexed by CRS
+     * @param $serviceid
+     * @return array stations
+     * @throws \Exception
+     */
+    public function getDestinationStations($serviceid) {
+        $destinations = \ORM::forTable('destination')->where('serviceid', $serviceid)->findMany();
+        if (!$joinings) {
+            throw new \Exception('No destination stations found for service id = ' . $serviceid);
+        }
+        $stations = array();
+        foreach ($destinations as $destination) {
+            $stations[$destination->crs] = $destination->station;
+        }
+
+        return $stations;
+    }
+
+    /**
      * Is destination used?
      * Checks if destination can be deleted
      * @param object $destination

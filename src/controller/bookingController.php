@@ -190,45 +190,33 @@ class BookingController extends coreController
 
     public function destinationAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
-        $booking = $this->get('srps_booking');
-
-        // Grab current purchase
+        // Basics
+        $booking = $this->getLibrary('Booking');
         $purchase = $booking->getPurchase();
-
-        // Get the service object
-        $code = $purchase->getCode();
-        $service = $em->getRepository('SRPSBookingBundle:Service')
-            ->findOneByCode($code);
-        if (!$service) {
-            throw $this->createNotFoundException('Unable to find code ' . $code);
-        }
+        $serviceid = $purchase->serviceid;
+        $service = $booking->Service($serviceid);
 
         // get the destinations
-        $destinations = $em->getRepository('SRPSBookingBundle:Destination')
-            ->findByServiceid($service->getId());
-        if (!$destinations) {
-            throw new \Exception('No destinations found for this service');
-        }
+        $stations = $booking->getDestinationStations($serviceid);
 
         // If there is only one then there is nothing to do
-        if (count($destinations)==1) {
-            $destination = array_pop($destinations);
-            $purchase->setDestination($destination->getCrs());
-            $em->persist($purchase);
-            $em->flush();
+        if (count($stations)==1) {
+            reset($stations);
+            $purchase->destination = key($stations);
+            $purchase->save();
 
-            return $this->redirect($this->generateUrl('booking_meals'));
+            $this->redirect('booking/meals');
         }
 
         // Get counts info
-        $numbers = $booking->countStuff($service->getId(), $purchase);
-        $destinationcounts = $numbers->getDestinations();
-        $passengercount = $purchase->getAdults() + $purchase->getChildren();
+        $numbers = $booking->countStuff($serviceid, $purchase);
+        $destinationcounts = $numbers->destinations;
+        $passengercount = $purchase->adults + $purchase->children;
 
         // we'll build up a set of data to display all the useful info in the
         // form... so bear with me
-        $joiningcrs = $purchase->getJoining();
+        $joiningcrs = $purchase->joining;
+        $joining = \OR
         $joining = $em->getRepository('SRPSBookingBundle:Joining')
             ->findOneBy(array('crs'=>$joiningcrs, 'serviceid'=>$service->getId()));
         $pricebandgroupid = $joining->getPricebandgroupid();
