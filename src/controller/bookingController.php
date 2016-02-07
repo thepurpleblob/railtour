@@ -188,7 +188,7 @@ class BookingController extends coreController
         ));
     }
 
-    public function destinationAction(Request $request)
+    public function destinationAction()
     {
         // Basics
         $booking = $this->getLibrary('Booking');
@@ -208,68 +208,47 @@ class BookingController extends coreController
             $this->redirect('booking/meals');
         }
 
-        // Get counts info
-        $numbers = $booking->countStuff($serviceid, $purchase);
-        $destinationcounts = $numbers->destinations;
-        $passengercount = $purchase->adults + $purchase->children;
+        // Get destinations with extra pricing information
+        $destinations = $booking->getDestinationsExtra($purchase, $service);
 
-        // we'll build up a set of data to display all the useful info in the
-        // form... so bear with me
-        $joiningcrs = $purchase->joining;
-        $joining = \OR
-        $joining = $em->getRepository('SRPSBookingBundle:Joining')
-            ->findOneBy(array('crs'=>$joiningcrs, 'serviceid'=>$service->getId()));
-        $pricebandgroupid = $joining->getPricebandgroupid();
-        $dests = array();
-        foreach ($destinations as $destination) {
-            $destinationcount = $destinationcounts[$destination->getCrs()];
-            $priceband = $em->getRepository('SRPSBookingBundle:Priceband')
-                ->findOneBy(array('pricebandgroupid'=>$pricebandgroupid, 'destinationid'=>$destination->getId()));
-            if (!$priceband) {
-                throw new \Exception( "No priceband for pbgid=$pricebandgroupid did=".$destination->getId());
+        // hopefully no errors
+        $errors = null;
+
+        // anything submitted?
+        if ($data = $this->getRequest()) {
+
+            // Cancel?
+            if (!empty($data['back'])) {
+                $this->redirect('booking/joining/' . $serviceid);
             }
-            $dest = new \stdClass();
-            $dest->crs = $destination->getCrs();
-            $dest->description = $destination->getDescription();
-            $dest->first = $priceband->getFirst();
-            $dest->standard = $priceband->getStandard();
-            $dest->child = $priceband->getChild();
 
-            // a limit of 0 means ignore the limit
-            if (($destinationcount->limit==0) or ($destinationcount->remaining>=$passengercount)) {
-                $dest->available = true;
-            } else {
-                $dest->available = false;
-            }
-            $dests[] = $dest;
-        }
+            // Validate
+            $this->gump->validation_rules(array(
+                'destination' => 'required',
+            ));
+            $this->gump->set_field_names(array(
+                'destination' => 'Joining station',
+            ));
+            if ($data = $this->gump->run($data)) {
 
-        // create form
-        $destinationtype = new DestinationType($destinations);
-        $form   = $this->createForm($destinationtype, $purchase);
-
-        // submitted?
-        $form->handleRequest($request);
-        if ($form->isValid()) {
-
-            // check that we have a value of some sort
-            if (!$purchase->getDestination()) {
-                $form->get('destination')->addError(new FormError('You must make a choice'));
-            } else {
-                $em->persist($purchase);
-                $em->flush();
-
-                return $this->redirect($this->generateUrl('booking_meals'));
+                // check crs is valid
+                $destination = trim($data['destination']);
+                if (empty($stations[$destination])) {
+                    throw new \Exception('No CRS code returned from form');
+                }
+                $purchase->destination = $destination;
+                $purchase->save();
+                $this->redirect('booking/meals');
             }
         }
 
         // display form
-        return $this->render('SRPSBookingBundle:Booking:destination.html.twig', array(
+        $this->View('booking/destination.html.twig', array(
             'purchase' => $purchase,
-            'destinations' => $dests,
+            'destinations' => $destinations,
             'code' => $code,
             'service' => $service,
-            'form'   => $form->createView(),
+            'errors' => $errors,
         ));
     }
 

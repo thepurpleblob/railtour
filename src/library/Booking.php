@@ -311,7 +311,7 @@ class Booking
      */
     public function getDestinationStations($serviceid) {
         $destinations = \ORM::forTable('destination')->where('serviceid', $serviceid)->findMany();
-        if (!$joinings) {
+        if (!$destinations) {
             throw new \Exception('No destination stations found for service id = ' . $serviceid);
         }
         $stations = array();
@@ -347,6 +347,60 @@ class Booking
         }
 
         return false;
+    }
+
+    /**
+     * Creates an array of destinations with extra stuff to enhance the
+     * user form.
+     * @param $purchase purchase object
+     * @return array complicated destination objects
+     * @throws \Exception
+     */
+    public function getDestinationExtra($purchase, $service) {
+
+        // Get counts info
+        $numbers = $this->countStuff($service->id, $purchase);
+        $destinationcounts = $numbers->destinations;
+        $passengercount = $purchase->adults + $purchase->children;
+
+        // get Destinations
+        $destinations = \ORM::forTable('destination')->where('serviceid', $service->id)->findMany();
+        if (!$destinations) {
+            throw new \Exception('No destinations found for service id = ' . $service->id);
+        }
+
+        // Get joining information
+        $joining = \ORM::forTable('joining')->where(array(
+            'serviceid' => $service->id,
+            'crs' => $purchase->joining,
+        ))->findOne();
+        if (!$joining) {
+            throw new \Exception('Missing joining record for service id = ' . $service->id . ', crs = ' . $purchase->joining);
+        }
+
+        $pricebandgroupid = $joining->pricebandgroupid;
+        foreach ($destinations as $destination) {
+            $destinationcount = $destinationcounts[$destination->crs];
+            $priceband = \ORM::forTable('priceband')->where(array(
+                'pricebandgroupid' => $pricebandgroupid,
+                'destinationid' => $destination->id,
+            ))->findOne();
+            if (!$priceband) {
+                throw new \Exception("No priceband for pbgid=$pricebandgroupid did=" . $destination->id);
+            }
+            $destination->first = $priceband->first;
+            $destination->standard = $priceband->standard;
+            $destination->child = $priceband->child;
+
+            // a limit of 0 means ignore the limit
+            if (($destinationcount->limit==0) or ($destinationcount->remaining>=$passengercount)) {
+                $destination->available = true;
+            } else {
+                $destination->available = false;
+            }
+        }
+
+        return $destinations;
     }
 
     /**
@@ -983,6 +1037,7 @@ class Booking
     }
 
     /**
+     * Create array of choices for numeric drop-down
      * @param $max maximum value of numeric choices
      * @param $none if true add 'None' in 0th place
      * @return array
