@@ -356,7 +356,7 @@ class Booking
      * @return array complicated destination objects
      * @throws \Exception
      */
-    public function getDestinationExtra($purchase, $service) {
+    public function getDestinationsExtra($purchase, $service) {
 
         // Get counts info
         $numbers = $this->countStuff($service->id, $purchase);
@@ -664,9 +664,9 @@ class Booking
                     throw new \Exception('Purchase key (' . $purchase->seskey .') does not match session (' . $key . ')');
                 } else {
 
-                    // if it has a sagapay status then something is wrong
+                    // if it has a Sagepay status then something is wrong
                     if ($purchase->status) {
-                        throw new \Exception('This booking has already been submitted for payment');
+                        throw new \Exception('This booking has already been submitted for payment, purchaseid = ' . $purchase->id);
                     }
 
                     // All is well. Return the record
@@ -798,7 +798,7 @@ class Booking
 
         // if we have a purchase object then remove any current count from pending
         if ($currentpurchase) {
-            if ($currentpurchase->getClass()=='S') {
+            if ($currentpurchase->class == 'S') {
                 $ps = $count->pendingstandard;
                 $ps = $ps - $currentpurchase->adults - $currentpurchase->children;
                 $ps = $ps < 0 ? 0 : $ps;

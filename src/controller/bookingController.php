@@ -234,7 +234,7 @@ class BookingController extends coreController
                 // check crs is valid
                 $destination = trim($data['destination']);
                 if (empty($stations[$destination])) {
-                    throw new \Exception('No CRS code returned from form');
+                    throw new \Exception('No valid CRS code returned from destination form  (supplied was ' . $destination . ')');
                 }
                 $purchase->destination = $destination;
                 $purchase->save();
@@ -246,7 +246,6 @@ class BookingController extends coreController
         $this->View('booking/destination.html.twig', array(
             'purchase' => $purchase,
             'destinations' => $destinations,
-            'code' => $code,
             'service' => $service,
             'errors' => $errors,
         ));
