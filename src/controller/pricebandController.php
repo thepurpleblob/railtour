@@ -34,7 +34,7 @@ class PricebandController extends coreController
             $group->used = $booking->isPricebandUsed($group);
         }
 
-        return $this->View('priceband/index.html.twig',
+        $this->View('priceband/index.html.twig',
             array(
                 'pricebandgroups' => $pricebandgroups,
                 'destinations' => $destinations,
@@ -63,22 +63,22 @@ class PricebandController extends coreController
     /**
      * Displays a form to edit a Priceband entity.
      */
-    public function editAction($serviceid, $id)
+    public function editAction($serviceid, $pricebandgroupid)
     {
         $this->require_login('ROLE_ADMIN', 'priceband/index/' . $serviceid);
 
         $booking = $this->getLibrary('Booking');
 
         // Get pricebandgroup and pricebands (new ones if no $id)
-        if ($id) {
-            $pricebandgroup = \ORM::forTable('Pricebandgroup')->findOne($id);
-            $pricebands = $booking->getPricebands($serviceid, $id);
+        if ($pricebandgroupid) {
+            $pricebandgroup = \ORM::forTable('Pricebandgroup')->findOne($pricebandgroupid);
+            $pricebands = $booking->getPricebands($serviceid, $pricebandgroupid);
         } else {
             $pricebandgroup = $booking->createPricebandgroup($serviceid);
-            $pricebands = $booking->getPricebands($serviceid, $id, false);
+            $pricebands = $booking->getPricebands($serviceid, $pricebandgroupid, false);
         }
         if (!$pricebandgroup) {
-            throw new \Exception('Price band group not found for id ' . $id);
+            throw new \Exception('Price band group not found for id ' . $pricebandgroupid);
         }
 
         // Service
@@ -113,14 +113,14 @@ class PricebandController extends coreController
             if ($data = $this->gump->run($data)) {
                 $pricebandgroup->name = $data['name'];
                 $pricebandgroup->save();
-                $id = $pricebandgroup->id();
+                $savedpricebandgroupid = $pricebandgroup->id();
                 $count = 1;
                 foreach ($pricebands as $priceband) {
                     unset($priceband->name);
                     $priceband->first = $data['first_'.$count];
                     $priceband->standard = $data['standard_'.$count];
                     $priceband->child = $data['child_'.$count];
-                    $priceband->pricebandgroupid = $id;
+                    $priceband->pricebandgroupid = $savedpricebandgroupid;
                     $priceband->save();
                     $count++;
                 }
@@ -130,7 +130,7 @@ class PricebandController extends coreController
             }
         }
 
-        return $this->View('priceband/edit.html.twig', array(
+        $this->View('priceband/edit.html.twig', array(
             'pricebandgroup' => $pricebandgroup,
             'pricebands' => $pricebands,
             'service' => $service,

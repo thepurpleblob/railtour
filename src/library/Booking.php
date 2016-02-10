@@ -180,7 +180,10 @@ class Booking
         }
         $pricebands = array();
         foreach ($destinations as $destination) {
-            $priceband = \ORM::forTable('Priceband')->where('destinationid', $destination->id)->findOne();
+            $priceband = \ORM::forTable('Priceband')->where(array(
+                'pricebandgroupid' => $pricebandgroupid,
+                'destinationid' => $destination->id,
+            ))->findOne();
             if (!$priceband) {
                 $priceband = \ORM::forTable('Priceband')->create();
                 $priceband->serviceid = $serviceid;
@@ -386,7 +389,7 @@ class Booking
                 'destinationid' => $destination->id,
             ))->findOne();
             if (!$priceband) {
-                throw new \Exception("No priceband for pbgid=$pricebandgroupid did=" . $destination->id);
+                throw new \Exception("No priceband for pricebandgroup id = $pricebandgroupid destination id = " . $destination->id . " service = " . $service->id);
             }
             $destination->first = $priceband->first;
             $destination->standard = $priceband->standard;

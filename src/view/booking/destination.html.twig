@@ -12,8 +12,7 @@
         the one you would like (Prices are per passenger)
     </p>
 
-    <form id="destination-form" class="form-horizontal" action="{{ path('booking_destination') }}"
-          novalidate="novalidate" method="post" {{ form_enctype(form) }}>
+    <form id="destination-form" class="form-horizontal" action="{{ path('booking/destination') }}" method="post">
 
           {% for destination in destinations %}
               {% if destination.available %}
