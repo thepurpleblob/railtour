@@ -2,8 +2,6 @@
 
 namespace thepurpleblob\core;
 
-;
-
 class coreController {
 
     protected $gump;

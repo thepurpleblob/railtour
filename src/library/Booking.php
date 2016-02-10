@@ -431,7 +431,7 @@ class Booking
         $oldtime = time() - PURCHASE_LIFETIME;
         \ORM::forTable('Purchase')
             ->where('completed', 0)
-            ->where_gt('timestamp', $oldtime)
+            ->where_lt('timestamp', $oldtime)
             ->delete_many();
     }
 
