@@ -689,6 +689,7 @@ class Booking
         // there won't be a purchase record either
 
         // if no code or serviceid was supplied then we are not allowed a new one
+        // ...so display expired message
         if (!$serviceid) {
             throw new \Exception("The purchase record was not found (id=$serviceid, key='$key')");
         }

@@ -16,12 +16,12 @@
 
           {% for destination in destinations %}
               {% if destination.available %}
-                  <label class="radio">
-                      <input type="radio" value="{{ destination.crs }}" name="srps_bookingbundle_booking_destinationtype[destination]">
+                  <div class="radio">
+                      <input type="radio" value="{{ destination.crs }}" name="destination">
                       <p>{{ destination.description | raw }}</p>
                       <p class="text-info">Price Each: <b>First</b> &pound;{{ destination.first }},  <b>Standard adult</b>
                           &pound;{{ destination.standard }},  <b>Standard child</b> &pound;{{ destination.child }}</p>
-                  </label>
+                  </div>
               {% else %}
                   <div class="alert alert-error">
                       <p class="muted">{{ destination.description | raw }}</p>
