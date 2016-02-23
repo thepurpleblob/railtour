@@ -10,6 +10,16 @@ class coreController {
 
     protected $twig;
 
+    protected $paths;
+
+    /**
+     * Sets the additional pathinfo array in the calling URL
+     * so that the controller can access it directly if required.
+     */
+    public function setPaths($paths) {
+        $this->paths = $paths;
+    }
+
     public function getHeaderAssets() {
         global $CFG;
 
@@ -249,7 +259,7 @@ class coreController {
         global $CFG;
 
         $classname = '\\thepurpleblob\\' . $CFG->projectname . '\\library\\' . $name;
-        return new $classname;
+        return new $classname($this);
     }
 
 }

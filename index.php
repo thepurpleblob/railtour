@@ -40,4 +40,5 @@ $action_name .= 'Action';
 array_shift($paths);
 array_shift($paths);
 array_shift($paths);
+$controller->setPaths($paths);
 call_user_func_array(array($controller, $action_name), $paths);

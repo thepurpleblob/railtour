@@ -188,7 +188,7 @@ class BookingController extends coreController
         ));
     }
 
-    public function destinationAction()
+    public function destinationAction($crs = '')
     {
         // Basics
         $booking = $this->getLibrary('Booking');
@@ -211,35 +211,26 @@ class BookingController extends coreController
         // Get destinations with extra pricing information
         $destinations = $booking->getDestinationsExtra($purchase, $service);
 
-        // hopefully no errors
-        $errors = null;
-
         // anything submitted?
+        // Will only apply to back in this case
         if ($data = $this->getRequest()) {
 
             // Cancel?
             if (!empty($data['back'])) {
                 $this->redirect('booking/joining/' . $serviceid);
             }
+        }
 
-            // Validate
-            $this->gump->validation_rules(array(
-                'destination' => 'required',
-            ));
-            $this->gump->set_field_names(array(
-                'destination' => 'Joining station',
-            ));
-            if ($data = $this->gump->run($data)) {
+        // Just links this time, CRS will be in the URL path.
+        if ($crs) {
 
-                // check crs is valid
-                $destination = trim($data['destination']);
-                if (empty($stations[$destination])) {
-                    throw new \Exception('No valid CRS code returned from destination form  (supplied was ' . $destination . ')');
-                }
-                $purchase->destination = $destination;
-                $purchase->save();
-                $this->redirect('booking/meals');
+            // check crs is valid
+            if (empty($stations[$crs])) {
+                throw new \Exception('No valid CRS code returned from destination form  (supplied was ' . $crs . ')');
             }
+            $purchase->destination = $crs;
+            $purchase->save();
+            $this->redirect('booking/meals');
         }
 
         // display form
@@ -247,7 +238,6 @@ class BookingController extends coreController
             'purchase' => $purchase,
             'destinations' => $destinations,
             'service' => $service,
-            'errors' => $errors,
         ));
     }
 

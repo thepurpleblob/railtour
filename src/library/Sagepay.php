@@ -2,10 +2,7 @@
 
 namespace SRPS\BookingBundle\Service;
 
-class Sagepay
-{
-
-    protected $em;
+class Sagepay {
 
     protected $container;
 
@@ -17,8 +14,10 @@ class Sagepay
 
     protected $srpsemail;
 
-    public function __construct($em) {
-        $this->em = $em;
+    protected $controller;
+
+    public function __construct($controller) {
+        $this->controller = $controller;
     }
 
     /**

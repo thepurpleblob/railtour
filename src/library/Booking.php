@@ -3,21 +3,38 @@
 namespace thepurpleblob\railtour\library;
 
 // Lifetime of incomplete purchases in seconds
+use Exception;
+
 define('PURCHASE_LIFETIME', 3600);
 
+/**
+ * Class Booking
+ * @package thepurpleblob\railtour\library
+ */
 class Booking
 {
+
+    protected $controller;
+
+    /**
+     * Booking constructor.
+     * @param $controller
+     */
+    public function __construct($controller) {
+        $this->controller = $controller;
+    }
 
     /**
      * Get/check the service
      * @param $id
      * @return mixed
+     * @throws Exception
      */
     public function Service($id) {
         $service = \ORM::forTable('Service')->findOne($id);
 
         if (!$service) {
-            throw new \Exception('Unable to find Service record for id = ' . $id);
+            throw new Exception('Unable to find Service record for id = ' . $id);
         }
 
         return $service;
@@ -25,16 +42,19 @@ class Booking
 
     /**
      * Get the service given the service 'code'
+     * @param string $code - booking code
+     * @return mixed
+     * @throws Exception
      */
     public function serviceFromCode($code) {
         $services = \ORM::forTable('Service')->where('code', $code)->findMany();
 
         if (!$services) {
-            throw new \Exception('Unable to find Service record for code = ' . $code);
+            throw new Exception('Unable to find Service record for code = ' . $code);
         }
 
         if (count($services) > 1) {
-            throw new \Exception('More than one service defined with code = ' . $code);
+            throw new Exception('More than one service defined with code = ' . $code);
         }
 
         return reset($services);
@@ -176,7 +196,7 @@ class Booking
     public function getPricebands($serviceid, $pricebandgroupid, $save=true) {
         $destinations = \ORM::forTable('Destination')->where('serviceid', $serviceid)->order_by_asc('destination.name')->findMany();
         if (!$destinations) {
-            throw new \Exception('No destinations found for serviceid = ' . $serviceid);
+            throw new Exception('No destinations found for serviceid = ' . $serviceid);
         }
         $pricebands = array();
         foreach ($destinations as $destination) {
@@ -214,7 +234,7 @@ class Booking
         $pricebands = array();
         $destinations = \ORM::forTable('Destination')->where('serviceid', $serviceid)->order_by_asc('destination.name')->findMany();
         if (!$destinations) {
-            throw new \Exception('No destinations found for serviceid = ' . $serviceid);
+            throw new Exception('No destinations found for serviceid = ' . $serviceid);
         }
 
         foreach ($destinations as $destination) {
@@ -233,7 +253,8 @@ class Booking
 
     /**
      * Get limits
-     * (may need to create a new record
+     * (may need to create a new record)
+     * @param $serviceid
      */
     public function getLimits($serviceid) {
         $limits = \ORM::forTable('Limits')->where('serviceid', $serviceid)->findOne();
@@ -291,12 +312,12 @@ class Booking
      * Get a list of joining stations indexed by CRS
      * @param $serviceid
      * @return array stations
-     * @throws \Exception
+     * @throws Exception
      */
     public function getJoiningStations($serviceid) {
         $joinings = \ORM::forTable('joining')->where('serviceid', $serviceid)->findMany();
         if (!$joinings) {
-            throw new \Exception('No joining stations found for service id = ' . $serviceid);
+            throw new Exception('No joining stations found for service id = ' . $serviceid);
         }
         $stations = array();
         foreach ($joinings as $joining) {
@@ -310,16 +331,16 @@ class Booking
      * Get a list of destination stations indexed by CRS
      * @param $serviceid
      * @return array stations
-     * @throws \Exception
+     * @throws Exception
      */
     public function getDestinationStations($serviceid) {
         $destinations = \ORM::forTable('destination')->where('serviceid', $serviceid)->findMany();
         if (!$destinations) {
-            throw new \Exception('No destination stations found for service id = ' . $serviceid);
+            throw new Exception('No destination stations found for service id = ' . $serviceid);
         }
         $stations = array();
         foreach ($destinations as $destination) {
-            $stations[$destination->crs] = $destination->station;
+            $stations[$destination->crs] = $destination->name;
         }
 
         return $stations;
@@ -357,7 +378,7 @@ class Booking
      * user form.
      * @param $purchase purchase object
      * @return array complicated destination objects
-     * @throws \Exception
+     * @throws Exception
      */
     public function getDestinationsExtra($purchase, $service) {
 
@@ -369,7 +390,7 @@ class Booking
         // get Destinations
         $destinations = \ORM::forTable('destination')->where('serviceid', $service->id)->findMany();
         if (!$destinations) {
-            throw new \Exception('No destinations found for service id = ' . $service->id);
+            throw new Exception('No destinations found for service id = ' . $service->id);
         }
 
         // Get joining information
@@ -378,7 +399,7 @@ class Booking
             'crs' => $purchase->joining,
         ))->findOne();
         if (!$joining) {
-            throw new \Exception('Missing joining record for service id = ' . $service->id . ', crs = ' . $purchase->joining);
+            throw new Exception('Missing joining record for service id = ' . $service->id . ', crs = ' . $purchase->joining);
         }
 
         $pricebandgroupid = $joining->pricebandgroupid;
@@ -389,7 +410,7 @@ class Booking
                 'destinationid' => $destination->id,
             ))->findOne();
             if (!$priceband) {
-                throw new \Exception("No priceband for pricebandgroup id = $pricebandgroupid destination id = " . $destination->id . " service = " . $service->id);
+                throw new Exception("No priceband for pricebandgroup id = $pricebandgroupid destination id = " . $destination->id . " service = " . $service->id);
             }
             $destination->first = $priceband->first;
             $destination->standard = $priceband->standard;
@@ -513,7 +534,7 @@ class Booking
                 $this->duplicateRecord($joining, $newjoining);
                 $newjoining->serviceid = $newserviceid;
                 if (empty($pbmap[$joining->pricebandgroupid])) {
-                    throw new \Exception('No pricebandgroup mapping exists for id = ' . $joining->pricebandgroupid);
+                    throw new Exception('No pricebandgroup mapping exists for id = ' . $joining->pricebandgroupid);
                 }
                 $newjoining->pricebandgroupid = $pbmap[$joining->pricebandgroupid];
                 $newjoining->save();
@@ -525,17 +546,17 @@ class Booking
         if ($pricebands) {
             foreach ($pricebands as $priceband) {
                 if (empty($pbmap[$priceband->pricebandgroupid])) {
-                    throw new \Exception('No pricebandgroup mapping exists for id = ' . $priceband->pricebandgroupid);
+                    throw new Exception('No pricebandgroup mapping exists for id = ' . $priceband->pricebandgroupid);
                 }
                 $newpriceband = \ORM::forTable('priceband')->create();
                 $this->duplicateRecord($priceband, $newpriceband);
                 $newpriceband->serviceid = $newserviceid;
                 if (empty($destmap[$priceband->destinationid])) {
-                    throw new \Exception('No destination mapping exists for id = ' . $priceband->destinationid);
+                    throw new Exception('No destination mapping exists for id = ' . $priceband->destinationid);
                 }
                 $newpriceband->destinationid = $destmap[$priceband->destinationid];
                 if (empty($pbmap[$priceband->pricebandgroupid])) {
-                    throw new \Exception('No pricebandgroup mapping exists for id = ' . $priceband->pricebandgroupid);
+                    throw new Exception('No pricebandgroup mapping exists for id = ' . $priceband->pricebandgroupid);
                 }
                 $newpriceband->pricebandgroupid = $pbmap[$priceband->pricebandgroupid];
                 $newpriceband->save();
@@ -562,7 +583,7 @@ class Booking
         // Check there are no purchases. We should not have got here if there
         // are, but we'll check anyway
         if (\ORM::forTable('purchase')->where('serviceid', $service->id)->count()) {
-            throw new \Exception('Trying to delete service with purchases. id = ' . $service->id);
+            throw new Exception('Trying to delete service with purchases. id = ' . $service->id);
         }
 
         $serviceid = $service->id;
@@ -595,7 +616,7 @@ class Booking
     public function getPurchaseRecord($purchaseid, $service = null) {
         if (!$purchaseid) {
             if (!$service) {
-                throw new \Exception('A service object must be supplied to create new purchase');
+                throw new Exception('A service object must be supplied to create new purchase');
             }
             $purchase = \ORM::forTable('purchase')->create();
             $purchase->created = time();
@@ -641,7 +662,7 @@ class Booking
             $purchase->einfo = 0;
             $purchase->save();
         } else if (!$purchase = \ORM::forTable('purchase')->findOne($purchaseid)) {
-            throw new \Exception('Cannot find purchase record for id=' . $purchaseid);
+            throw new Exception('Cannot find purchase record for id=' . $purchaseid);
         }
 
         return $purchase;
@@ -664,12 +685,12 @@ class Booking
 
                 // if it exists then the key must match (security I think)
                 if ($purchase->seskey != $key) {
-                    throw new \Exception('Purchase key (' . $purchase->seskey .') does not match session (' . $key . ')');
+                    throw new Exception('Purchase key (' . $purchase->seskey .') does not match session (' . $key . ')');
                 } else {
 
                     // if it has a Sagepay status then something is wrong
                     if ($purchase->status) {
-                        throw new \Exception('This booking has already been submitted for payment, purchaseid = ' . $purchase->id);
+                        throw new Exception('This booking has already been submitted for payment, purchaseid = ' . $purchase->id);
                     }
 
                     // All is well. Return the record
@@ -679,7 +700,7 @@ class Booking
             } else {
 
                  // if record id isn't there then this is an exception
-                throw new \Exception('Purchase id is missing in session');
+                throw new Exception('Purchase id is missing in session');
             }
         } else {
             $key = '';
@@ -691,7 +712,7 @@ class Booking
         // if no code or serviceid was supplied then we are not allowed a new one
         // ...so display expired message
         if (!$serviceid) {
-            throw new \Exception("The purchase record was not found (id=$serviceid, key='$key')");
+            $this->controller->View('booking/timeout.html.twig');
         }
 
         // Get the service

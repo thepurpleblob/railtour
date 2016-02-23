@@ -8,50 +8,38 @@
     <h3 class="text-error">Destination...</h3>
 
     <p>
-        There is more than one destination/option for this tour. Please choose
-        the one you would like (Prices are per passenger)
+        There is more than one destination or option for this tour. Please choose
+        the one you would like.
     </p>
 
-    <form id="destination-form" class="form-horizontal" action="{{ path('booking/destination') }}" method="post">
+    {% for destination in destinations %}
+        {% if destination.available %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{ destination.name }}</h3>
+                </div>
+                <div class="panel-body">
+                    {{ destination.description | raw }}
+                    <ul>
+                        <li><b>First adult/child</b> (each) &pound;{{ destination.first }}</li>
+                        <li><b>Standard adult</b> (each) &pound;{{ destination.standard }}</li>
+                        <li><b>Standard child</b> (each) &pound;{{ destination.child }}</li>
+                    </ul>
+                    <a class="btn btn-primary" href="{{ path( 'booking/destination', destination.crs ) }}">Choose {{ destination.name }}</a>
+                </div>
+            </div>
+        {% else %}
+            <div class="panel panel-default">
+                <p class="muted">{{ destination.description | raw }}</p>
+                <p><b>Sorry, this destination is fully booked.</b></p>
+            </div>
+        {% endif %}
+    {% endfor %}
 
-          {% for destination in destinations %}
-              {% if destination.available %}
-                  <div class="radio">
-                      <input type="radio" value="{{ destination.crs }}" name="destination">
-                      <p>{{ destination.description | raw }}</p>
-                      <p class="text-info">Price Each: <b>First</b> &pound;{{ destination.first }},  <b>Standard adult</b>
-                          &pound;{{ destination.standard }},  <b>Standard child</b> &pound;{{ destination.child }}</p>
-                  </div>
-              {% else %}
-                  <div class="alert alert-error">
-                      <p class="muted">{{ destination.description | raw }}</p>
-                      <p><b>Sorry, this destination is fully booked.</b></p>
-                  </div>
-              {% endif %}
-          {% endfor %}
+    <div>
+        <form action="{{ path( 'booking/destination' ) }}" method="post">
+            <input type="submit" name="back" value="Back" class="btn btn-warning" formnovalidate />
+        </form>
+    </div>
 
-        {{ form_errors(errors) }}
-
-        <div>
-            <input type="submit" name="next" value="Next step" class="btn btn-primary" />
-            <input type="submit" name="cancel" value="Back" class="btn btn-warning" formnovalidate />
-        </div>
-
-    </form>
 {% endblock content %}
-
-{% block javascripts %}
-    {{ parent() }}
-
-    <script>
-        $('#destination-form').validate({
-            errorClass: "validateError",
-            errorLabelContainer: ".errorlabel",
-            //rules: {
-            //    joining: {
-            //        required: true
-            //    }
-            //}
-        });
-    </script>
-{% endblock javascripts %}

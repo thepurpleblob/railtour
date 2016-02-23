@@ -3,7 +3,14 @@
 namespace thepurpleblob\railtour\library;
 
 class Reports {
-    
+
+    protected $controller;
+
+    public function __construct($controller)
+    {
+        $this->controller = $controller;
+    }
+
     private function clean($string, $length=255) {
         
         // sanitize the string
