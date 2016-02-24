@@ -328,6 +328,25 @@ class Booking
     }
 
     /**
+     * Get single joining record
+     * @param $serviceid
+     * @param $crs
+     * @return object
+     * @throws Exception
+     */
+    public function getJoining($serviceid, $crs) {
+        $joining = \ORM::forTable('joining')->where(array(
+            'serviceid' => $serviceid,
+            'crs' => $crs,
+        ))->findOne();
+        if (!$joining) {
+            throw new Exception('No joining station found for service id = ' . $serviceid . ' and CRS = ' . $crs);
+        }
+
+        return $joining;
+    }
+
+    /**
      * Get a list of destination stations indexed by CRS
      * @param $serviceid
      * @return array stations
@@ -1035,14 +1054,14 @@ class Booking
 
     /**
      * detect if any meals are available
-     *
+     * @return boolean
      */
     public function mealsAvailable($service) {
         return
-            $service->isMealavisible() ||
-            $service->isMealbvisible() ||
-            $service->isMealcvisible() ||
-            $service->isMealdvisible()
+            $service->mealavisible ||
+            $service->mealbvisible ||
+            $service->mealcvisible ||
+            $service->mealdvisible
             ;
     }
 

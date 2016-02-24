@@ -188,6 +188,10 @@ class BookingController extends coreController
         ));
     }
 
+    /**
+     * @param string $crs
+     * @throws \Exception
+     */
     public function destinationAction($crs = '')
     {
         // Basics
@@ -241,21 +245,16 @@ class BookingController extends coreController
         ));
     }
 
-   public function mealsAction(Request $request)
+    /**
+     * @throws \Exception
+     */
+   public function mealsAction()
     {
-        $em = $this->getDoctrine()->getManager();
-        $booking = $this->get('srps_booking');
-
-        // Grab current purchase
+        // Basics
+        $booking = $this->getLibrary('Booking');
         $purchase = $booking->getPurchase();
-
-        // Get the service object
-        $code = $purchase->getCode();
-        $service = $em->getRepository('SRPSBookingBundle:Service')
-            ->findOneByCode($code);
-        if (!$service) {
-            throw $this->createNotFoundException('Unable to find code ' . $code);
-        }
+        $serviceid = $purchase->serviceid;
+        $service = $booking->Service($serviceid);
 
         // If there are no meals on this service just bail
         if (!$booking->mealsAvailable($service)) {
@@ -263,43 +262,52 @@ class BookingController extends coreController
         }
 
         // get the joining station (to see what meals available)
-        $station = $em->getRepository('SRPSBookingBundle:Joining')
-            ->findOneBy(array('serviceid'=>$service->getId(), 'crs'=>$purchase->getJoining()));
-        if (!$station) {
-            throw new \Exception('No joining stations found for this service');
-        }
+        $station = $booking->getJoining($serviceid, $purchase->joining);
 
         // Get the passenger count
-        $passengercount = $purchase->getAdults() + $purchase->getChildren();
+        $passengercount = $purchase->adults + $purchase->children;
 
         // we need to know about the number
-        $numbers = $booking->countStuff($service->getId());
+        $numbers = $booking->countStuff($service->id);
 
-        // create form
-        $mealstype = new MealsType($station, $service, $numbers, $passengercount);
-        $form   = $this->createForm($mealstype, $purchase);
+        // hopefully no errors
+        $errors = null;
 
-        // submitted?
-        $form->handleRequest($request);
-        if ($form->isValid()) {
+        // anything submitted?
+        if ($data = $this->getRequest()) {
 
-            // check that we have a value of some sort
-            if (!$purchase->getJoining()) {
-                $form->get('joining')->addError(new FormError('You must choose a joining station'));
-            } else {
-                $em->persist($purchase);
-                $em->flush();
+            // Cancel?
+            if (!empty($data['back'])) {
 
-                return $this->redirect($this->generateUrl('booking_class'));
+                // We need to know if Destinations would have been displayed
+                $stations = $booking->getDestinationStations($serviceid);
+                if (count($stations) > 1) {
+                    $this->redirect('booking/destination');
+                } else {
+                    $this->redirect('booking/joining');
+                }
+            }
+
+            // Validate
+            $this->gump->validation_rules(array(
+                'joining' => 'required',
+            ));
+            $this->gump->set_field_names(array(
+                'joining' => 'Joining station',
+            ));
+            if ($data = $this->gump->run($data)) {
+
+                $purchase->save();
+                $this->redirect('booking/class');
             }
         }
 
         // display form
-        return $this->render('SRPSBookingBundle:Booking:meals.html.twig', array(
+        return $this->render('booking/meals.html.twig', array(
             'purchase' => $purchase,
             'code' => $code,
             'service' => $service,
-            'form'   => $form->createView(),
+            'errors' => $errors,
         ));
     }
 
