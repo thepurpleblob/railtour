@@ -258,7 +258,7 @@ class BookingController extends coreController
 
         // If there are no meals on this service just bail
         if (!$booking->mealsAvailable($service)) {
-            return $this->redirect($this->generateUrl('booking_class'));
+            $this->redirect('booking/class');
         }
 
         // get the joining station (to see what meals available)
@@ -269,6 +269,9 @@ class BookingController extends coreController
 
         // we need to know about the number
         $numbers = $booking->countStuff($service->id);
+
+        // Array of meal options for forms
+        $meals = $booking->mealsForm($service, $numbers);
 
         // hopefully no errors
         $errors = null;
@@ -303,9 +306,8 @@ class BookingController extends coreController
         }
 
         // display form
-        return $this->render('booking/meals.html.twig', array(
+        $this->View('booking/meals.html.twig', array(
             'purchase' => $purchase,
-            'code' => $code,
             'service' => $service,
             'errors' => $errors,
         ));

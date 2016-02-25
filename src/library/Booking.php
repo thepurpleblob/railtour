@@ -1065,6 +1065,20 @@ class Booking
             ;
     }
 
+    public function mealsForm($service, $numbers) {
+        $letters = array('a', 'b', 'c', 'd');
+        $meals = array();
+        foreach ($letters as $letter) {
+            $mealname = 'meal' . $letter . 'name';
+            $mealvisible = 'meal' . $letter . 'visible';
+            $mealprice = 'meal' . $letter . 'price';
+            $remaining = 'remainingmeal' . $letter;
+            if (($numbers->$remaining) && ($service->$mealvisible)) {
+                
+            }
+        }
+    }
+
     /**
      * Returns object with all the Sage stuff therein
      */
