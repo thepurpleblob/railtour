@@ -13,6 +13,9 @@
     </p>
 
     <form id="meals-form" class="form-horizontal" action="{{ path('booking/meals') }}" method="post" >
+        {% for meal in meals %}
+            <p>{{ meal.name }}</p>
+        {% endfor %}
 
         {{ form_errors(errors) }}
 

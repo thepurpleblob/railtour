@@ -263,6 +263,7 @@ class BookingController extends coreController
 
         // get the joining station (to see what meals available)
         $station = $booking->getJoining($serviceid, $purchase->joining);
+        echo "<pre>"; var_dump($station); die;
 
         // Get the passenger count
         $passengercount = $purchase->adults + $purchase->children;
@@ -271,7 +272,7 @@ class BookingController extends coreController
         $numbers = $booking->countStuff($service->id);
 
         // Array of meal options for forms
-        $meals = $booking->mealsForm($service, $numbers);
+        $meals = $booking->mealsForm($service, $numbers, $passengercount);
 
         // hopefully no errors
         $errors = null;
@@ -309,6 +310,7 @@ class BookingController extends coreController
         $this->View('booking/meals.html.twig', array(
             'purchase' => $purchase,
             'service' => $service,
+            'meals' => $meals,
             'errors' => $errors,
         ));
     }

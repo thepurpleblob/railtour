@@ -1065,7 +1065,15 @@ class Booking
             ;
     }
 
-    public function mealsForm($service, $numbers) {
+    /**
+     * Create an array of available meals
+     * along with names, price and array of choices
+     * @param $service
+     * @param $numbers
+     * @param $maxpassengers
+     * @return array
+     */
+    public function mealsForm($service, $numbers, $maxpassengers) {
         $letters = array('a', 'b', 'c', 'd');
         $meals = array();
         foreach ($letters as $letter) {
@@ -1074,9 +1082,17 @@ class Booking
             $mealprice = 'meal' . $letter . 'price';
             $remaining = 'remainingmeal' . $letter;
             if (($numbers->$remaining) && ($service->$mealvisible)) {
-                
+                $meal = new \stdClass();
+                $meal->letter = $letter;
+                $meal->name = $service->$mealname;
+                $meal->price = $service->$mealprice;
+                $meal->maxmeals = $numbers->$remaining > $maxpassengers ? $maxpassengers : $numbers->$remaining;
+                $meal->choices = $this->choices($meal->maxmeals, true);
+                $meals[$letter] = $meal;
             }
         }
+
+        return $meals;
     }
 
     /**
