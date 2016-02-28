@@ -261,18 +261,9 @@ class BookingController extends coreController
             $this->redirect('booking/class');
         }
 
-        // get the joining station (to see what meals available)
-        $station = $booking->getJoining($serviceid, $purchase->joining);
-        echo "<pre>"; var_dump($station); die;
-
-        // Get the passenger count
-        $passengercount = $purchase->adults + $purchase->children;
-
-        // we need to know about the number
-        $numbers = $booking->countStuff($service->id);
-
         // Array of meal options for forms
-        $meals = $booking->mealsForm($service, $numbers, $passengercount);
+        $meals = $booking->mealsForm($service, $purchase);
+        echo
 
         // hopefully no errors
         $errors = null;

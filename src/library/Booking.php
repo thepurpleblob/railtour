@@ -1069,24 +1069,40 @@ class Booking
      * Create an array of available meals
      * along with names, price and array of choices
      * @param $service
-     * @param $numbers
-     * @param $maxpassengers
+     * @param $purchase
      * @return array
      */
-    public function mealsForm($service, $numbers, $maxpassengers) {
+    public function mealsForm($service, $purchase) {
+
+        // we need to know about the number
+        $numbers = $this->countStuff($service->id);
+
+        // Get the passenger count
+        $maxpassengers = $purchase->adults + $purchase->children;
+
+        // get the joining station (to see what meals available)
+        $station = $this->getJoining($service->id, $purchase->joining);
+
         $letters = array('a', 'b', 'c', 'd');
         $meals = array();
         foreach ($letters as $letter) {
-            $mealname = 'meal' . $letter . 'name';
-            $mealvisible = 'meal' . $letter . 'visible';
-            $mealprice = 'meal' . $letter . 'price';
+            $prefix = 'meal' . $letter;
+            $mealname = $prefix . 'name';
+            $mealvisible = $prefix . 'visible';
+            $mealprice = $prefix . 'price';
             $remaining = 'remainingmeal' . $letter;
-            if (($numbers->$remaining) && ($service->$mealvisible)) {
+
+            // NB maxmeals=0 if they are sold out
+            if ($service->$mealvisible) {
                 $meal = new \stdClass();
                 $meal->letter = $letter;
                 $meal->name = $service->$mealname;
                 $meal->price = $service->$mealprice;
+                $meal->available = $station->$prefix;
                 $meal->maxmeals = $numbers->$remaining > $maxpassengers ? $maxpassengers : $numbers->$remaining;
+
+                // precaution
+                $meal->maxmeals = $meal->maxmeals < 0 ? 0 : $meal->maxmeals;
                 $meal->choices = $this->choices($meal->maxmeals, true);
                 $meals[$letter] = $meal;
             }
