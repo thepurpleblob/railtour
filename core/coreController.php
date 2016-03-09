@@ -160,6 +160,9 @@ class coreController {
 
         // Render
         echo $this->twig->render($viewname, $variables);
+
+        // The view is always the last thing we do, so just in case...
+        die;
     }
 
     /**
