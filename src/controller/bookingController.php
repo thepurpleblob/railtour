@@ -263,7 +263,17 @@ class BookingController extends coreController
 
         // Array of meal options for forms
         $meals = $booking->mealsForm($service, $purchase);
-        echo
+
+        // Create validation
+        $gumprules = array();
+        $fieldnames = array();
+        $jqvrules = array();
+        foreach ($meals as $meal) {
+            $gumprules[$meal->formname] = 'required|integer|min_numeric,0|max_numeric,' . $meal->maxmeals;
+            $fieldnames[$meal->formname] = $meal->name;
+            $jqvrules[] = $meal->formname . '{required: true, range: [0, ' . $meal->maxmeals . ']}';
+        }
+        $jqv = implode(',', $jqvrules);
 
         // hopefully no errors
         $errors = null;
@@ -284,14 +294,13 @@ class BookingController extends coreController
             }
 
             // Validate
-            $this->gump->validation_rules(array(
-                'joining' => 'required',
-            ));
-            $this->gump->set_field_names(array(
-                'joining' => 'Joining station',
-            ));
+            $this->gump->validation_rules($gumprules);
+            $this->gump->set_field_names($fieldnames);
             if ($data = $this->gump->run($data)) {
-
+                foreach ($meals as $meal) {
+                    $name = $meal->formname;
+                    $purchase->$name = $data[$name];
+                }
                 $purchase->save();
                 $this->redirect('booking/class');
             }
@@ -302,6 +311,7 @@ class BookingController extends coreController
             'purchase' => $purchase,
             'service' => $service,
             'meals' => $meals,
+            'jqv' => $jqv,
             'errors' => $errors,
         ));
     }

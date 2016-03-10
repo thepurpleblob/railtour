@@ -14,7 +14,7 @@
 
     <form id="meals-form" class="form-horizontal" action="{{ path('booking/meals') }}" method="post" >
         {% for meal in meals %}
-            <p>{{ meal.name }}</p>
+            {{ form_select(meal.formname, meal.label, meal.purchase, meal.choices) }}
         {% endfor %}
 
         {{ form_errors(errors) }}
@@ -25,3 +25,17 @@
         </div>
     </form>
 {% endblock content %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $('#meals-form').validate({
+            errorClass: "validateError",
+            errorLabelContainer: ".errorlabel",
+            rules: {
+                {{ jqv }}
+            }
+        });
+    </script>
+{% endblock javascripts %}

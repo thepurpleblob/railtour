@@ -1096,9 +1096,12 @@ class Booking
             if ($service->$mealvisible) {
                 $meal = new \stdClass();
                 $meal->letter = $letter;
-                $meal->name = $service->$mealname;
+                $meal->formname = $prefix;
                 $meal->price = $service->$mealprice;
+                $meal->label = $service->$mealname . "  <span class=\"labelinfo\">(&pound;$meal->price each)</span>";
+                $meal->name = $service->$mealname;
                 $meal->available = $station->$prefix;
+                $meal->purchase = $purchase->$prefix;
                 $meal->maxmeals = $numbers->$remaining > $maxpassengers ? $maxpassengers : $numbers->$remaining;
 
                 // precaution

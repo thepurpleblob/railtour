@@ -84,3 +84,7 @@ div#sb_info {
     color: #ff0000;
     font-size: 16px;
 }
+
+span.labelinfo {
+    font-weight: normal;
+}
