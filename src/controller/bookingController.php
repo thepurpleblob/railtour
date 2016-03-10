@@ -316,39 +316,25 @@ class BookingController extends coreController
         ));
     }
 
-   public function classAction(Request $request)
+   public function classAction()
     {
-        $em = $this->getDoctrine()->getManager();
-        $booking = $this->get('srps_booking');
-
-        // Grab current purchase
+        // Basics
+        $booking = $this->getLibrary('Booking');
         $purchase = $booking->getPurchase();
+        $serviceid = $purchase->serviceid;
+        $service = $booking->Service($serviceid);
 
-        // Get the service object
-        $code = $purchase->getCode();
-        $service = $em->getRepository('SRPSBookingBundle:Service')
-            ->findOneByCode($code);
-        if (!$service) {
-            throw $this->createNotFoundException('Unable to find code ' . $code);
-        }
+        // Get the limits for this service:
+        $limits = $booking->getLimits($serviceid);
 
-        // Get the limits for this service
-        $limits = $em->getRepository('SRPSBookingBundle:Limits')
-            ->findOneByServiceid($service->getId());
-        if (!$limits) {
-            throw $this->createNotFoundException('Unable to find limits for serviceid ' . $service->getId());
-        }
+        // get acting maxparty
+        $maxpartystandard = $booking->getMaxparty($limits);
 
         // get first and standard maximum parties
-        $maxpartystandard = $limits->getMaxparty();
-        if ($limits->getMaxpartyfirst()) {
-            $maxpartyfirst = $limits->getMaxpartyfirst();
-        } else {
-            $maxpartyfirst = $maxpartystandard;
-        }
+        $maxpartyfirst = $limits->maxpartyfirst ? $limits->maxpartyfirst : $maxpartystandard;
 
         // Get the passenger count
-        $passengercount = $purchase->getAdults() + $purchase->getChildren();
+        $passengercount = $purchase->adults + $purchase->children;
 
         // get first and standard fares
         $farestandard = $booking->calculateFare($service, $purchase, 'S');
