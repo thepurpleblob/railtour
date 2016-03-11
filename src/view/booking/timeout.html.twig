@@ -5,9 +5,14 @@
     SRPS Railtours Online Booking
 </div>
 
-<div class="panel">
-    Your session has expired. You will need to start again.<br />
-    <a class="btn btn-primary" href="{{ path('admin/main') }}">Continue</a>
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        Session timed out
+    </div>
+    <div class="panel-body">
+        <p>Too much time has expired since your last activity. You will need to start again.</p>
+        <a class="btn btn-primary" href="{{ path('admin/main') }}">Continue</a>
+    </div>
 </div>
 
 

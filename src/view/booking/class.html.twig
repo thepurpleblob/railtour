@@ -1,9 +1,9 @@
-{% extends 'SRPSBookingBundle:Booking:booking.html.twig' %}
-
-{% form_theme form 'SRPSBookingBundle:Admin:fields.html.twig' %}
+{% extends 'booking/booking.html.twig' %}
 
 {% block content %}
-    <h2>SRPS Railtours Online Booking</h2>
+    <div class="srpsnavbar">
+        SRPS Railtours Online Booking &nbsp;<span class="navdot glyphicon glyphicon-record"></span>&nbsp; {{ service.name }}
+    </div>
 
     <h3 class="text-error">Choose First or Standard...</h3>
 
@@ -12,66 +12,62 @@
         price breakdown is shown for your information.
     </p>
 
-    <form id="class-form" class="form-horizontal" action="{{ path('booking_class') }}"
-          novalidate="novalidate" method="post" {{ form_enctype(form) }}>
-
-        {% if availablefirst %}
-            <label class="radio">
-                <input type="radio" value="F" name="srps_bookingbundle_booking_classtype[class]">
-                <p class="label label-info">FIRST CLASS</p>
-                <div class="alert">
-                    <ul>
-                        <li><b>Total for First Class is &pound;{{ farefirst.total }}</b></li>
-                        <li>{{ purchase.adults }} {{ purchase.adults==1 ? 'Adult' : 'Adults' }}
-                            at &pound;{{ farefirst.adultunit}}, total &pound;{{ farefirst.adultfare }}</li>
-                        {% if purchase.children %}
-                            <li>{{ purchase.children }} {{ purchase.children==1 ? 'Child' : 'Children' }}
-                                at &pound;{{ farefirst.childunit}}, total &pound;{{ farefirst.childfare }}</li>
-                        {% endif %}
-                        <li>Booked meals total &pound;{{ farefirst.meals }}</li>
-                    </ul>
-                </div>
-            </label>
-        {% else %}
-            <div class="alert alert-error">
+    {% if availablefirst %}
+        <div class="panel panel-primary">
+            <div class="panel-heading">FIRST CLASS &pound;{{ farefirst.total }}</div>
+            <div class="panel-body">
+                <ul>
+                    <li><span class="classtotal">Total for First Class is &pound;{{ farefirst.total }}</span></li>
+                    <li>{{ purchase.adults }} {{ purchase.adults==1 ? 'Adult' : 'Adults' }}
+                        at &pound;{{ farefirst.adultunit}}, total &pound;{{ farefirst.adultfare }}</li>
+                    {% if purchase.children %}
+                        <li>{{ purchase.children }} {{ purchase.children==1 ? 'Child' : 'Children' }}
+                            at &pound;{{ farefirst.childunit}}, total &pound;{{ farefirst.childfare }}</li>
+                    {% endif %}
+                    <li>Booked meals total &pound;{{ farefirst.meals }}</li>
+                </ul>
+                <a class="btn btn-primary" href="{{ path( 'booking/class', "F" ) }}">Choose <b>FIRST CLASS</b></a>
+            </div>
+        </div>
+    {% else %}
+        <div class="panel panel-danger">
+            <div class="panel-body">
                 We are sorry, there are not enough available seats to accomodate your party
                 in First Class.
             </div>
-        {% endif %}
+        </div>
+    {% endif %}
 
-        {% if availablestandard %}
-            <label class="radio">
-                <input type="radio" value="S" name="srps_bookingbundle_booking_classtype[class]">
-                <p class="label label-info">STANDARD CLASS</p>
-                <div class="alert">
-                    <ul>
-                        <li><b>Total for Standard Class is &pound;{{ farestandard.total }}</b></li>
-                        <li>{{ purchase.adults }} {{ purchase.adults==1 ? 'Adult' : 'Adults' }}
-                            at &pound;{{ farestandard.adultunit}}, total &pound;{{ farestandard.adultfare }}</li>
-                        {% if purchase.children %}
-                            <li>{{ purchase.children }} {{ purchase.children==1 ? 'Child' : 'Children' }}
-                                at &pound;{{ farestandard.childunit}}, total &pound;{{ farestandard.childfare }}</li>
-                        {% endif %}
-                        <li>Booked meals total &pound;{{ farestandard.meals }}</li>
-                    </ul>
-                </div>
-            </label>
-        {% else %}
-            <div class="alert alert-error">
+    {% if availablestandard %}
+        <div class="panel panel-primary">
+            <div class="panel-heading">STANDARD CLASS &pound;{{ farestandard.total }}</div>
+            <div class="panel-body">
+                <ul>
+                    <li><span class="classtotal">Total for Standard Class is &pound;{{ farestandard.total }}</span></li>
+                    <li>{{ purchase.adults }} {{ purchase.adults==1 ? 'Adult' : 'Adults' }}
+                        at &pound;{{ farestandard.adultunit}}, total &pound;{{ farestandard.adultfare }}</li>
+                    {% if purchase.children %}
+                        <li>{{ purchase.children }} {{ purchase.children==1 ? 'Child' : 'Children' }}
+                            at &pound;{{ farestandard.childunit}}, total &pound;{{ farestandard.childfare }}</li>
+                    {% endif %}
+                    <li>Booked meals total &pound;{{ farestandard.meals }}</li>
+                </ul>
+                <a class="btn btn-primary" href="{{ path( 'booking/class', "S" ) }}">Choose <b>STANDARD CLASS</b></a>
+            </div>
+        </div>
+    {% else %}
+        <div class="panel panel-danger">
+            <div class="panel-body">
                 We are sorry, there are not enough available seats to accomodate your party
                 in Standard Class.
             </div>
-        {% endif %}
-
-        {{ form_errors(form.class) }}
-    </form>
+        </div>
+    {% endif %}
 
     <div>
-        {% if availablefirst or availablestandard %}
-            <a class="btn btn-primary" onclick="$('#class-form').submit();">
-                Next step
-            </a>
-        {% endif %}
+        <form action="{{ path( 'booking/class' ) }}" method="post">
+            <input type="submit" name="back" value="Back" class="btn btn-warning" />
+        </form>
     </div>
 
 {% endblock content %}

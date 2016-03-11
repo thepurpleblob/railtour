@@ -308,6 +308,18 @@ class Booking
         return ($seatsavailable and $isvisible and $isindate);
     }
 
+    public function getDestination($serviceid, $crs) {
+        $destination = \ORM::forTable('destination')->where(array(
+            'serviceid' => $serviceid,
+            'crs' => $crs,
+        ))->findOne();
+        if (!$destination) {
+            throw new Exception('No destination station for for service id = ' . $serviceid . ' and CRS = ' . $crs);
+        }
+
+        return $destination;
+    }
+
     /**
      * Get a list of joining stations indexed by CRS
      * @param $serviceid
@@ -990,58 +1002,60 @@ class Booking
      * @param string $class (F or S)
      */
     public function calculateFare($service, $purchase, $class) {
-        $em = $this->em;
 
         // Need to drag everything out of the database
-        $serviceid = $service->getId();
+        $serviceid = $service->id;
 
         // Get basic numbers from purchase
-        $adults = $purchase->getAdults();
-        $children = $purchase->getChildren();
-        $meala = $purchase->getMeala();
-        $mealb = $purchase->getMealb();
-        $mealc = $purchase->getMealc();
-        $meald = $purchase->getMeald();
+        $adults = $purchase->adults;
+        $children = $purchase->children;
+        $meala = $purchase->meala;
+        $mealb = $purchase->mealb;
+        $mealc = $purchase->mealc;
+        $meald = $purchase->meald;
 
         // get basic start/destination info
-        $join = $purchase->getJoining();
-        $dest= $purchase->getDestination();
+        $join = $purchase->joining;
+        $dest= $purchase->destination;
 
         // get the db records for above
-        $joining = $em->getRepository('SRPSBookingBundle:Joining')
-            ->findOneBy(array('crs'=>$join, 'serviceid'=>$serviceid));
-        $destination = $em->getRepository('SRPSBookingBundle:Destination')
-            ->findOneBy(array('crs'=>$dest, 'serviceid'=>$serviceid));
-        $pricebandgroupid = $joining->getPricebandgroupid();
-        $destinationid = $destination->getId();
-        $priceband = $em->getRepository('SRPSBookingBundle:Priceband')
-            ->findOneBy(array('pricebandgroupid'=>$pricebandgroupid, 'destinationid'=>$destinationid));
+        $joining = $this->getJoining($serviceid, $join);
+        $destination = $this->getDestination($serviceid, $dest);
+        $pricebandgroupid = $joining->pricebandgroupid;
+        $destinationid = $destination->id;
+        $priceband = \ORM::forTable('priceband')->where(array(
+            'pricebandgroupid' => $pricebandgroupid,
+            'destinationid' => $destinationid,
+        ))->findOne();
+        if (!$priceband) {
+            throw new Exception('No priceband found for pricebandgroup id = ' . $pricebandgroupid . ' destinationid = ' . $destinationid);
+        }
 
         // we return an object with various info
         $result = new \stdClass();
         if ($class=="F") {
-            $result->adultunit = $priceband->getFirst();
-            $result->childunit = $priceband->getFirst();
+            $result->adultunit = $priceband->first;
+            $result->childunit = $priceband->first;
             $result->adultfare = $adults * $result->adultunit;
             $result->childfare = $children * $result->childunit;
         } else {
-            $result->adultunit = $priceband->getStandard();
-            $result->childunit = $priceband->getChild();
+            $result->adultunit = $priceband->standard;
+            $result->childunit = $priceband->child;
             $result->adultfare = $adults * $result->adultunit;
             $result->childfare = $children * $result->childunit;
         }
 
         // Calculate meals
-        $result->meals = $meala * $service->getMealaprice() +
-            $mealb * $service->getMealbprice() +
-            $mealc * $service->getMealcprice() +
-            $meald * $service->getMealdprice();
+        $result->meals = $meala * $service->mealaprice +
+            $mealb * $service->mealbprice +
+            $mealc * $service->mealcprice +
+            $meald * $service->mealdprice;
 
         // Calculate seat supplement
         $passengers = $adults + $children;
         $suppallowed = (($passengers==1) or ($passengers==2));
-        if (($purchase->getClass()=='F') and $purchase->isSeatsupplement() and $suppallowed) {
-            $result->seatsupplement = $passengers * $service->getSinglesupplement();
+        if (($purchase->class == 'F') && $purchase->seatsupplement && $suppallowed) {
+            $result->seatsupplement = $passengers * $service->singlesupplement;
         } else {
             $result->seatsupplement = 0;
         }
@@ -1096,9 +1110,12 @@ class Booking
             if ($service->$mealvisible) {
                 $meal = new \stdClass();
                 $meal->letter = $letter;
-                $meal->name = $service->$mealname;
+                $meal->formname = $prefix;
                 $meal->price = $service->$mealprice;
+                $meal->label = $service->$mealname . "  <span class=\"labelinfo\">(&pound;$meal->price each)</span>";
+                $meal->name = $service->$mealname;
                 $meal->available = $station->$prefix;
+                $meal->purchase = $purchase->$prefix;
                 $meal->maxmeals = $numbers->$remaining > $maxpassengers ? $maxpassengers : $numbers->$remaining;
 
                 // precaution

@@ -78,7 +78,7 @@ class BookingController extends coreController
 
             // Cancel?
             if (!empty($data['cancel'])) {
-                $this->redirect('admin/main');
+                $this->redirect('admin/main', true);
             }
 
             // Validate
@@ -155,7 +155,7 @@ class BookingController extends coreController
 
             // Cancel?
             if (!empty($data['back'])) {
-                $this->redirect('booking/numbers/' . $serviceid);
+                $this->redirect('booking/numbers/' . $serviceid, true);
             }
 
             // Validate
@@ -221,7 +221,7 @@ class BookingController extends coreController
 
             // Cancel?
             if (!empty($data['back'])) {
-                $this->redirect('booking/joining/' . $serviceid);
+                $this->redirect('booking/joining/' . $serviceid, true);
             }
         }
 
@@ -263,7 +263,17 @@ class BookingController extends coreController
 
         // Array of meal options for forms
         $meals = $booking->mealsForm($service, $purchase);
-        echo
+
+        // Create validation
+        $gumprules = array();
+        $fieldnames = array();
+        $jqvrules = array();
+        foreach ($meals as $meal) {
+            $gumprules[$meal->formname] = 'required|integer|min_numeric,0|max_numeric,' . $meal->maxmeals;
+            $fieldnames[$meal->formname] = $meal->name;
+            $jqvrules[] = $meal->formname . '{required: true, range: [0, ' . $meal->maxmeals . ']}';
+        }
+        $jqv = implode(',', $jqvrules);
 
         // hopefully no errors
         $errors = null;
@@ -277,21 +287,20 @@ class BookingController extends coreController
                 // We need to know if Destinations would have been displayed
                 $stations = $booking->getDestinationStations($serviceid);
                 if (count($stations) > 1) {
-                    $this->redirect('booking/destination');
+                    $this->redirect('booking/destination', true);
                 } else {
-                    $this->redirect('booking/joining');
+                    $this->redirect('booking/joining', true);
                 }
             }
 
             // Validate
-            $this->gump->validation_rules(array(
-                'joining' => 'required',
-            ));
-            $this->gump->set_field_names(array(
-                'joining' => 'Joining station',
-            ));
+            $this->gump->validation_rules($gumprules);
+            $this->gump->set_field_names($fieldnames);
             if ($data = $this->gump->run($data)) {
-
+                foreach ($meals as $meal) {
+                    $name = $meal->formname;
+                    $purchase->$name = $data[$name];
+                }
                 $purchase->save();
                 $this->redirect('booking/class');
             }
@@ -302,43 +311,30 @@ class BookingController extends coreController
             'purchase' => $purchase,
             'service' => $service,
             'meals' => $meals,
+            'jqv' => $jqv,
             'errors' => $errors,
         ));
     }
 
-   public function classAction(Request $request)
+   public function classAction($class = '')
     {
-        $em = $this->getDoctrine()->getManager();
-        $booking = $this->get('srps_booking');
-
-        // Grab current purchase
+        // Basics
+        $booking = $this->getLibrary('Booking');
         $purchase = $booking->getPurchase();
+        $serviceid = $purchase->serviceid;
+        $service = $booking->Service($serviceid);
 
-        // Get the service object
-        $code = $purchase->getCode();
-        $service = $em->getRepository('SRPSBookingBundle:Service')
-            ->findOneByCode($code);
-        if (!$service) {
-            throw $this->createNotFoundException('Unable to find code ' . $code);
-        }
+        // Get the limits for this service:
+        $limits = $booking->getLimits($serviceid);
 
-        // Get the limits for this service
-        $limits = $em->getRepository('SRPSBookingBundle:Limits')
-            ->findOneByServiceid($service->getId());
-        if (!$limits) {
-            throw $this->createNotFoundException('Unable to find limits for serviceid ' . $service->getId());
-        }
+        // get acting maxparty
+        $maxpartystandard = $booking->getMaxparty($limits);
 
         // get first and standard maximum parties
-        $maxpartystandard = $limits->getMaxparty();
-        if ($limits->getMaxpartyfirst()) {
-            $maxpartyfirst = $limits->getMaxpartyfirst();
-        } else {
-            $maxpartyfirst = $maxpartystandard;
-        }
+        $maxpartyfirst = $limits->maxpartyfirst ? $limits->maxpartyfirst : $maxpartystandard;
 
         // Get the passenger count
-        $passengercount = $purchase->getAdults() + $purchase->getChildren();
+        $passengercount = $purchase->adults + $purchase->children;
 
         // get first and standard fares
         $farestandard = $booking->calculateFare($service, $purchase, 'S');
@@ -346,9 +342,9 @@ class BookingController extends coreController
 
         // we need to know about the number
         // it's a bodge - but if the choice is made then skip this check
-        $numbers = $booking->countStuff($service->getId(), $purchase);
-        $availablefirst = $numbers->getRemainingfirst() >= $passengercount;
-        $availablestandard = $numbers->getRemainingstandard() >= $passengercount;
+        $numbers = $booking->countStuff($serviceid, $purchase);
+        $availablefirst = $numbers->remainingfirst >= $passengercount;
+        $availablestandard = $numbers->remainingstandard >= $passengercount;
 
         // still might not be available if passengercount exceeds ruling maxparty
         if ($passengercount > $maxpartyfirst) {
@@ -358,37 +354,33 @@ class BookingController extends coreController
             $availablestandard = false;
         }
 
-        // create form
-        $classtype = new ClassType();
-        $form   = $this->createForm($classtype, $purchase);
+        // anything submitted?
+        // Will only apply to back in this case
+        if ($data = $this->getRequest()) {
 
-        // submitted?
-        $form->handleRequest($request);
-        if ($form->isValid()) {
+            // Cancel?
+            if (!empty($data['back'])) {
+                $this->redirect('booking/meals', true);
+            }
+        }
 
-            // check that we have a valid response
-            $class = $purchase->getClass();
+        // Data will come from link
+        if ($crs) {
             if (($class=='F' and $availablefirst) or ($class=='S' and $availablestandard)) {
-                $em->persist($purchase);
-                $em->flush();
-
-                return $this->redirect($this->generateUrl('booking_additional'));
-
-            } else {
-                $form->get('class')->addError(new FormError('You must make a selection'));
+                $purchase->class = $class;
+                $purchase->save();
+                $this->redirect('booking/additional');
             }
         }
 
         // display form
-        return $this->render('SRPSBookingBundle:Booking:class.html.twig', array(
+        $this->View('booking/class.html.twig', array(
             'purchase' => $purchase,
-            'code' => $code,
             'service' => $service,
             'farefirst' => $farefirst,
             'farestandard' => $farestandard,
             'availablefirst' => $availablefirst,
             'availablestandard' => $availablestandard,
-            'form'   => $form->createView(),
         ));
     }
 

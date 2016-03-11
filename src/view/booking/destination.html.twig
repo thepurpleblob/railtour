@@ -14,7 +14,7 @@
 
     {% for destination in destinations %}
         {% if destination.available %}
-            <div class="panel panel-default">
+            <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h3 class="panel-title">{{ destination.name }}</h3>
                 </div>
@@ -25,7 +25,7 @@
                         <li><b>Standard adult</b> (each) &pound;{{ destination.standard }}</li>
                         <li><b>Standard child</b> (each) &pound;{{ destination.child }}</li>
                     </ul>
-                    <a class="btn btn-primary" href="{{ path( 'booking/destination', destination.crs ) }}">Choose {{ destination.name }}</a>
+                    <a class="btn btn-primary" href="{{ path( 'booking/destination', destination.crs ) }}">Choose <b>{{ destination.name }}</b></a>
                 </div>
             </div>
         {% else %}
