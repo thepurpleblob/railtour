@@ -88,3 +88,8 @@ div#sb_info {
 span.labelinfo {
     font-weight: normal;
 }
+
+span.classtotal {
+    font-weight: bold;
+    font-size: 125%;
+}

@@ -78,7 +78,7 @@ class BookingController extends coreController
 
             // Cancel?
             if (!empty($data['cancel'])) {
-                $this->redirect('admin/main');
+                $this->redirect('admin/main', true);
             }
 
             // Validate
@@ -155,7 +155,7 @@ class BookingController extends coreController
 
             // Cancel?
             if (!empty($data['back'])) {
-                $this->redirect('booking/numbers/' . $serviceid);
+                $this->redirect('booking/numbers/' . $serviceid, true);
             }
 
             // Validate
@@ -221,7 +221,7 @@ class BookingController extends coreController
 
             // Cancel?
             if (!empty($data['back'])) {
-                $this->redirect('booking/joining/' . $serviceid);
+                $this->redirect('booking/joining/' . $serviceid, true);
             }
         }
 
@@ -287,9 +287,9 @@ class BookingController extends coreController
                 // We need to know if Destinations would have been displayed
                 $stations = $booking->getDestinationStations($serviceid);
                 if (count($stations) > 1) {
-                    $this->redirect('booking/destination');
+                    $this->redirect('booking/destination', true);
                 } else {
-                    $this->redirect('booking/joining');
+                    $this->redirect('booking/joining', true);
                 }
             }
 
@@ -316,7 +316,7 @@ class BookingController extends coreController
         ));
     }
 
-   public function classAction()
+   public function classAction($class = '')
     {
         // Basics
         $booking = $this->getLibrary('Booking');
@@ -342,9 +342,9 @@ class BookingController extends coreController
 
         // we need to know about the number
         // it's a bodge - but if the choice is made then skip this check
-        $numbers = $booking->countStuff($service->getId(), $purchase);
-        $availablefirst = $numbers->getRemainingfirst() >= $passengercount;
-        $availablestandard = $numbers->getRemainingstandard() >= $passengercount;
+        $numbers = $booking->countStuff($serviceid, $purchase);
+        $availablefirst = $numbers->remainingfirst >= $passengercount;
+        $availablestandard = $numbers->remainingstandard >= $passengercount;
 
         // still might not be available if passengercount exceeds ruling maxparty
         if ($passengercount > $maxpartyfirst) {
@@ -354,37 +354,36 @@ class BookingController extends coreController
             $availablestandard = false;
         }
 
-        // create form
-        $classtype = new ClassType();
-        $form   = $this->createForm($classtype, $purchase);
+        // hopefully no errors
+        $errors = null;
 
-        // submitted?
-        $form->handleRequest($request);
-        if ($form->isValid()) {
+        // anything submitted?
+        // Will only apply to back in this case
+        if ($data = $this->getRequest()) {
 
-            // check that we have a valid response
-            $class = $purchase->getClass();
+            // Cancel?
+            if (!empty($data['back'])) {
+                $this->redirect('booking/meals', true);
+            }
+        }
+
+        // Data will come from link
+        if ($crs) {
             if (($class=='F' and $availablefirst) or ($class=='S' and $availablestandard)) {
-                $em->persist($purchase);
-                $em->flush();
-
-                return $this->redirect($this->generateUrl('booking_additional'));
-
-            } else {
-                $form->get('class')->addError(new FormError('You must make a selection'));
+                $purchase->class = $class;
+                $purchase->save();
+                $this->redirect('booking/additional');
             }
         }
 
         // display form
-        return $this->render('SRPSBookingBundle:Booking:class.html.twig', array(
+        $this->View('booking/class.html.twig', array(
             'purchase' => $purchase,
-            'code' => $code,
             'service' => $service,
             'farefirst' => $farefirst,
             'farestandard' => $farestandard,
             'availablefirst' => $availablefirst,
             'availablestandard' => $availablestandard,
-            'form'   => $form->createView(),
         ));
     }
 

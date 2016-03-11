@@ -12,6 +12,8 @@ class coreController {
 
     protected $paths;
 
+    protected $back;
+
     /**
      * Sets the additional pathinfo array in the calling URL
      * so that the controller can access it directly if required.
@@ -98,6 +100,11 @@ class coreController {
             $this->gump = new \GUMP();
             $this->getTwig();
             $this->twig->addExtension(new twigextension());
+            if (isset($_SESSION['back'])) {
+                $this->back = $_SESSION['back'];
+            } else {
+                $this->back = false;
+            }
         }
     }
 
@@ -189,10 +196,13 @@ class coreController {
 
     /**
      * Redirect to some other location
+     * @param string $path relative path
+     * @parm bool $back flag rearwards links so they (can be) handled appropriately
      */
-    public function redirect($path) {
+    public function redirect($path, $back = false) {
         global $CFG;
 
+        $_SESSION['back'] = $back;
         $url = $CFG->www . '/index.php/' . $path;
         header("Location: $url");
         die;
