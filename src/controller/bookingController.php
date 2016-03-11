@@ -354,9 +354,6 @@ class BookingController extends coreController
             $availablestandard = false;
         }
 
-        // hopefully no errors
-        $errors = null;
-
         // anything submitted?
         // Will only apply to back in this case
         if ($data = $this->getRequest()) {
