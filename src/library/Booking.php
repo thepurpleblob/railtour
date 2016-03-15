@@ -485,6 +485,22 @@ class Booking
             ->where('completed', 0)
             ->where_lt('timestamp', $oldtime)
             ->delete_many();
+
+        // IF we've deleted the current purchase then we have
+        // an interesting problem!
+
+        // See if the current purchase still exists
+        if (isset($_SESSION['purchaseid'])) {
+            $purchaseid = $_SESSION['purchaseid'];
+            $purchase = \ORM::forTable('Purchase')->findOne($purchaseid);
+            if (!$purchase) {
+                unset($_SESSION['key']);
+                unset($_SESSION['purchaseid']);
+
+                // Redirect out of here
+                $this->controller->View('booking/timeout.html.twig');
+            }
+        }
     }
 
     /**

@@ -365,7 +365,7 @@ class BookingController extends coreController
         }
 
         // Data will come from link
-        if ($crs) {
+        if ($class) {
             if (($class=='F' and $availablefirst) or ($class=='S' and $availablestandard)) {
                 $purchase->class = $class;
                 $purchase->save();
@@ -384,62 +384,55 @@ class BookingController extends coreController
         ));
     }
 
-    public function additionalAction(Request $request)
+    public function additionalAction()
     {
-        $em = $this->getDoctrine()->getManager();
-        $booking = $this->get('srps_booking');
-
-        // Grab current purchase
+        // Basics
+        $booking = $this->getLibrary('Booking');
         $purchase = $booking->getPurchase();
-
-        // Get the service object
-        $code = $purchase->getCode();
-        $service = $em->getRepository('SRPSBookingBundle:Service')
-            ->findOneByCode($code);
-        if (!$service) {
-            throw $this->createNotFoundException('Unable to find code ' . $code);
-        }
+        $serviceid = $purchase->serviceid;
+        $service = $booking->Service($serviceid);
 
         // current counts
-        $numbers = $booking->countStuff($service->getId(), $purchase);
+        $numbers = $booking->countStuff($serviceid, $purchase);
 
         // Get the passenger count
-        $passengercount = $purchase->getAdults() + $purchase->getChildren();
+        $passengercount = $purchase->adults + $purchase->children;
 
         // This page will only be shown if we are going to ask about firstsingle
         // option, or ask for comments.
-        $iscomments = $service->isCommentbox();
-        $issupplement = ($numbers->getRemainingfirstsingles() >= $passengercount)
-                && ($purchase->getClass()=='F')
-                && (($passengercount==1) || ($passengercount==2))
+        $iscomments = $service->commentbox;
+        $issupplement = ($numbers->remainingfirstsingles >= $passengercount)
+                && ($purchase->class == 'F')
+                && (($passengercount == 1) || ($passengercount==2))
                 ;
         if (!($iscomments or $issupplement)) {
-                return $this->redirect($this->generateUrl('booking_personal'));
+                $this->redirect('booking/personal');
         }
 
-        // create form
-        $classtype = new AdditionalType($iscomments, $issupplement);
-        $form   = $this->createForm($classtype, $purchase);
+        // hopefully no errors
+        $errors = null;
 
-        // submitted?
-        $form->handleRequest($request);
-        if ($form->isValid()) {
+        // anything submitted?
+        if ($data = $this->getRequest()) {
 
-            // 'save' the purchase
-            $em->persist($purchase);
-            $em->flush();
+            // Validate
+            $this->gump->validation_rules($gumprules);
+            $this->gump->set_field_names($fieldnames);
+            if ($data = $this->gump->run($data)) {
 
-            return $this->redirect($this->generateUrl('booking_personal'));
+                // 'save' the purchase
+                $purchase->save();
+            }
+
+            $this->redirect('booking/personal');
         }
 
         // display form
-        return $this->render('SRPSBookingBundle:Booking:additional.html.twig', array(
+        $this->View('booking/additional.html.twig', array(
             'purchase' => $purchase,
-            'code' => $code,
             'service' => $service,
             'iscomments' => $iscomments,
             'issupplement' => $issupplement,
-            'form'   => $form->createView(),
         ));
     }
 

@@ -1,21 +1,21 @@
-{% extends 'SRPSBookingBundle:Booking:booking.html.twig' %}
-
-{% form_theme form 'SRPSBookingBundle:Admin:fields.html.twig' %}
+{% extends 'booking/booking.html.twig' %}
 
 {% block content %}
-    <h2>SRPS Railtours Online Booking</h2>
 
-    <h3 class="text-error">Additional options and comments...</h3>
+    <div class="srpsnavbar">
+        SRPS Railtours Online Booking &nbsp;<span class="navdot glyphicon glyphicon-record"></span>&nbsp; {{ service.name }}
+    </div>
 
-    <form id="additional-form" class="form-horizontal" action="{{ path('booking_additional') }}"
-          novalidate="novalidate" method="post" {{ form_enctype(form) }}>
+    <h3 class="text-error">Additional options {% if iscomments %}and comments...{% endif %}</h3>
+
+    <form id="additional-form" class="form-horizontal" action="{{ path('booking/additional') }}">
         {% if iscomments %}
             <div class="alert alert-block">
                 You may add a short comment or request here and we will do our best
                 to accommodate you. Please <b>DO NOT</b> use this to ask a question
                 or request special meals - please call us. 
             </div>  
-            {{ form_row(form.comment) }}    
+            {{ form_text('comment', '', purchase.comment) }}
         {% endif %}
                     
         {% if issupplement %}
@@ -26,7 +26,7 @@
                 a charge of &pound;{{ service.singlesupplement | number_format(2) }}
                 per person<br />
             </div>  
-            {{ form_row(form.seatsupplement) }}
+            {{ form_yesno('seatsupplement', 'Window seats in First Class', purchase.seatsupplement) }}
         {% endif %}            
 
     </form>
