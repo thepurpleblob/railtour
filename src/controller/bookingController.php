@@ -501,62 +501,57 @@ class BookingController extends coreController
         ));
     }
 
-   public function reviewAction()
-    {
-        $em = $this->getDoctrine()->getManager();
-        $booking = $this->get('srps_booking');
-        $sagepay = $this->get('srps_sagepay');
+   public function reviewAction() {
 
-        // initialise sagepay thingy
-        // (needs to access a bunch of params)
-        $sagepay->setParameters($this->container);
-
-        // Grab current purchase
+        // Basics
+        $booking = $this->getLibrary('Booking');
         $purchase = $booking->getPurchase();
-
-        // We have to mark done here, there isn't another chance
-        // before passing control to SagePay (and it will get deleted if
-        // something goes wrong
-        $purchase->setCompleted(true);
-        $em->persist($purchase);
-        $em->flush();
-
-        // Get the service object
-        $code = $purchase->getCode();
-        $service = $em->getRepository('SRPSBookingBundle:Service')
-            ->findOneByCode($code);
-        if (!$service) {
-            throw $this->createNotFoundException('Unable to find code ' . $code);
-        }
+        $serviceid = $purchase->serviceid;
+        $service = $booking->Service($serviceid);
 
         // work out final fare
-        $fare = $booking->calculateFare($service, $purchase, $purchase->getClass());
-        $purchase->setPayment($fare->total);
-        $em->persist($purchase);
-        $em->flush();
+        $fare = $booking->calculateFare($service, $purchase, $purchase->class);
+        $purchase->payment = $fare->total;
+        $purchase->save();
 
         // get the destination
-        $destination = $em->getRepository('SRPSBookingBundle:Destination')
-            ->findOneBy(array('serviceid'=>$service->getId(), 'crs'=>$purchase->getDestination()));
+        $destination = $booking->getDestination($serviceid, $purchase->destination);
 
         // get the joining station
-        $joining = $em->getRepository('SRPSBookingBundle:Joining')
-            ->findOneBy(array('serviceid'=>$service->getId(), 'crs'=>$purchase->getJoining()));
-
-        // get stuff for sagepay (must be absolute)
-        $callbackurl = $this->generateUrl('booking_callback', array(), true);
-        $sage = $sagepay->getSage($service, $purchase, $destination, $joining, $callbackurl, $fare);
+        $joining = $booking->getJoining($serviceid, $purchase->joining);
 
         // display form
-        return $this->render('SRPSBookingBundle:Booking:review.html.twig', array(
+        $this->View('booking/review.html.twig', array(
             'purchase' => $purchase,
-            'code' => $code,
             'service' => $service,
             'destination' => $destination,
             'joining' => $joining,
-            'sage' => $sage,
             'fare' => $fare,
         ));
+    }
+
+    /**
+     * This is a bit different - we get here from the
+     * review page, only if the form is submitted
+     */
+    public function paymentAction() {
+
+        // Basics
+        $booking = $this->getLibrary('Booking');
+        $purchase = $booking->getPurchase();
+        $serviceid = $purchase->serviceid;
+        $service = $booking->Service($serviceid);
+
+        // anything submitted?
+        if ($data = $this->getRequest()) {
+
+            // Anything other than 'next' jumps back
+            if (empty($data['next'])) {
+                $this->redirect('booking/personal', true);
+            }
+
+            // If we get here we can process SagePay stuff
+        }
     }
 
     public function callbackAction()

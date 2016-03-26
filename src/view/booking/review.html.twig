@@ -1,7 +1,9 @@
-{% extends 'SRPSBookingBundle:Booking:booking.html.twig' %}
+{% extends 'booking/booking.html.twig' %}
 
 {% block content %}
-    <h2>SRPS Railtours Online Booking</h2>
+    <div class="srpsnavbar">
+        SRPS Railtours Online Booking &nbsp;<span class="navdot glyphicon glyphicon-record"></span>&nbsp; {{ service.name }}
+    </div>
 
     <h3 class="text-error">Review and pay</h3>
 
@@ -80,24 +82,10 @@
         Terms and Conditions</a>
     </div>
 
-    <form id="sagepay-form" class="form-horizontal" action="{{ sage.submissionurl }}"
-          novalidate="novalidate" method="post">
-        <input type="hidden" name="VPSProtocol" value="3.00" />
-        <input type="hidden" name="TxType" value="PAYMENT" />
-        <input type="hidden" name="Vendor" value="{{ sage.login }}" />
-        <input type="hidden" name="Crypt" value="{{ sage.crypt }}" />
+    <form id="review-form" class="form-horizontal" action="{{ path('booking/payment') }}" method="post">
+        <div>
+            <input type="submit" name="next" value="Go to our secure payment site" class="btn btn-primary" />
+            <input type="submit" name="back" value="Back" class="btn btn-warning" formnovalidate />
+        </div>
     </form>
-
-    <div>
-        <a class="btn btn-primary" onclick="sagepay_submit();">
-            Go to our secure payment site
-        </a>
-    </div>
-
-    <script>
-        function sagepay_submit() {
-            $('#sagepay-form').submit();
-        }
-    </script>
-
 {% endblock content %}
