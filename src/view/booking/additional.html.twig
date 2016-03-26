@@ -8,7 +8,7 @@
 
     <h3 class="text-error">Additional options {% if iscomments %}and comments...{% endif %}</h3>
 
-    <form id="additional-form" class="form-horizontal" action="{{ path('booking/additional') }}">
+    <form id="additional-form" class="form-horizontal" action="{{ path('booking/additional') }}" method="post">
         {% if iscomments %}
             <div class="alert alert-block">
                 You may add a short comment or request here and we will do our best
@@ -27,14 +27,12 @@
                 per person<br />
             </div>  
             {{ form_yesno('seatsupplement', 'Window seats in First Class', purchase.seatsupplement) }}
-        {% endif %}            
+        {% endif %}
 
+        <div>
+            <input type="submit" name="next" value="Next step" class="btn btn-primary" />
+            <input type="submit" name="back" value="Back" class="btn btn-warning"  />
+        </div>
     </form>
-
-    <div>
-        <a class="btn btn-primary" onclick="$('#additional-form').submit();">
-            Next step
-        </a>
-    </div>
 
 {% endblock content %}

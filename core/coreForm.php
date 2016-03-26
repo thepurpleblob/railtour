@@ -100,7 +100,7 @@ class coreForm {
             echo '    <label for="' . $id . '" class="col-sm-' . $labelcol . ' control-label">' . $label . '</label>';
         }
         echo '    <div class="col-sm-' . $inputcol .'">';
-        echo '    <select class="form-control input-sm" name="'.$name.'">';
+        echo '    <select class="form-control input-sm" name="'.$name.'" id="' . $id . '"">';
         if ($choose) {
         	echo '<option selected disabled="disabled">'.$choose.'</option>';
         }

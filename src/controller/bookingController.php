@@ -384,8 +384,8 @@ class BookingController extends coreController
         ));
     }
 
-    public function additionalAction()
-    {
+    public function additionalAction() {
+
         // Basics
         $booking = $this->getLibrary('Booking');
         $purchase = $booking->getPurchase();
@@ -406,7 +406,11 @@ class BookingController extends coreController
                 && (($passengercount == 1) || ($passengercount==2))
                 ;
         if (!($iscomments or $issupplement)) {
+            if ($this->back) {
+                redirect('booking/class');
+            } else {
                 $this->redirect('booking/personal');
+            }
         }
 
         // hopefully no errors
@@ -415,14 +419,13 @@ class BookingController extends coreController
         // anything submitted?
         if ($data = $this->getRequest()) {
 
-            // Validate
-            $this->gump->validation_rules($gumprules);
-            $this->gump->set_field_names($fieldnames);
-            if ($data = $this->gump->run($data)) {
-
-                // 'save' the purchase
-                $purchase->save();
+            if (!empty($data['comment'])) {
+                $purchase->comment = $data['comment'];
             }
+            if (!empty($data['seatsupplement'])) {
+                $purchase->seatsupplement = $data['seatsupplement'];
+            }
+            $purchase->save();
 
             $this->redirect('booking/personal');
         }
@@ -436,82 +439,65 @@ class BookingController extends coreController
         ));
     }
 
-    public function personalAction(Request $request)
+    public function personalAction()
     {
-        $em = $this->getDoctrine()->getManager();
-        $booking = $this->get('srps_booking');
-
-        // Grab current purchase
+        // Basics
+        $booking = $this->getLibrary('Booking');
         $purchase = $booking->getPurchase();
+        $serviceid = $purchase->serviceid;
+        $service = $booking->Service($serviceid);
 
-        // Get the service object
-        $code = $purchase->getCode();
-        $service = $em->getRepository('SRPSBookingBundle:Service')
-            ->findOneByCode($code);
-        if (!$service) {
-            throw $this->createNotFoundException('Unable to find code ' . $code);
-        }
+        // hopefully no errors
+        $errors = null;
 
-        // create form
-        $personaltype = new PersonalType();
-        $form   = $this->createForm($personaltype, $purchase);
+        // anything submitted?
+        if ($data = $this->getRequest()) {
 
-        // submitted?
-        $form->handleRequest($request);
-        if ($form->isValid()) {
-
-            // need to check fields the hard way
-            $error = false;
-            if (!$purchase->getSurname()) {
-                $form->get('surname')->addError(new FormError('Surname is required'));
-                $error = true;
-            }
-            if (!$purchase->getFirstname()) {
-                $form->get('firstname')->addError(new FormError('First name is required'));
-                $error = true;
-            }
-            if (!$purchase->getAddress1()) {
-                $form->get('address1')->addError(new FormError('Address line 1 is required'));
-                $error = true;
-            }
-            if (!$purchase->getCity()) {
-                $form->get('city')->addError(new FormError('Post town/city is required'));
-                $error = true;
-            }
-            if (!$purchase->getPostcode()) {
-                $form->get('postcode')->addError(new FormError('Postcode is required'));
-                $error = true;
-            }
-            if (!$purchase->getEmail()) {
-                $form->get('email')->addError(new FormError('Email is required'));
-                $error = true;
+            // Cancel?
+            if (!empty($data['back'])) {
+                $this->redirect('booking/additional', true);
             }
 
-            // Now need to 'normalise' some of the fields
-            $purchase->setTitle(ucwords($purchase->getTitle()));
-            $purchase->setSurname(ucwords($purchase->getSurname()));
-            $purchase->setFirstname(ucwords($purchase->getFirstname()));
-            $purchase->setAddress1(ucwords($purchase->getAddress1()));
-            $purchase->setAddress2(ucwords($purchase->getAddress2()));
-            $purchase->setCity(ucwords($purchase->getCity()));
-            $purchase->setCounty(ucwords($purchase->getCounty()));
-            $purchase->setPostcode(strtoupper($purchase->getPostcode()));
-            $purchase->setEmail(strtolower($purchase->getEmail()));
+            // Validate
+            $this->gump->validation_rules(array(
+                'surname' => 'required',
+                'firstname' => 'required',
+                'address1' => 'required',
+                'city' => 'required',
+                'postcode' => 'required',
+                'email' => 'required',
+            ));
+            $this->gump->set_field_names(array(
+                'surname' => 'Surname',
+                'firstname' => 'First name',
+                'address1' => 'Address line 1',
+                'city' => 'City',
+                'postcode' => 'Post code',
+                'email' => 'Email',
+            ));
+            if ($data = $this->gump->run($data)) {
 
-            if (!$error) {
-                $em->persist($purchase);
-                $em->flush();
+                // Now need to 'normalise' some of the fields
+                $purchase->title = ucwords($data['title']);
+                $purchase->surname = ucwords($data['surname']);
+                $purchase->firstname = ucwords($data['firstname']);
+                $purchase->address1 = ucwords($data['address1']);
+                $purchase->address2 = ucwords($data['address2']);
+                $purchase->city = ucwords($data['city']);
+                $purchase->county = ucwords($data['county']);
+                $purchase->postcode = strtoupper($data['postcode']);
+                $purchase->phone = $data['phone'];
+                $purchase->email = strtolower($data['email']);
 
-                return $this->redirect($this->generateUrl('booking_review'));
+                $purchase->save();
+                $this->redirect('booking/review');
             }
         }
 
         // display form
-        return $this->render('SRPSBookingBundle:Booking:personal.html.twig', array(
+        $this->View('booking/personal.html.twig', array(
             'purchase' => $purchase,
-            'code' => $code,
             'service' => $service,
-            'form'   => $form->createView(),
         ));
     }
 
