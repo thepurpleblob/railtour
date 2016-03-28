@@ -542,6 +542,15 @@ class BookingController extends coreController
         $serviceid = $purchase->serviceid;
         $service = $booking->Service($serviceid);
 
+        // work out final fare
+        $fare = $booking->calculateFare($service, $purchase, $purchase->class);
+
+        // Line up Sagepay class
+        $sagepay = $this->getLibrary('SagepayServer');
+        $sagepay->setService($service);
+        $sagepay->setPurchase($purchase);
+        $sagepay->setFare($fare);
+
         // anything submitted?
         if ($data = $this->getRequest()) {
 
@@ -551,10 +560,12 @@ class BookingController extends coreController
             }
 
             // If we get here we can process SagePay stuff
+            // Register payment with Sagepay
+            $sagepay->register();
         }
     }
 
-    public function callbackAction()
+    public function notificationAction()
     {
         $em = $this->getDoctrine()->getManager();
         $sagepay = $this->get('srps_sagepay');

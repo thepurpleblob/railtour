@@ -32,15 +32,15 @@ $CFG->default_party = 8;
 $CFG->select_limit = 8;
 
 // Sagepay stuff
-$CFG->sage_url = '';
-$CFG->sage_vendor = '';
-$CFG->sage_encrypt = '';
+$CFG->sage_url = 'https://test.sagepay.com/gateway/service/vspserver-register.vsp'; // Test server
+// $CFG->sage_url = 'https://live.sagepay.com/gateway/service/vspserver-register.vsp'; // Live server
+$CFG->sage_vendor = 'srpsrailtours';
 $CFG->sage_email = ''; // multiple separate with colons
 $CFG->sage_message = ''; // message inserted into sage email (up to 700 chars)
 $CFG->sage_prefix = 'TS'; // prefix for booking codes (MUST be unique for installation)
 
 // Email stuff
-$CFG->smtpd_host = '';
+$CFG->smtpd_host = 'mailx.e-learndesign.co.uk';
 $CFG->backup_email = '';
 
 // Contact number

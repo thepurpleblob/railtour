@@ -1,6 +1,8 @@
 <?php
 
-namespace SRPS\BookingBundle\Service;
+namespace thepurpleblob\railtour\library;
+
+use Exception;
 
 class Sagepay {
 

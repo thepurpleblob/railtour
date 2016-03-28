@@ -186,12 +186,12 @@ class coreController {
     }
 
     /**
-     * Create a url from route
+     * Create a url from path
      */
-    public function Url($route) {
+    public function Url($path) {
         global $CFG;
 
-        return $CFG->www . '/index.php/' . $route;
+        return $CFG->www . '/index.php/' . $path;
     }
 
     /**
@@ -203,7 +203,7 @@ class coreController {
         global $CFG;
 
         $_SESSION['back'] = $back;
-        $url = $CFG->www . '/index.php/' . $path;
+        $url = $this->Url($path);
         header("Location: $url");
         die;
     }
