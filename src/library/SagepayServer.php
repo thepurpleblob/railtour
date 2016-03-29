@@ -159,7 +159,8 @@ class SagepayServer {
             'AccountType' => 'E', // TODO - could be 'M' somehow
         ];
 
-        return http_build_query($data);
+        //return http_build_query($data);
+        return implode('&', $data);
     }
 
     /**
