@@ -31,7 +31,7 @@ class Booking
      * @throws Exception
      */
     public function Service($id) {
-        $service = \ORM::forTable('Service')->findOne($id);
+        $service = \ORM::forTable('service')->findOne($id);
 
         if (!$service) {
             throw new Exception('Unable to find Service record for id = ' . $id);
@@ -47,7 +47,7 @@ class Booking
      * @throws Exception
      */
     public function serviceFromCode($code) {
-        $services = \ORM::forTable('Service')->where('code', $code)->findMany();
+        $services = \ORM::forTable('service')->where('code', $code)->findMany();
 
         if (!$services) {
             throw new Exception('Unable to find Service record for code = ' . $code);
@@ -113,7 +113,7 @@ class Booking
      * Create new Destination
      */
     public function createDestination($serviceid) {
-        $destination = \ORM::forTable('Destination')->create();
+        $destination = \ORM::forTable('destination')->create();
         $destination->serviceid = $serviceid;
         $destination->name = '';
         $destination->crs = '';
@@ -127,7 +127,7 @@ class Booking
      * Create new pricebandgroup
      */
     public function createPricebandgroup($serviceid) {
-        $pricebandgroup = \ORM::forTable('Pricebandgroup')->create();
+        $pricebandgroup = \ORM::forTable('pricebandgroup')->create();
         $pricebandgroup->serviceid = $serviceid;
         $pricebandgroup->name = '';
 
@@ -154,7 +154,7 @@ class Booking
      * @return object new (empty) joining object
      */
     public function createJoining($serviceid, $pricebandgroups) {
-        $joining = \ORM::forTable('Joining')->create();
+        $joining = \ORM::forTable('joining')->create();
         $joining->serviceid = $serviceid;
         $joining->station = '';
         $joining->crs = '';
@@ -176,13 +176,13 @@ class Booking
     public function isPricebandsConfigured($serviceid) {
 
         // presumably we need at least one pricebandgroup
-        $pricebandgroup_count = \ORM::forTable('Pricebandgroup')->where('serviceid', $serviceid)->count();
+        $pricebandgroup_count = \ORM::forTable('pricebandgroup')->where('serviceid', $serviceid)->count();
         if (!$pricebandgroup_count) {
             return false;
         }
 
         // ...and there must be some pricebands too
-        $priceband_count = \ORM::forTable('Priceband')->where('serviceid', $serviceid)->count();
+        $priceband_count = \ORM::forTable('priceband')->where('serviceid', $serviceid)->count();
         if (!$priceband_count) {
             return false;
         }
@@ -194,18 +194,18 @@ class Booking
      * Get pricebands ordered by destinations (create any new missing ones)
      */
     public function getPricebands($serviceid, $pricebandgroupid, $save=true) {
-        $destinations = \ORM::forTable('Destination')->where('serviceid', $serviceid)->order_by_asc('destination.name')->findMany();
+        $destinations = \ORM::forTable('destination')->where('serviceid', $serviceid)->order_by_asc('destination.name')->findMany();
         if (!$destinations) {
             throw new Exception('No destinations found for serviceid = ' . $serviceid);
         }
         $pricebands = array();
         foreach ($destinations as $destination) {
-            $priceband = \ORM::forTable('Priceband')->where(array(
+            $priceband = \ORM::forTable('priceband')->where(array(
                 'pricebandgroupid' => $pricebandgroupid,
                 'destinationid' => $destination->id,
             ))->findOne();
             if (!$priceband) {
-                $priceband = \ORM::forTable('Priceband')->create();
+                $priceband = \ORM::forTable('priceband')->create();
                 $priceband->serviceid = $serviceid;
                 $priceband->pricebandgroupid = $pricebandgroupid;
                 $priceband->destinationid = $destination->id;
@@ -232,13 +232,13 @@ class Booking
      */
     public function createPricebands($serviceid) {
         $pricebands = array();
-        $destinations = \ORM::forTable('Destination')->where('serviceid', $serviceid)->order_by_asc('destination.name')->findMany();
+        $destinations = \ORM::forTable('destination')->where('serviceid', $serviceid)->order_by_asc('destination.name')->findMany();
         if (!$destinations) {
             throw new Exception('No destinations found for serviceid = ' . $serviceid);
         }
 
         foreach ($destinations as $destination) {
-            $priceband = \ORM::forTable('Priceband')->create();
+            $priceband = \ORM::forTable('priceband')->create();
             $priceband->name = $destination->name;
             $priceband->serviceid = $serviceid;
             $priceband->destinationid = $destination->id;
@@ -257,11 +257,11 @@ class Booking
      * @param $serviceid
      */
     public function getLimits($serviceid) {
-        $limits = \ORM::forTable('Limits')->where('serviceid', $serviceid)->findOne();
+        $limits = \ORM::forTable('limits')->where('serviceid', $serviceid)->findOne();
 
         // Its's possible that the limits for this service don't exist (yet)
         if (!$limits) {
-            $limits = \ORM::forTable('Limits')->create();
+            $limits = \ORM::forTable('limits')->create();
             $limits->serviceid = $serviceid;
             $limits->first = 0;
             $limits->standard = 0;
@@ -386,7 +386,7 @@ class Booking
     public function isDestinationUsed($destination) {
 
         // find pricebands that specify this destination
-        $pricebands = \ORM::forTable('Priceband')->where('destinationid', $destination->id)->findMany();
+        $pricebands = \ORM::forTable('priceband')->where('destinationid', $destination->id)->findMany();
 
         // if there are non then not used
         if (!$pricebands) {
@@ -466,7 +466,7 @@ class Booking
     public function isPricebandUsed($pricebandgroup) {
 
         // find joining stations that specify this group
-        $joinings = \ORM::forTable('Joining')->where('pricebandgroupid', $pricebandgroup->id)->findMany();
+        $joinings = \ORM::forTable('joining')->where('pricebandgroupid', $pricebandgroup->id)->findMany();
 
         // if there are any then it is used
         if ($joinings) {
@@ -481,7 +481,7 @@ class Booking
      */
     public function deleteOldPurchases() {
         $oldtime = time() - PURCHASE_LIFETIME;
-        \ORM::forTable('Purchase')
+        \ORM::forTable('purchase')
             ->where('completed', 0)
             ->where_lt('timestamp', $oldtime)
             ->delete_many();
@@ -492,7 +492,7 @@ class Booking
         // See if the current purchase still exists
         if (isset($_SESSION['purchaseid'])) {
             $purchaseid = $_SESSION['purchaseid'];
-            $purchase = \ORM::forTable('Purchase')->findOne($purchaseid);
+            $purchase = \ORM::forTable('purchase')->findOne($purchaseid);
             if (!$purchase) {
                 unset($_SESSION['key']);
                 unset($_SESSION['purchaseid']);
@@ -808,7 +808,7 @@ class Booking
         $count = new \stdClass();
 
         // get first class booked
-        $fbtotal = \ORM::forTable('Purchase')
+        $fbtotal = \ORM::forTable('purchase')
             ->select_expr('SUM(adults + children)', 'fb')
             ->where(array(
                 'completed' => 1,
@@ -820,7 +820,7 @@ class Booking
         $count->bookedfirst = $this->zero($fbtotal->fb);
 
         // get first class in progress
-        $fptotal = \ORM::forTable('Purchase')
+        $fptotal = \ORM::forTable('purchase')
             ->select_expr('SUM(adults + children)', 'fp')
             ->where(array(
                 'completed' => 0,
@@ -845,7 +845,7 @@ class Booking
         $count->remainingfirst = $limits->first - $count->bookedfirst - $count->pendingfirst;
 
         // get standard class booked
-        $sbtotal = \ORM::forTable('Purchase')
+        $sbtotal = \ORM::forTable('purchase')
             ->select_expr('SUM(adults + children)', 'sb')
             ->where(array(
                 'completed' => 1,
@@ -857,7 +857,7 @@ class Booking
         $count->bookedstandard = $this->zero($sbtotal->sb);
 
         // get standard class in progress
-        $sptotal = \ORM::forTable('Purchase')
+        $sptotal = \ORM::forTable('purchase')
             ->select_expr('SUM(adults + children)', 'sp')
             ->where(array(
                 'completed' => 0,
@@ -883,7 +883,7 @@ class Booking
 
         // get first supplements booked. Note field is a boolean and applies to
         // all persons in booking (which is only asked for parties of one or two)
-        $suptotal = \ORM::forTable('Purchase')
+        $suptotal = \ORM::forTable('purchase')
             ->select_expr('SUM(adults + children)', 'sup')
             ->where(array(
                 'completed' => 1,
@@ -897,7 +897,7 @@ class Booking
 
         // get first supplements in progress. Note field is a boolean and applies to
         // all persons in booking (which is only asked for parties of one or two)
-        $supptotal = \ORM::forTable('Purchase')
+        $supptotal = \ORM::forTable('purchase')
             ->select_expr('SUM(adults + children)', 'supp')
             ->where(array(
                 'completed' => 0,
@@ -913,7 +913,7 @@ class Booking
         $count->remainingfirstsingles = $limits->firstsingles - $count->bookedfirstsingles - $count->pendingfirstsingles;
 
         // Get booked meals
-        $bmeals = \ORM::forTable('Purchase')
+        $bmeals = \ORM::forTable('purchase')
             ->select_expr('SUM(meala)', 'suma')
             ->select_expr('SUM(mealb)', 'sumb')
             ->select_expr('SUM(mealc)', 'sumc')
@@ -930,7 +930,7 @@ class Booking
         $count->bookedmeald = $this->zero($bmeals->sumd);
 
         // Get pending meals
-        $pmeals = \ORM::forTable('Purchase')
+        $pmeals = \ORM::forTable('purchase')
             ->select_expr('SUM(meala)', 'suma')
             ->select_expr('SUM(mealb)', 'sumb')
             ->select_expr('SUM(mealc)', 'sumc')
@@ -953,7 +953,7 @@ class Booking
         $count->remainingmeald = $limits->meald - $count->bookedmeald - $count->pendingmeald;
 
         // Get counts for destination limits
-        $destinations = \ORM::forTable('Destination')->where('serviceid', $serviceid)->findMany();
+        $destinations = \ORM::forTable('destination')->where('serviceid', $serviceid)->findMany();
         $destinationcounts = array();
         foreach ($destinations as $destination) {
             $name = $destination->name;
@@ -962,7 +962,7 @@ class Booking
             $destinationcount->name = $name;
 
             // bookings for this destination
-            $dtotal = \ORM::forTable('Purchase')
+            $dtotal = \ORM::forTable('purchase')
                 ->select_expr('SUM(adults + children)', 'dt')
                 ->where(array(
                     'completed' => 1,
@@ -974,7 +974,7 @@ class Booking
             $destinationcount->booked = $this->zero($dtotal->dt);
 
             // pending bookings for this destination
-            $ptotal = \ORM::forTable('Purchase')
+            $ptotal = \ORM::forTable('purchase')
                 ->select_expr('SUM(adults + children)', 'pt')
                 ->where(array(
                     'completed' => 0,
