@@ -7,7 +7,7 @@
         <div class="panel panel-primary">
             <div class="panel-heading">{{ service.date }} {{ service.name }}</div>
             <div class="panel-body">
-                {{ service.description }}
+                {{ service.description | raw }}
                 <br /><br />
                 <a class="btn btn-primary" href="{{ path('booking/index', service.code) }}">Book now</a>
             </div>
