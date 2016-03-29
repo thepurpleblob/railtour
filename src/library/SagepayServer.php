@@ -76,7 +76,7 @@ class SagepayServer {
         // Adult purchases
         $aname = $this->purchase->adults==1 ? 'Adult' : 'Adults';
         $basket->add('item', true)
-            ->add('description',"Railtour '" . $this->service->name . "' $aname in $class Class" )
+            ->add('description', "Railtour '" . $this->service->name . "' $aname in $class Class" )
             ->add('quantity', $this->purchase->adults)
             ->add('unitNetAmount', number_format($this->fare->adultunit, 2))
             ->add('unitTaxAmount', 0)
@@ -86,7 +86,7 @@ class SagepayServer {
         // Child purchases
         $aname = $this->purchase->children==1 ? 'Child' : 'Children';
         $basket->add('item', true)
-            ->add('description',"Railtour '" . $this->service->name . "' $aname in $class Class" )
+            ->add('description', "Railtour '" . $this->service->name . "' $aname in $class Class" )
             ->add('quantity', $this->purchase->children)
             ->add('unitNetAmount', number_format($this->fare->childunit, 2))
             ->add('unitTaxAmount', 0)
@@ -120,8 +120,10 @@ class SagepayServer {
                 ->add('totalGrossAmount', number_format($this->fare->seatsupplement, 2));
         }
 
-        // 'true' removes the xml declaration
-        $xml = $basket->xml(true);
+        $dom = $basket->dom();
+        $dom->formatOutput = false;
+        $xml = $dom->saveXML();
+        echo "<pre>"; var_dump($xml); die;
    
         return str_replace(PHP_EOL, '', $xml);
     }
