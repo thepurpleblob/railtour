@@ -166,8 +166,20 @@ class SagepayServer {
      * Register Purchase with Sagepay
      */
     public function register() {
+        global $CFG;
+
+        // get the POST data
         $data = $this->buildRegistrationData();
-        echo "<pre>"; var_dump($data); die;
+
+        // send it off to SagePay
+        $curl = curl_init($CFG->sage_url);
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($curl);
+
+        echo "<pre>"; var_dump($result); die;
+
     }
 
 }
