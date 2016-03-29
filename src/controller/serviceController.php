@@ -19,7 +19,7 @@ class ServiceController extends coreController
 
         $this->require_login('ROLE_ORGANISER');
 
-        $allservices = \ORM::forTable('Service')->order_by_asc('date')->findMany();
+        $allservices = \ORM::forTable('service')->order_by_asc('date')->findMany();
 
         // submitted year
         $thisyear = date('Y');
