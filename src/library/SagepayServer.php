@@ -117,7 +117,7 @@ class SagepayServer {
                 ->add('unitNetAmount', $this->service->singlesupplement)
                 ->add('unitTaxAmount', 0)
                 ->add('unitGrossAmount', $this->service->singlesupplemet)
-                ->add('totalGrossAmount', number_format($this->fare->singlesupplement, 2));
+                ->add('totalGrossAmount', number_format($this->fare->seatsupplement, 2));
         }
 
         // 'true' removes the xml declaration
