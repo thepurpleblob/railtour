@@ -121,7 +121,9 @@ class SagepayServer {
         }
 
         // 'true' removes the xml declaration
-        return $basket->xml(true);
+        $xml = $basket->xml(true);
+   
+        return str_replace(PHP_EOL, '', $xml);
     }
 
     /**
@@ -154,13 +156,12 @@ class SagepayServer {
             'DeliveryPostCode' => $this->clean($this->purchase->postcode, 10),
             'DeliveryCountry' => 'GB', // TODO (maybe)
             'CustomerEmail' => $this->clean($this->purchase->email, 255),
-            'BasketXML' => $this->buildBasket(),
+            // 'BasketXML' => $this->buildBasket(),
             'AllowGiftAid' => 1,
             'AccountType' => 'E', // TODO - could be 'M' somehow
         ];
 
-        //return http_build_query($data);
-        return implode('&', $data);
+        return http_build_query($data);
     }
 
     /**
