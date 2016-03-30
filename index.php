@@ -2,12 +2,16 @@
 
 require(dirname(__FILE__) . '/vendor/autoload.php');
 require(dirname(__FILE__) . '/config.php');
+require(dirname(__FILE__) . '/core/version.php');
 require(dirname(__FILE__) . '/core/setup.php');
 
 $CFG->basepath = dirname(__FILE__);
 
 error_reporting(E_ALL);
 ini_set('display_errors', 'stdout');
+
+// Make a check for any schema updates and such
+require(dirname(__FILE__) . '/core/update.php');
 
 // If no path is given, use the default
 if (isset($_SERVER['PATH_INFO'])) {

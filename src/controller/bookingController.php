@@ -561,7 +561,32 @@ class BookingController extends coreController
 
             // If we get here we can process SagePay stuff
             // Register payment with Sagepay
-            $sagepay->register();
+            $sr = $sagepay->register();
+
+            // If false is returned then it went wrong
+            if ($sr === false) {
+                $this->View('booking/fail', array(
+                    'diagnostic' => $sagepay->error,
+                ));
+            }
+
+            // check status of registration from SagePay
+            $status = $sr['Status'];
+            if (($status != 'OK') && ($status != 'OK REPEATED')) {
+                $this->View('booking/fail', array(
+                    'diagnostic' => $sr['StatusDetail'],
+                ));
+            }
+
+            // update purchase
+            $purchase->securitykey = $sr['SecurityKey'];
+            $purchase->regstatus = $status;
+            $purchase->save();
+
+            // redirect to Sage
+            $url = $sr['NextURL'];
+            header("Location: $url");
+            die;
         }
     }
 

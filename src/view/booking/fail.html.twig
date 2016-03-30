@@ -1,0 +1,24 @@
+{% extends 'booking/booking.html.twig' %}
+
+{% block content %}
+
+    <div class="srpsnavbar">
+        SRPS Railtours Online Booking &nbsp;<span class="navdot glyphicon glyphicon-record"></span>&nbsp; {{ service.name }}
+    </div>
+
+    <h3 class="text-error">Payment failure</h3>
+
+    <div class="panel panel-danger">
+        <div class="panel-body">
+            <p>Something has gone wrong communicating with our payment service.</p>
+            <p>Please try again later. If you're still having problems contact
+            webmaster@srps.org.uk</p>
+            <p><i>(Diagnostic message: '{{ diagnostic }}')</i></p>
+        </div>
+    </div>
+
+    <div>
+        <a class="button button-primary" href="{{ path('admin/main') }}">Continue</a>
+    </div>
+
+{% endblock content %}
