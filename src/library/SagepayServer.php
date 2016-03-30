@@ -203,8 +203,8 @@ class SagepayServer {
         $lines = explode(PHP_EOL, $result);
         $sr = [];
         foreach ($lines as $line) {
-            $parts = explode('=', $line);
-            $sr[$parts[0]] = $parts[1];
+            $parts = explode('=', $line, 2);
+            $sr[$parts[0]] = trim($parts[1]);
         }
 
         return $sr;
