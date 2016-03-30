@@ -565,7 +565,7 @@ class BookingController extends coreController
 
             // If false is returned then it went wrong
             if ($sr === false) {
-                $this->View('booking/fail', array(
+                $this->View('booking/fail.html.twig', array(
                     'diagnostic' => $sagepay->error,
                 ));
             }
@@ -573,7 +573,7 @@ class BookingController extends coreController
             // check status of registration from SagePay
             $status = $sr['Status'];
             if (($status != 'OK') && ($status != 'OK REPEATED')) {
-                $this->View('booking/fail', array(
+                $this->View('booking/fail.html.twig', array(
                     'diagnostic' => $sr['StatusDetail'],
                 ));
             }
