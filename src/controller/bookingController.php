@@ -566,6 +566,7 @@ class BookingController extends coreController
             // If false is returned then it went wrong
             if ($sr === false) {
                 $this->View('booking/fail.html.twig', array(
+                    'status' => 'N/A',
                     'diagnostic' => $sagepay->error,
                 ));
             }
@@ -574,6 +575,7 @@ class BookingController extends coreController
             $status = $sr['Status'];
             if (($status != 'OK') && ($status != 'OK REPEATED')) {
                 $this->View('booking/fail.html.twig', array(
+                    'status' => $status,
                     'diagnostic' => $sr['StatusDetail'],
                 ));
             }
