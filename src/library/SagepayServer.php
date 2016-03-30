@@ -21,6 +21,8 @@ class SagepayServer {
 
     protected $fare;
 
+    protected $error;
+
     protected $controller;
 
     /**
@@ -29,6 +31,7 @@ class SagepayServer {
      */
     public function __construct($controller) {
         $this->controller = $controller;
+        $this->error = '';
     }
 
     public function setPurchase($purchase) {
@@ -76,22 +79,24 @@ class SagepayServer {
         // Adult purchases
         $aname = $this->purchase->adults==1 ? 'Adult' : 'Adults';
         $basket->add('item', true)
-            ->add('description', "Railtour '" . $this->service->name . "' $aname in $class Class" )
+            ->add('description', htmlentities("Railtour '" . $this->service->name . "' $aname in $class Class"))
             ->add('quantity', $this->purchase->adults)
             ->add('unitNetAmount', number_format($this->fare->adultunit, 2))
-            ->add('unitTaxAmount', 0)
+            ->add('unitTaxAmount', '0.00')
             ->add('unitGrossAmount', number_format($this->fare->adultunit, 2))
             ->add('totalGrossAmount', number_format($this->fare->adultfare, 2));
 
         // Child purchases
-        $aname = $this->purchase->children==1 ? 'Child' : 'Children';
-        $basket->add('item', true)
-            ->add('description', "Railtour '" . $this->service->name . "' $aname in $class Class" )
-            ->add('quantity', $this->purchase->children)
-            ->add('unitNetAmount', number_format($this->fare->childunit, 2))
-            ->add('unitTaxAmount', 0)
-            ->add('unitGrossAmount', number_format($this->fare->childunit, 2))
-            ->add('totalGrossAmount', number_format($this->fare->childfare, 2));
+        if ($this->purchase->children) {
+            $aname = $this->purchase->children==1 ? 'Child' : 'Children';
+            $basket->add('item', true)
+                ->add('description', htmlentities("Railtour '" . $this->service->name . "' $aname in $class Class"))
+                ->add('quantity', $this->purchase->children)
+                ->add('unitNetAmount', number_format($this->fare->childunit, 2))
+                ->add('unitTaxAmount', '0.00')
+                ->add('unitGrossAmount', number_format($this->fare->childunit, 2))
+                ->add('totalGrossAmount', number_format($this->fare->childfare, 2));
+        }
 
         // Meals
         foreach (['a', 'b', 'c', 'd'] as $c) {
@@ -99,10 +104,10 @@ class SagepayServer {
             if ($this->service->{$name . 'visible'} && $this->purchase->$name) {
                 $total = $this->purchase->$name * $this->service->{$name . 'price'};
                 $basket->add('item', true)
-                    ->add('description', $this->service->{$name . 'name'})
+                    ->add('description', htmlentities($this->service->{$name . 'name'}))
                     ->add('quantity', $this->purchase->$name)
                     ->add('unitNetAmount', $this->service->{$name . 'price'})
-                    ->add('unitTaxAmount', 0)
+                    ->add('unitTaxAmount', '0.00')
                     ->add('unitGrossAmount', $this->service->{$name . 'price'})
                     ->add('totalGrossAmount', number_format($total, 2));
             }
@@ -116,16 +121,15 @@ class SagepayServer {
                 ->add('quantity', $passengers)
                 ->add('unitNetAmount', $this->service->singlesupplement)
                 ->add('unitTaxAmount', 0)
-                ->add('unitGrossAmount', $this->service->singlesupplemet)
+                ->add('unitGrossAmount', $this->service->singlesupplement)
                 ->add('totalGrossAmount', number_format($this->fare->seatsupplement, 2));
         }
 
         $dom = $basket->dom();
         $dom->formatOutput = false;
-        $xml = $dom->saveXML();
-        echo "<pre>"; var_dump($xml); die;
-   
-        return str_replace(PHP_EOL, '', $xml);
+        $xml = $dom->saveXML($dom->documentElement);
+
+        return trim($xml);
     }
 
     /**
@@ -158,12 +162,19 @@ class SagepayServer {
             'DeliveryPostCode' => $this->clean($this->purchase->postcode, 10),
             'DeliveryCountry' => 'GB', // TODO (maybe)
             'CustomerEmail' => $this->clean($this->purchase->email, 255),
-            // 'BasketXML' => $this->buildBasket(),
+            'BasketXML' => $this->clean($this->buildBasket(), 20000),
             'AllowGiftAid' => 1,
             'AccountType' => 'E', // TODO - could be 'M' somehow
         ];
 
-        return http_build_query($data);
+        // turn these into name=value
+        $params = [];
+        foreach ($data as $name => $value) {
+            $params[] = "$name=$value";
+        }
+        $post = implode('&', $params);
+
+        return $post;
     }
 
     /**
@@ -182,8 +193,21 @@ class SagepayServer {
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $result = curl_exec($curl);
 
-        echo "<pre>"; var_dump($result); die;
+        // if result is (exactly) false something is amiss
+        if ($result === false) {
+            $this->error = curl_error($curl);
+            return false;
+        }
 
+        // result consists of name=value on new lines
+        $lines = explode(PHP_EOL, $result);
+        $sr = [];
+        foreach ($lines as $line) {
+            $parts = explode('=', $line);
+            $sr[$parts[0]] = $parts[1];
+        }
+
+        return $sr;
     }
 
 }
