@@ -22,7 +22,7 @@ class LimitsController extends coreController
         $limits = $booking->getLimits($serviceid);
 
         // Get destinations (for destination limits)
-        $destinations = \ORM::forTable('Destination')->where('serviceid', $serviceid)->findMany();
+        $destinations = \ORM::forTable('destination')->where('serviceid', $serviceid)->findMany();
 
         // Create array of destinations limits
         $destinationlimits = array();
@@ -85,7 +85,7 @@ class LimitsController extends coreController
             }
         }
 
-        return $this->View('limits/edit.html.twig', array(
+        $this->View('limits/edit.html.twig', array(
             'limits' => $limits,
             'count' => $count,
             'service' => $service,

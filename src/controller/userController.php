@@ -38,7 +38,7 @@ class UserController extends coreController
         // Get all our users
         $users = \ORM::forTable('srps_users')->findMany();
 
-        return $this->View('user/index.html.twig', array(
+        $this->View('user/index.html.twig', array(
             'users' => $users,
         ));
     }
@@ -169,7 +169,7 @@ class UserController extends coreController
 
         
         // display form
-        return $this->View('user/edit.html.twig', array(
+        $this->View('user/edit.html.twig', array(
             'username' => $username,
             'user' => $user,
             'rolechoice' => $rolechoice,
@@ -193,7 +193,7 @@ class UserController extends coreController
         // Delete the user
         $user->delete();
 
-        return $this->redirect('user/index');
+        $this->redirect('user/index');
     }    
 }
 

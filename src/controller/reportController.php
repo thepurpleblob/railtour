@@ -25,7 +25,7 @@ class reportController extends coreController
             ->order_by_asc('timestamp')
             ->findMany();
 
-        return $this->View('report/list.html.twig', array(
+        $this->View('report/list.html.twig', array(
             'service' => $service,
             'purchases' => $purchases,
         ));
@@ -38,7 +38,7 @@ class reportController extends coreController
         $booking = $this->getLibrary('Booking');
 
         // Get the purchase record
-        $purchase = \ORM::forTable('Purchase')->findOne($purchaseid);
+        $purchase = \ORM::forTable('purchase')->findOne($purchaseid);
         if (!$purchase) {
             throw new \Exception('purchase item could not be found, id = ' . $purchaseid);
         }
@@ -46,7 +46,7 @@ class reportController extends coreController
         // ...and the service record
         $service = $booking->Service($purchase->serviceid);
 
-        return $this->View('report/view.html.twig', array(
+        $this->View('report/view.html.twig', array(
             'service' => $service,
             'purchase' => $purchase,
         ));
@@ -75,7 +75,7 @@ class reportController extends coreController
         
         // if there are none, then nothing to do
         if (!$purchases) {
-            return $this->redirect('service/index/' . $serviceid);
+            $this->redirect('service/index/' . $serviceid);
         }
         
         // Create a filename

@@ -65,7 +65,7 @@ class ServiceController extends coreController
 
         $this->require_login('ROLE_ORGANISER');
 
-        $service = \ORM::forTable('Service')->findOne($id);
+        $service = \ORM::forTable('service')->findOne($id);
 
         if (!$service) {
             throw new \Exception('Unable to find Service entity.');
@@ -98,10 +98,10 @@ class ServiceController extends coreController
         }
 
         // Get the other information stored for this service
-        $destinations = \ORM::forTable('Destination')->where('serviceid', $id)->findMany();
-        $pricebandgroups = \ORM::forTable('Pricebandgroup')->where('serviceid', $id)->findMany();
-        $joinings = \ORM::forTable('Joining')->where('serviceid', $id)->findMany();
-        $limits = \ORM::forTable('Limits')->where('serviceid', $id)->findOne();
+        $destinations = \ORM::forTable('destination')->where('serviceid', $id)->findMany();
+        $pricebandgroups = \ORM::forTable('pricebandgroup')->where('serviceid', $id)->findMany();
+        $joinings = \ORM::forTable('joining')->where('serviceid', $id)->findMany();
+        $limits = \ORM::forTable('limits')->where('serviceid', $id)->findOne();
 
         // iterate over these and get destinations
         // (very inefficiently)
@@ -113,7 +113,7 @@ class ServiceController extends coreController
 
         // add pricebandgroup names
         foreach ($joinings as $joining) {
-            $pricebandgroup = \ORM::forTable('Pricebandgroup')->findOne($joining->pricebandgroupid);
+            $pricebandgroup = \ORM::forTable('pricebandgroup')->findOne($joining->pricebandgroupid);
             $joining->pricebandname = $pricebandgroup->name;
         }
 
@@ -136,7 +136,7 @@ class ServiceController extends coreController
         $this->require_login('ROLE_ADMIN', 'service/show/' . $id);
 
         if ($id) {
-            $service = \ORM::forTable('Service')->findOne($id);
+            $service = \ORM::forTable('service')->findOne($id);
 
             if (!$service) {
                 throw new \Exception('Unable to find Service.');

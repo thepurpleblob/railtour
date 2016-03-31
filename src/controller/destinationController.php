@@ -22,7 +22,7 @@ class DestinationController extends coreController
 
         $service = $booking->Service($serviceid);
 
-        $destinations = \ORM::forTable('Destination')->where('serviceid', $serviceid)->findMany();
+        $destinations = \ORM::forTable('destination')->where('serviceid', $serviceid)->findMany();
 
         // Check if used
         foreach ($destinations as $destination) {
@@ -47,7 +47,7 @@ class DestinationController extends coreController
         $booking = $this->getLibrary('Booking');
 
         if ($id) {
-            $destination = \ORM::forTable('Destination')->findOne($id);
+            $destination = \ORM::forTable('destination')->findOne($id);
         } else {
             $destination = $booking->createDestination($serviceid);
         }
@@ -114,7 +114,7 @@ class DestinationController extends coreController
         \ORM::for_table('Priceband')->where('destinationid', $id)->delete_many();
 
         // delete destination
-        $destination = \ORM::for_table('Destination')->find_one($id);
+        $destination = \ORM::forTable('destination')->find_one($id);
         if ($destination) {
             $serviceid = $destination->serviceid;
             $destination->delete();
@@ -135,7 +135,7 @@ class DestinationController extends coreController
        $crs = $_POST['crstyped'];
 
        // Attempt to find in db
-       $station = \ORM::forTable('Station')->where('crs', $crs)->findOne();
+       $station = \ORM::forTable('station')->where('crs', $crs)->findOne();
        if ($station) {
            echo $station->name;
        } else {

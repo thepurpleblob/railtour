@@ -26,7 +26,7 @@ class PricebandController extends coreController
         $pricebandgroups = \ORM::forTable('Pricebandgroup')->where('serviceid', $serviceid)->findMany();
         
         // Get destinations mostly to check that there are some
-        $destinations = \ORM::forTable('Destination')->where('serviceid', $serviceid)->findMany();
+        $destinations = \ORM::forTable('destination')->where('serviceid', $serviceid)->findMany();
         
         // Get the band info to go with bands
         foreach ($pricebandgroups as $group) {
@@ -71,7 +71,7 @@ class PricebandController extends coreController
 
         // Get pricebandgroup and pricebands (new ones if no $id)
         if ($pricebandgroupid) {
-            $pricebandgroup = \ORM::forTable('Pricebandgroup')->findOne($pricebandgroupid);
+            $pricebandgroup = \ORM::forTable('pricebandgroup')->findOne($pricebandgroupid);
             $pricebands = $booking->getPricebands($serviceid, $pricebandgroupid);
         } else {
             $pricebandgroup = $booking->createPricebandgroup($serviceid);
@@ -149,7 +149,7 @@ class PricebandController extends coreController
         $this->require_login('ROLE_ADMIN', 'priceband/index/' . $serviceid);
         
         // Remove pricebands associated with this group
-        \ORM::forTable('Priceband')->where('pricebandgroupid', $pricebandgroupid)->deleteMany();
+        \ORM::forTable('priceband')->where('pricebandgroupid', $pricebandgroupid)->deleteMany();
         
         // Remove pricebandgroup
         $pricebandgroup = \ORM::forTable('Pricebandgroup')->findOne($pricebandgroupid);

@@ -22,18 +22,18 @@ class JoiningController extends coreController
 
         // Fetch basic data
         $service = $booking->Service($serviceid);
-        $joinings = \ORM::forTable('Joining')->where('serviceid', $serviceid)->findMany();
+        $joinings = \ORM::forTable('joining')->where('serviceid', $serviceid)->findMany();
 
         // add pricebandgroup names
         foreach ($joinings as $joining) {
-            $pricebandgroup = \ORM::forTable('Pricebandgroup')->findOne($joining->pricebandgroupid);
+            $pricebandgroup = \ORM::forTable('pricebandgroup')->findOne($joining->pricebandgroupid);
             if (!$pricebandgroup) {
                 throw new \Exception('No pricebandgroup found for id = ' . $joining->pricebandgroupid);
             }
             $joining->pricebandname = $pricebandgroup->name;
         }
 
-        return $this->View('joining/index.html.twig',
+        $this->View('joining/index.html.twig',
             array(
                 'joinings' => $joinings,
                 'service' => $service,
@@ -62,7 +62,7 @@ class JoiningController extends coreController
 
         // Find/create joining to edit
         if ($joiningid) {
-            $joining = \ORM::forTable('Joining')->findOne($joiningid);
+            $joining = \ORM::forTable('joining')->findOne($joiningid);
             if (!$joining) {
                 throw new \Exception('Unable to find joining, id = ' . $joiningid);
             }
@@ -112,7 +112,7 @@ class JoiningController extends coreController
             }
         }
 
-        return $this->View('joining/edit.html.twig', array(
+        $this->View('joining/edit.html.twig', array(
             'joining' => $joining,
             'service' => $service,
             'serviceid' => $serviceid,
@@ -129,7 +129,7 @@ class JoiningController extends coreController
     {
         $this->require_login('ROLE_ADMIN', 'joining/index/' . $serviceid);
 
-        $joining = \ORM::forTable('Joining')->findOne($joiningid);
+        $joining = \ORM::forTable('joining')->findOne($joiningid);
         if (!$joining) {
             throw new \Exception('Unable to find joining, id = ' . $joiningid);
         }
