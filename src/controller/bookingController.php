@@ -532,7 +532,8 @@ class BookingController extends coreController
 
     /**
      * This is a bit different - we get here from the
-     * review page, only if the form is submitted
+     * review page, only if the form is submitted.
+     * This action sends the payment registration to SagePay
      */
     public function paymentAction() {
 
@@ -592,7 +593,33 @@ class BookingController extends coreController
         }
     }
 
-    public function notificationAction()
+    /**
+     * Sagepay sends a POST notification when the payment is complete
+     * NB: We *cannot* assume anything about our payment timeout anymore
+     * Bear in mind that we can't interact with the user either (server-2-server)
+     * @return mixed
+     * @throws \Exception
+     */
+    public function notificationAction() {
+
+        // Library stuff
+        $booking = $this->getLibrary('Booking');
+        $sagepay = $this->getLibrary('SagepayServer');
+
+        $url = $this->Url('booking/complete') . '/' . $VendorTxCode;
+
+        // Get the VendorTxCode and use it to look up the purchase
+        $VendorTxCode = $data['VendorTxCode'];
+        $url = $this->Url('booking/complete') . '/' . $VendorTxCode;
+        if (!$purchase = \ORM::forTable('purchase')->where('bookingref', $VendorTxCode)->findOne()) {
+            $url = $this->Url('booking/complete') . '/';
+            $sagepay->notificationreceipt('INVALID', $url . '/notfound', 'Purchase record not found');
+        }
+
+        // Check VPSSignature for validity
+    }
+
+    public function oldnotificationAction()
     {
         $em = $this->getDoctrine()->getManager();
         $sagepay = $this->get('srps_sagepay');

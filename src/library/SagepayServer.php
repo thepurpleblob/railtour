@@ -210,4 +210,15 @@ class SagepayServer {
         return $sr;
     }
 
+    /**
+     * Notification receipt
+     *
+     */
+    public function notificationreceipt($Status, $RedirectURL, $StatusDetail) {
+        echo "Status=$Status\n";
+        echo "RedirectURL=$RedirectURL\n";
+        echo "StatusDetail=$StatusDetail\n";
+        die;
+    }
+
 }
