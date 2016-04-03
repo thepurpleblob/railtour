@@ -28,10 +28,15 @@ if ($config) {
 
 // Conversion to server method for SagePay needs extra fields
 if ($dbversion < 2016033000) {
-    $db = ORM::get_db();
     $db->exec('ALTER TABLE purchase
         ADD securitykey VARCHAR(50),
         ADD regstatus VARCHAR(50)');
+}
+
+// More fields I seem to have forgotten about
+if ($dbversion < 2016040300) {
+    $db->exec('ALTER TABLE purchase
+        ADD VPSTxId VARCHAR(40)');
 }
 
 // Make config version up to date

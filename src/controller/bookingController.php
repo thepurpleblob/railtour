@@ -584,6 +584,7 @@ class BookingController extends coreController
             // update purchase
             $purchase->securitykey = $sr['SecurityKey'];
             $purchase->regstatus = $status;
+            $purchase->VPSTxId = $sr['VPSTxId'];
             $purchase->save();
 
             // redirect to Sage
@@ -606,13 +607,16 @@ class BookingController extends coreController
         $booking = $this->getLibrary('Booking');
         $sagepay = $this->getLibrary('SagepayServer');
 
-        $url = $this->Url('booking/complete') . '/' . $VendorTxCode;
+        // Post data
+        $data = $this->getRequest();
 
         // Get the VendorTxCode and use it to look up the purchase
         $VendorTxCode = $data['VendorTxCode'];
+
+        // The URL for SagePay to redirect to
         $url = $this->Url('booking/complete') . '/' . $VendorTxCode;
+
         if (!$purchase = \ORM::forTable('purchase')->where('bookingref', $VendorTxCode)->findOne()) {
-            $url = $this->Url('booking/complete') . '/';
             $sagepay->notificationreceipt('INVALID', $url . '/notfound', 'Purchase record not found');
         }
 
