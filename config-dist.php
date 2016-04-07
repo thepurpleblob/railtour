@@ -45,3 +45,6 @@ $CFG->backup_email = '';
 
 // Contact number
 $CFG->help_number = '01506 825855';
+
+// Debugging
+$CFG->debugging = 1;

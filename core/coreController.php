@@ -275,4 +275,20 @@ class coreController {
         return new $classname($this);
     }
 
+    /**
+     * Write to log file (only write if logging is actually enabled
+     */
+    public function log($message) {
+        global $CFG;
+
+        // Forget if if debugging not enabled.
+        if (!$CFG->debugging) {
+            return;
+        }
+
+        $filename = $CFG->dirroot . '/log/debug';
+        $preamble = date('Y-m-d ')
+        file_put_contents($filename, )
+    }
+
 }
