@@ -15,6 +15,9 @@ class BookingController extends coreController
         // Basics
         $booking = $this->getLibrary('Booking');
 
+        // Log
+        $this->log('Booking started ' . $code);
+
         // Clear session and delete expired purchases
         $booking->cleanPurchases();
 

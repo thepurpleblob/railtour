@@ -287,9 +287,9 @@ class coreController {
         }
 
         $filename = $CFG->dirroot . '/log/debug';
-        $preamble = date('Y-m-d H:i');
+        $preamble = date('Y-m-d H:i | ') . $_SERVER['REMOTE_ADDR'];
         if (isset($_SESSION['purchaseid'])) {
-            $preamble .= ' ID:' . $purcaseid . "\n";
+            $preamble .= '| ID:' . $purcaseid . "\n";
         }
         file_put_contents($filename, $preamble . $message, LOCK_EX);
     }
