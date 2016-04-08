@@ -291,7 +291,7 @@ class coreController {
         if (isset($_SESSION['purchaseid'])) {
             $preamble .= '| ID:' . $purcaseid . PHP_EOL;
         }
-        file_put_contents($filename, $preamble . $message . PHP_EOL, LOCK_EX);
+        file_put_contents($filename, $preamble . $message . PHP_EOL, LOCK_EX | FILE_APPEND);
     }
 
 }
