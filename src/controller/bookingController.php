@@ -610,6 +610,8 @@ class BookingController extends coreController
         // Post data
         $data = $this->getRequest();
 
+        $this->log(var_export($data, true));
+
         // Get the VendorTxCode and use it to look up the purchase
         $VendorTxCode = $data['VendorTxCode'];
 
@@ -621,6 +623,7 @@ class BookingController extends coreController
         }
 
         // Check VPSSignature for validity
+        die;
     }
 
     public function oldnotificationAction()

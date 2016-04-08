@@ -287,8 +287,11 @@ class coreController {
         }
 
         $filename = $CFG->dirroot . '/log/debug';
-        $preamble = date('Y-m-d ')
-        file_put_contents($filename, )
+        $preamble = date('Y-m-d H:i');
+        if (isset($_SESSION['purchaseid'])) {
+            $preamble .= ' ID:' . $purcaseid . "\n";
+        }
+        file_put_contents($filename, $preamble . $message, LOCK_EX);
     }
 
 }
