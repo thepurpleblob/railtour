@@ -610,9 +610,10 @@ class BookingController extends coreController
         $booking = $this->getLibrary('Booking');
         $sagepay = $this->getLibrary('SagepayServer');
 
-        // Post data
-        $data = $this->getRequest();
+        // POST data from SagePay
+        $data = $sagepay->getNotification();
 
+        // Log the notification data to debug file (in case it's interesting)
         $this->log(var_export($data, true));
 
         // Get the VendorTxCode and use it to look up the purchase

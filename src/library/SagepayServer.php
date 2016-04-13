@@ -211,6 +211,55 @@ class SagepayServer {
     }
 
     /**
+     * Get fields from POST data.
+     * @param array list of field names
+     * @return array assoc array of results (or blanks)
+     */
+    private function getFields($names) {
+        $values = array();
+        $data = $this->controller->getRequest();
+        foreach ($names as $name) {
+            if (isset($_POST[$name])) {
+                $values[$name] = $_POST[$name];
+            } else {
+                $values[$name] = '';
+            }
+        }
+
+        return $values;
+    }
+
+    /**
+     * Get the SagePay response data
+     * @return assoc array of the data
+     */
+    public function getNotification() {
+        $fields = [
+            'VPSProtocol',
+            'TxType',
+            'VendorTxCode',
+            'VPSTXId',
+            'Status',
+            'StatusDetail',
+            'TxAuthNo',
+            'AVSCV2',
+            'AddressResult',
+            'PostCodeResult',
+            'CV2Result',
+            'GiftAid',
+            '3DSecureStatus',
+            'CardType',
+            'Last4Digits',
+            'VPSSignature',
+            'DeclineCode',
+            'ExpiryDate',
+            'BankAuthCode',
+        ];
+
+        return $this->getFields($fields);
+    }
+
+    /**
      * Notification receipt
      *
      */
