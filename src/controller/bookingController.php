@@ -622,12 +622,30 @@ class BookingController extends coreController
         // The URL for SagePay to redirect to
         $url = $this->Url('booking/complete') . '/' . $VendorTxCode;
 
-        if (!$purchase = \ORM::forTable('purchase')->where('bookingref', $VendorTxCode)->findOne()) {
-            $sagepay->notificationreceipt('INVALID', $url . '/notfound', 'Purchase record not found');
+        if (!$purchase = $booking->getPurchaseFromVendorTxCode($VendorTxCode)) {
+            $url = $this->Url('booking/fail') . '/' . $VendorTxCode . '/' . urlencode('Purchase record not found');
+            $sagepay->notificationreceipt('INVALID', $url, 'Purchase record not found');
         }
 
         // Check VPSSignature for validity
+        if (!checkVPSSignature($purchase, $data)) {
+            $url = $this->Url('booking/fail') . '/' . $VendorTxCode . '/' . urlencode('VPSSignature not matched');
+            $sagepay->notificationreceipt('INVALID', $url, 'VPSSignature not matched');
+        }
+
         die;
+    }
+
+    /**
+     * Fail action - we get here if we return error to SagePay
+     * SagePay then redirects here
+     */
+    public function failAction($VendorTxCode, $message) {
+        $message = urldecode($message);
+        $this->View('booking/fail.html.twig', array(
+            'status' => 'N/A',
+            'diagnostic' => $message,
+        ));
     }
 
     public function oldnotificationAction()

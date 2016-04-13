@@ -260,6 +260,48 @@ class SagepayServer {
     }
 
     /**
+     * Check VPSSignature
+     * Complicated calculation
+     * @param object $purchase
+     * @param array $nvals notification data from SagePay
+     * @return boolean true if matches
+     *
+     */
+    public function checkVPSSignature($purchase, $nvals) {
+        global $CFG;
+
+        // concatenate various fields
+        $values = [
+            $purchase->VPSTXId,
+            $nvals['VendorTxCode'],
+            $nvals['Status'],
+            $nvals['TxAuthNo'],
+            $CFG->sage_vendor,
+            $nvals['AVSCV2'],
+            $purchase['securitykey'],
+            $nvals['AddressResult'],
+            $nvals['PostCodeResult'],
+            $nvals['CV2Result'],
+            $nvals['GiftAid'],
+            $nvals['3DSecureStatus'],
+            $nvals['CAVV'],
+            $nvals['AddressStatus'],
+            $nvals['PayerStatus'],
+            $nvals['CardType'],
+            $nvals['Last4Digits'],
+            $nvals['DeclineCode'],
+            $nvals['ExpiryDate'],
+            $nvals['FraudResponse'],
+            $nvals['BankAuthCode'],
+        ];
+
+        // Calculate our version of signature
+        $oursignature = strtoupper(md5(implode($values)));
+
+        return $oursignature == $nvals['VPSSignature'];
+    }
+
+    /**
      * Notification receipt
      *
      */

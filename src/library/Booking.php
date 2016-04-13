@@ -785,6 +785,18 @@ class Booking
     }
 
     /**
+     * Find the purchase from the VendorTxCode
+     * (Same as our bookingref)
+     * @param string $VendorTxCode
+     * @return mixed Purchase record of false if not found
+     */
+    public function getPurchaseFromVendorTxCode($VendorTxCode) {
+        $purchase = \ORM::forTable('purchase')->where('bookingref', $VendorTxCode)->findOne();
+
+        return $purchase;
+    }
+
+    /**
      * Convert a null to a zero
      * (done a lot in countStuff)
      */
