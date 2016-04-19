@@ -72,7 +72,7 @@ class ServiceController extends coreController
         }
 
         if (($visible != 1) && ($visible != 0)) {
-            throw $this->Exception('visible parameter must be 0 or 1');
+            throw new \Exception('visible parameter must be 0 or 1');
         }
         $service->visible = $visible;
         $service->save();
@@ -117,12 +117,20 @@ class ServiceController extends coreController
             $joining->pricebandname = $pricebandgroup->name;
         }
 
+        // ETicket selected
+        if ($service->eticketenabled) {
+            $etmode = $service->eticketforce ? 'Enabled: Forced' : 'Enabled: Optional';
+        } else {
+            $etmode = 'Disabled';
+        }
+
         $this->View('service/show.html.twig', array(
             'service' => $service,
             'destinations' => $destinations,
             'pricebandgroups' => $pricebandgroups,
             'joinings' => $joinings,
             'limits' => $limits,
+            'etmode' => $etmode,
             'serviceid' => $id,
         ));
     }
@@ -144,6 +152,20 @@ class ServiceController extends coreController
         } else {
             $booking = $this->getLibrary('Booking');
             $service = $booking->createService();
+        }
+
+        // ETicket options
+        $etoptions = array(
+            0 => 'Disabled',
+            1 => 'Enabled - optional',
+            2 => 'Enabled - forced',
+        );
+
+        // ETicket selected
+        if ($service->eticketenabled) {
+            $etselected = $service->eticketforce ? 2 : 1;
+        } else {
+            $etselected = 0;
         }
 
         // hopefully no errors
@@ -168,6 +190,7 @@ class ServiceController extends coreController
                 'description' => 'required',
                 'visible' => 'required|integer',
                 'date' => 'required',
+                'eticket' => 'required|integer',
                 'commentbox' => 'required|integer',
                 'mealaname' => 'required',
                 'mealavisible' => 'required|integer',
@@ -203,6 +226,16 @@ class ServiceController extends coreController
                 $service->mealdname = $data['mealdname'];
                 $service->mealdvisible = $data['mealdvisible'];
                 $service->mealdprice = $data['mealdprice'];
+
+                // eticket
+                if ($data['eticket'] == 0) {
+                    $service->eticketenabled = 0;
+                    $service->eticketforce = 0;
+                } else {
+                    $service->eticketenabled = 1;
+                    $service->eticketforce = $data['eticket'] == 1 ? 0 : 1;
+                }
+
                 $service->save();
 
                 $id = $service->id();
@@ -215,6 +248,8 @@ class ServiceController extends coreController
         $this->View('service/edit.html.twig', array(
             'service'      => $service,
             'serviceid' => $id,
+            'etoptions' => $etoptions,
+            'etselected' => $etselected,
             'errors' => $errors
         ));
     }
