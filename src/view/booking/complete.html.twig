@@ -1,13 +1,16 @@
-{% extends 'SRPSBookingBundle:Booking:booking.html.twig' %}
+{% extends 'booking/booking.html.twig' %}
 
 {% block content %}
-    <h2>SRPS Railtours Online Booking</h2>
 
-    <h3 class="text-error">Transaction complete</h3>
+    <div class="srpsnavbar">
+        SRPS Railtours Online Booking &nbsp;<span class="navdot glyphicon glyphicon-record"></span>&nbsp; {{ service.name }}
+    </div>
+
+    <h3 class="text-error">Booking completed successfuly</h3>
 
     <p>
         {% if not purchase.emailsent %}
-            Please find the details of your transaction. You should recieve an
+            Please find the details of your transaction. You should receive an
             email shortly.
         {% else %}
             Please find the details of your transaction. An email has already
@@ -16,7 +19,13 @@
     </p>
 
     <p>
-        Final timings and tickets will be sent <b>ONE WEEK</b> before the tour.
+        {% if purchase.eticket %}
+            Final timings and your electronic ticket will be emailed to you approximately <b>ONE WEEK</b> before the
+            tour date. Please make sure you check your "spam" or junk mail folders before contacting us if you do not
+            receive this.
+        {% else %}
+            Final timings and tickets will be sent <b>ONE WEEK</b> before the tour.
+        {% elseif %}
     </p>
 
     <dl class="dl-horizontal">

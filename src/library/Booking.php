@@ -1157,21 +1157,6 @@ class Booking
     }
 
     /**
-     * Returns object with all the Sage stuff therein
-     */
-    public function getSage($service, $purchase) {
-        $em = $this->em;
-
-        $sage = new \stdClass();
-
-        $sage->submissionurl = '';
-        $sage->login = '';
-        $sage->crypt = '';
-
-        return $sage;
-    }
-
-    /**
      * Create array of choices for numeric drop-down
      * @param $max maximum value of numeric choices
      * @param $none if true add 'None' in 0th place
@@ -1188,6 +1173,21 @@ class Booking
         }
 
         return $choices;
+    }
+
+    /**
+     * Update purchase with data returned from SagePay
+     * @param object $purchase
+     * @param array $data
+     */
+    public function updatePurchase($purchase, $data) {
+        $purchase->status = $data['Status'];
+        $purchase->statusdetail = $data['StatusDetail'];
+        $purchase->cardtype = $data['CardType'];
+        $purchase->last4digits = $data['Last4Digits'];
+        $purchase->bankauthcode = $data['BankAuthCode'];
+        $purchase->declinecode = $data['DeclineCode'];
+        $purchase->save();
     }
 
 }

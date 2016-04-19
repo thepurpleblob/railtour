@@ -618,19 +618,35 @@ class BookingController extends coreController
 
         // Get the VendorTxCode and use it to look up the purchase
         $VendorTxCode = $data['VendorTxCode'];
-
-        // The URL for SagePay to redirect to
-        $url = $this->Url('booking/complete') . '/' . $VendorTxCode;
-
         if (!$purchase = $booking->getPurchaseFromVendorTxCode($VendorTxCode)) {
             $url = $this->Url('booking/fail') . '/' . $VendorTxCode . '/' . urlencode('Purchase record not found');
             $sagepay->notificationreceipt('INVALID', $url, 'Purchase record not found');
         }
+        
+        // Now that we have the purchase object, we can save whatever we got back in it
+        $booking->updatePurchase($purchase, $data);
 
         // Check VPSSignature for validity
         if (!checkVPSSignature($purchase, $data)) {
             $url = $this->Url('booking/fail') . '/' . $VendorTxCode . '/' . urlencode('VPSSignature not matched');
             $sagepay->notificationreceipt('INVALID', $url, 'VPSSignature not matched');
+        }
+
+        // Check Status. 
+        // Work out what next action should be
+        $status = $purchase->status;
+        if ($status == 'OK') {
+
+            // TODO: Emails
+
+            $url = $this->Url('booking/complete') . '/' . $VendorTxCode;
+            $sagepay->notificationreceipt('OK', $url, '');
+        } else if ($status == 'ERROR') {
+            $url = $this->Url('booking/fail') . '/' . $VendorTxCode . '/' . urlencode($purchase->statusdetail);
+            $sagepay->notificationreceipt('OK', $url, $purchase->statusdetail);
+        } else {
+            $url = $this->Url('booking/decline') . '/' . $VendorTxCode;
+            $sagepay->notificationreceipt('OK', $url, $purchase->statusdetail);
         }
 
         die;
@@ -639,13 +655,69 @@ class BookingController extends coreController
     /**
      * Fail action - we get here if we return error to SagePay
      * SagePay then redirects here
+     * @param string $VendorTxCode
+     * @param string $message
      */
     public function failAction($VendorTxCode, $message) {
         $message = urldecode($message);
-        $this->View('booking/fail.html.twig', array(
-            'status' => 'N/A',
-            'diagnostic' => $message,
-        ));
+        $booking = $this->getLibrary('Booking');
+        if (!$purchase = $booking->getPurchaseFromVendorTxCode($VendorTxCode)) {
+            $this->View('booking/fail.html.twig', array(
+                'status' => 'N/A',
+                'diagnostic' => 'Purchase record could not be found for ' . $VendorTxCode . ' Plus ' . $message,
+                'servicename' => '',
+            ));
+        } else {
+            $service = $booking->Service($purchase->serviceid);
+            $this->View('booking/fail.html.twig', array(
+                'status' => 'N/A',
+                'diagnostic' => $message,
+                'servicename' => $service->name,
+            ));
+        }
+    }
+
+    /**
+     * Complete action - SagePay returns here when all successful
+     * SagePay then redirects here
+     * @param string $VendorTxCode
+     */
+    public function completeAction($VendorTxCode) {
+        $booking = $this->getLibrary('Booking');
+        if (!$purchase = $booking->getPurchaseFromVendorTxCode($VendorTxCode)) {
+            $this->View('booking/fail.html.twig', array(
+                'status' => 'N/A',
+                'diagnostic' => 'Purchase record could not be found for ' . $VendorTxCode,
+                'servicename' => '',
+            ));
+        } else {
+            $service = $booking->Service($purchase->serviceid);
+            $this->View('booking/complete.html.twig', array(
+                'purchase' => $purchase,
+                'service' => $service,
+            ));
+        }
+    }
+
+    /**
+     * Decline action - SagePay returns here when payment declined
+     * SagePay then redirects here
+     * @param string $VendorTxCode
+     */
+    public function declineAction($VendorTxCode) {
+        $booking = $this->getLibrary('Booking');
+        if (!$purchase = $booking->getPurchaseFromVendorTxCode($VendorTxCode)) {
+            $this->View('booking/fail.html.twig', array(
+                'status' => 'N/A',
+                'diagnostic' => 'Purchase record could not be found for ' . $VendorTxCode,
+            ));
+        } else {
+            $service = $booking->Service($purchase->serviceid);
+            $this->View('booking/decline.html.twig', array(
+                'purchase' => $purchase,
+                'service' => $service,
+            ));
+        }
     }
 
     public function oldnotificationAction()
@@ -788,7 +860,7 @@ class BookingController extends coreController
 
         // display form
         if ($sage->Status == 'OK') {
-            return $this->render('SRPSBookingBundle:Booking:callback.html.twig', array(
+            return $this->render('SRPSBookingBundle:Booking:complete.html.twig', array(
                 'purchase' => $purchase,
                 'service' => $service,
                 'sage' => $sage,

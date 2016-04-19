@@ -1,7 +1,10 @@
-{% extends 'SRPSBookingBundle:Booking:booking.html.twig' %}
+{% extends 'booking/booking.html.twig' %}
 
 {% block content %}
-    <h2>SRPS Railtours Online Booking</h2>
+    
+    <div class="srpsnavbar">
+        SRPS Railtours Online Booking &nbsp;<span class="navdot glyphicon glyphicon-record"></span>&nbsp; {{ service.name }}
+    </div>
 
     <h3 class="text-error">Payment declined</h3>
 
