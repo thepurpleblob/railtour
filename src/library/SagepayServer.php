@@ -303,6 +303,7 @@ class SagepayServer {
         // If it fails log the trouble.
         if (!$match) {
             $this->controller->log('VPSSignature mismatch - ' . var_export($values, true));
+            $this->controller->log('Purchase record - ' . var_export($purchase, true));
             $this->controller->log('MD5 is ' . $oursignature);
         }
 

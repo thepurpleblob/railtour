@@ -281,6 +281,9 @@ class coreController {
     public function log($message) {
         global $CFG;
 
+        // End of line character (in case it's wrong)
+        $eol = "\r\n";
+
         // Forget if if debugging not enabled.
         if (!$CFG->debugging) {
             return;
@@ -289,9 +292,9 @@ class coreController {
         $filename = $CFG->dirroot . '/log/debug';
         $preamble = date('Y-m-d H:i | ') . $_SERVER['REMOTE_ADDR'];
         if (isset($_SESSION['purchaseid'])) {
-            $preamble .= '| ID:' . $purcaseid . PHP_EOL;
+            $preamble .= '| ID:' . $purcaseid . $eol;
         }
-        file_put_contents($filename, $preamble . $message . PHP_EOL, LOCK_EX | FILE_APPEND);
+        file_put_contents($filename, $preamble . $message . $eol, LOCK_EX | FILE_APPEND);
     }
 
 }
