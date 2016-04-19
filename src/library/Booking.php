@@ -84,7 +84,9 @@ class Booking
         $service->mealdvisible = 0;
         $service->singlesupplement = 10.00;
         $service->maxparty = 16;
-        $service->commentbox = false;
+        $service->commentbox = 0;
+        $service->eticketenabled = 0;
+        $service->eticketforce = 0;
 
         return $service;
     }
@@ -707,6 +709,10 @@ class Booking
             $purchase->emailsent = 0;
             $purchase->eticket = 0;
             $purchase->einfo = 0;
+            $purchase->securitykey = '';
+            $purchase->regstatus = '';
+            $purchase->VPSTxId = '';
+            $purchase->bookedby = '';
             $purchase->save();
         } else if (!$purchase = \ORM::forTable('purchase')->findOne($purchaseid)) {
             throw new Exception('Cannot find purchase record for id=' . $purchaseid);

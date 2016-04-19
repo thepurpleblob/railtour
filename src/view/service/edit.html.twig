@@ -12,6 +12,7 @@
         {{ form_date('date', 'Date', service.date, true) }}
         {{ form_text('singlesupplement', 'Single supplement', service.singlesupplement) }}
         {{ form_yesno('commentbox', 'Show comment box', service.commentbox) }}
+        {{ form_select('eticket', 'E-Ticket mode', etselected, etoptions) }}
 
         <table class="table">
             <thead>

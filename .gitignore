@@ -1,4 +1,5 @@
 /vendor
+/log
 composer.lock
 config.php
 .idea/*
