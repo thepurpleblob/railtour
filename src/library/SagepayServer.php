@@ -272,13 +272,13 @@ class SagepayServer {
 
         // concatenate various fields
         $values = [
-            $purchase->VPSTXId,
+            $purchase->VPSTxId,
             $nvals['VendorTxCode'],
             $nvals['Status'],
             $nvals['TxAuthNo'],
             $CFG->sage_vendor,
             $nvals['AVSCV2'],
-            $purchase['securitykey'],
+            $purchase->securitykey,
             $nvals['AddressResult'],
             $nvals['PostCodeResult'],
             $nvals['CV2Result'],
