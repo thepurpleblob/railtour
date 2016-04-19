@@ -627,7 +627,7 @@ class BookingController extends coreController
         $booking->updatePurchase($purchase, $data);
 
         // Check VPSSignature for validity
-        if (!checkVPSSignature($purchase, $data)) {
+        if (!$sagepay->checkVPSSignature($purchase, $data)) {
             $url = $this->Url('booking/fail') . '/' . $VendorTxCode . '/' . urlencode('VPSSignature not matched');
             $sagepay->notificationreceipt('INVALID', $url, 'VPSSignature not matched');
         }
