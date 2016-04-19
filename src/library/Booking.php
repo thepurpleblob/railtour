@@ -1187,6 +1187,7 @@ class Booking
         $purchase->last4digits = $data['Last4Digits'];
         $purchase->bankauthcode = $data['BankAuthCode'];
         $purchase->declinecode = $data['DeclineCode'];
+        $purchase->completed = 1;
         $purchase->save();
     }
 

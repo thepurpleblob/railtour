@@ -39,6 +39,17 @@ if ($dbversion < 2016040300) {
         ADD VPSTxId VARCHAR(40)');
 }
 
+// Add fields for eTicket option and for user-not-present booking
+if ($dbversion < 2016041900) {
+    $db->exec('ALTER TABLE purchase
+        ADD bookedby VARCHAR(25)');
+}
+if ($dbversion < 2016041901) {
+    $db->exec('ALTER TABLE service
+        ADD eticketenabled tinyint(1),
+        ADD eticketforce tinyint(1)');
+}
+
 // Make config version up to date
 $config->name = 'version';
 $config->value = $version;
