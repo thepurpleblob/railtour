@@ -298,7 +298,15 @@ class SagepayServer {
         // Calculate our version of signature
         $oursignature = strtoupper(md5(implode($values)));
 
-        return $oursignature == $nvals['VPSSignature'];
+        $match = $oursignature == $nvals['VPSSignature'];
+
+        // If it fails log the trouble.
+        if (!$match) {
+            $this->controller->log('VPSSignature mismatch - ' . var_export($values, true));
+            $this->controller->log('MD5 is ' . $oursignature);
+        }
+
+        return $match;
     }
 
     /**
