@@ -25,6 +25,17 @@
         {{ form_text('phone', 'Telephone', purchase.phone) }}
         {{ form_text('email', 'Email', purchase.email) }}
 
+        {%  if service.eticketenabled and service.eticketoptional %}
+            <div class="panel panel-info">
+                <div class="panel-heading">eTicket (Ticket by email)</div>
+                <div class="panel-body">
+                    Please let us know if you would like an 'eTicket' send by email? This will be send approximately
+                    one week before the tour. You will need access to a printer to print your own ticket.
+                    {{ form_yesno('eticket', 'Send eTicket by email', purchase.eticket) }}
+                </div>
+            </div>
+        {% endif %}
+
         {{ form_errors(errors) }}
 
         <div>

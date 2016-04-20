@@ -492,6 +492,13 @@ class BookingController extends coreController
                 $purchase->phone = $data['phone'];
                 $purchase->email = strtolower($data['email']);
 
+                // eticket is optional
+                if (!$service->eticketenabled) {
+                    $purchase->eticket = 0;
+                } else {
+                    $purchase->eticket = $service->eticketoptional ? $data['eticket'] : 1;
+                }
+
                 $purchase->save();
                 $this->redirect('booking/review');
             }
