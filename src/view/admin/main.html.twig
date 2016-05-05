@@ -5,7 +5,7 @@
 
     {% for service in services %}
         <div class="panel panel-primary">
-            <div class="panel-heading">{{ service.date }} {{ service.name }}</div>
+            <div class="panel-heading">{{ service.date | date('jS F Y') }} : {{ service.name }}</div>
             <div class="panel-body">
                 {{ service.description | raw }}
                 <br /><br />

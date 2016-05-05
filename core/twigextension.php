@@ -20,6 +20,7 @@ class twigextension extends \Twig_Extension
         return array(
             'path' => new \Twig_Function_Function('\thepurpleblob\core\twigextension::path'),
             'asset' => new \Twig_Function_Function('\thepurpleblob\core\twigextension::asset'),
+            'vendor' => new \Twig_Function_Function('\thepurpleblob\core\twigextension::vendor'),
             'form_text' => new \Twig_Function_Function('\thepurpleblob\core\twigextension::form_text', array('needs_context' => true)),
             'form_date' => new \Twig_Function_Function('\thepurpleblob\core\twigextension::form_date', array('needs_context' => true)),
             'form_textarea' => new \Twig_Function_Function('\thepurpleblob\core\twigextension::form_textarea', array('needs_context' => true)),
@@ -50,6 +51,12 @@ class twigextension extends \Twig_Extension
         global $CFG;
 
         return $CFG->www . '/src/assets/' . $asset;
+    }
+
+    public static function vendor($asset) {
+        global $CFG;
+
+        return $CFG->www . '/vendor/' . $asset;
     }
 
     public static function form_text($context, $name, $label, $value, $required=false, $attrs=null) {

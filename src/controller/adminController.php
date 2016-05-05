@@ -19,9 +19,4 @@ class AdminController extends coreController
             'services' => $services,
         ));
     }
-
-    public function indexAction()
-    {
-        $this->redirect('admin/main');
-    }
 }
