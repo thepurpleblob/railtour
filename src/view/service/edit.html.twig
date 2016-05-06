@@ -2,7 +2,11 @@
 
 
 {% block content %}
-    <h3>{{service.name}} ({{ service.code }})</h3>
+    {% if service.name %}
+        <h3>{{service.name}} ({{ service.code }})</h3>
+    {% else %}
+        <h3>Create new service</h3>
+    {% endif %}
 
     <form id="service-edit-form" class="form-horizontal" action="{{ path('service/edit', service.id) }}" method="post" >
         {{ form_text('code', 'Code', service.code, true) }}

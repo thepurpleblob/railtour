@@ -49,6 +49,97 @@ class BookingController extends coreController
     }
 
     /**
+     * Opening page for *telephone* bookings.
+     * @param $code unique (hopefully) tour code
+     */
+    public function telephoneAction($code)
+    {
+        // Security
+        $this->require_login('ROLE_ORGANISER', 'booking/telephone/' . $code);
+
+        // Basics
+        $booking = $this->getLibrary('Booking');
+
+        // Log
+        $this->log('Booking started ' . $code);
+
+        // Clear session and delete expired purchases
+        $booking->cleanPurchases();
+
+        // Get the service object
+        $service = $booking->serviceFromCode($code);
+        $serviceid = $service->id;
+
+        // count the seats left
+        $count = $booking->countStuff($serviceid);
+
+        // Get the limits for this service
+        $limits = $booking->getLimits($serviceid);
+
+        // get acting maxparty (best estimate to display to punter)
+        $maxparty = $booking->getMaxparty($limits);
+
+        // Bail out if this service is unavailable
+        if (!$booking->canProceedWithBooking($service, $count)) {
+            $this->View('booking/closed.html.twig', array(
+                'code' => $code,
+                'service' => $service
+            ));
+        }
+
+        // Grab current purchase
+        $purchase = $booking->getPurchase($serviceid);
+
+        // hopefully no errors
+        $errors = null;
+
+        // anything submitted?
+        if ($data = $this->getRequest()) {
+
+            // Cancel?
+            if (!empty($data['cancel'])) {
+                $this->redirect('admin/main', true);
+            }
+
+            // Validate
+            $this->gump->validation_rules(array(
+                'surname' => 'required',
+                'firstname' => 'required',
+            ));
+            $this->gump->set_field_names(array(
+                'surname' => 'Surname',
+                'firstname' => 'First name',
+            ));
+            if ($data = $this->gump->run($data)) {
+
+                // Now need to 'normalise' some of the fields
+                $purchase->title = ucwords($data['title']);
+                $purchase->surname = ucwords($data['surname']);
+                $purchase->firstname = ucwords($data['firstname']);
+
+                // Get the booker's username and mark the purchase
+                // as a "customer not present" transaction.
+                if (!$user = $this->getUser()) {
+                    throw new \Exception('User record unexpectedly not found in session!');
+                }
+                $username = $user->username;
+                $purchase->bookedby = $username;
+
+                $purchase->save();
+                $this->redirect('booking/numbers/' . $serviceid);
+            }
+        }
+
+        $this->View('booking/telephone.html.twig', array(
+            'code' => $code,
+            'maxparty' => $maxparty,
+            'service' => $service,
+            'purchase' => $purchase,
+            'errors' => $errors,
+        ));
+    }
+
+    /**
      * First 'proper' booking page.
      * Ask for numbers of travellers. Also sets up purchase record
      * and session data.
@@ -65,6 +156,9 @@ class BookingController extends coreController
 
         // Grab current purchase
         $purchase = $booking->getPurchase($serviceid);
+        if ($purchase->bookedby) {
+            $this->require_login('ROLE_ORGANISER', 'booking/numbers/' . $serviceid);
+        }
 
         // get acting maxparty
         $maxparty = $booking->getMaxparty($limits);
@@ -138,6 +232,10 @@ class BookingController extends coreController
         $serviceid = $purchase->serviceid;
         $service = $booking->Service($serviceid);
 
+        if ($purchase->bookedby) {
+            $this->require_login('ROLE_ORGANISER', 'booking/joining');
+        }
+
         // get the joining stations
         $stations = $booking->getJoiningStations($serviceid);
 
@@ -203,6 +301,10 @@ class BookingController extends coreController
         $serviceid = $purchase->serviceid;
         $service = $booking->Service($serviceid);
 
+        if ($purchase->bookedby) {
+            $this->require_login('ROLE_ORGANISER', 'booking/destination');
+        }
+
         // get the destinations
         $stations = $booking->getDestinationStations($serviceid);
 
@@ -258,6 +360,10 @@ class BookingController extends coreController
         $purchase = $booking->getPurchase();
         $serviceid = $purchase->serviceid;
         $service = $booking->Service($serviceid);
+
+        if ($purchase->bookedby) {
+            $this->require_login('ROLE_ORGANISER', 'booking/meals');
+        }
 
         // If there are no meals on this service just bail
         if (!$booking->mealsAvailable($service)) {
@@ -327,6 +433,10 @@ class BookingController extends coreController
         $serviceid = $purchase->serviceid;
         $service = $booking->Service($serviceid);
 
+        if ($purchase->bookedby) {
+            $this->require_login('ROLE_ORGANISER', 'booking/class');
+        }
+
         // Get the limits for this service:
         $limits = $booking->getLimits($serviceid);
 
@@ -395,6 +505,10 @@ class BookingController extends coreController
         $serviceid = $purchase->serviceid;
         $service = $booking->Service($serviceid);
 
+        if ($purchase->bookedby) {
+            $this->require_login('ROLE_ORGANISER', 'booking/additional');
+        }
+
         // current counts
         $numbers = $booking->countStuff($serviceid, $purchase);
 
@@ -449,6 +563,10 @@ class BookingController extends coreController
         $purchase = $booking->getPurchase();
         $serviceid = $purchase->serviceid;
         $service = $booking->Service($serviceid);
+
+        if ($purchase->bookedby) {
+            $this->require_login('ROLE_ORGANISER', 'booking/personal');
+        }
 
         // hopefully no errors
         $errors = null;
@@ -518,6 +636,10 @@ class BookingController extends coreController
         $purchase = $booking->getPurchase();
         $serviceid = $purchase->serviceid;
         $service = $booking->Service($serviceid);
+
+       if ($purchase->bookedby) {
+           $this->require_login('ROLE_ORGANISER', 'booking/review');
+       }
 
         // work out final fare
         $fare = $booking->calculateFare($service, $purchase, $purchase->class);

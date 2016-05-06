@@ -44,7 +44,8 @@
                         {% else %}
                             <a class="btn btn-sm btn-info disabled">Book</a>
                         {% endif %}
-                        <a class="btn btn-sm btn-warning" href="{{ path('report/list', service.id) }}">Report/Export</a>
+                        <a class="btn btn-sm btn-warning" href="{{ path('report/list', service.id) }}">Report</a>
+                        <a class="btn btn-sm btn-warning" href="{{ path('report/export', service.id) }}">Export</a>
                         <a class="btn btn-sm btn-danger" href="{{ path('service/duplicate', service.id) }}">Duplicate</a>
                         <a class="btn btn-sm btn-danger" href="{{ path('service/delete', service.id) }}">Delete</a>
                     </td>

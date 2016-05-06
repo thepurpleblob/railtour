@@ -30,6 +30,8 @@
                         {% if system.fullname %}
                             Logged in as <b>{{ system.fullname }}</b><br />
                             <a class="btn btn-primary btn-xs" href="{{ path('user/logout') }}">Logout</a>
+                        {% else %}
+                            <a class="btn btn-primary btn-xs" href="{{ path('user/login') }}">Login</a>
                         {% endif %}
                     </div>
                 </div>

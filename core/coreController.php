@@ -159,9 +159,11 @@ class coreController {
         if ($user) {
             $system->userrole = $user->role;
             $system->fullname = $user->firstname . ' ' . $user->lastname;
+            $system->loggedin = true;
         } else {
             $system->userrole = '';
             $system->fullname = '';
+            $system->loggedin = false;
         }
         $variables['system'] = $system;
 
@@ -292,7 +294,8 @@ class coreController {
         $filename = $CFG->dirroot . '/log/debug';
         $preamble = date('Y-m-d H:i | ') . $_SERVER['REMOTE_ADDR'];
         if (isset($_SESSION['purchaseid'])) {
-            $preamble .= '| ID:' . $purcaseid . $eol;
+            $purchaseid = $_SESSION['purchaseid'];
+            $preamble .= '| ID:' . $purchaseid . $eol;
         }
         file_put_contents($filename, $preamble . $message . $eol, LOCK_EX | FILE_APPEND);
     }
