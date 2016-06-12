@@ -5,7 +5,7 @@ use thepurpleblob\core\coreController;
 /**
  * Custom exception handler
  */
-function exception_handler(Exception $e) {
+function exception_handler($e) {
     echo "<pre>$e</pre>"; die;
     //$controller = new coreController(true);
     //$controller->View('header');
@@ -13,6 +13,28 @@ function exception_handler(Exception $e) {
     //    'e' => $e,
     //));
     //$controller->View('footer');
+}
+
+/**
+ * function to work around PDOs nastiness
+ * Use this for table creation and manipulation
+ * (because Idiorm doesn't)
+ */
+function pdo_execute($db, $sql) {
+    $stmt = $db->prepare($sql);
+    if (!$stmt->execute()) {
+        $error = $stmt->errorInfo();
+        echo "<pre>PDO error... ";
+        var_dump($error);
+        die;
+    }
+    if ($stmt->rowCount()) {
+        $result = $stmt->fetchAll();
+        $stmt->closeCursor();
+        return $result;
+    } else {
+        return array();
+    }
 }
 
 // MAIN SETUP STUFF

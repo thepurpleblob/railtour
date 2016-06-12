@@ -10,6 +10,9 @@ $CFG->basepath = dirname(__FILE__);
 error_reporting(E_ALL);
 ini_set('display_errors', 'stdout');
 
+// see if the database has been installed at all
+require(dirname(__FILE__) . '/core/install.php');
+
 // Make a check for any schema updates and such
 require(dirname(__FILE__) . '/core/update.php');
 

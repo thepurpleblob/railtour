@@ -2,16 +2,8 @@
 
 namespace thepurpleblob\railtour\service;
 
-
 class Stations
 {
-
-    private $controller;
-
-    public function __construct($controller)
-    {
-        $this->controller = $controller;
-    }
 
     public function installStations() {
 

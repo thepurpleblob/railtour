@@ -6,29 +6,26 @@ use thepurpleblob\core\coreController;
 
 class UserController extends coreController
 {
-    
+
+    /**
+     * Not an action really
+     */
     public function installAction() 
     {
-        $em = $this->getDoctrine()->getManager();
 
         // Get all our users
-        $users = $em->getRepository('SRPSBookingBundle:User')
-            ->findAll();
+        $users = \ORM::forTable('User')->findMany();
         
         // if there are none, we will create the default admin user
         if (!$users) {
-            $user = new User;
-            $user->setFirstname('admin');
-            $user->setLastname('admin');
-            $user->setUsername('admin');
-            $user->setPassword('admin');
-            $user->setRole('ROLE_ADMIN');
-            $em->persist($user);
-            $em->flush();
+            $user = \ORM::forTable('User')->create();
+            $user->firstname = 'admin';
+            $user->lastname = 'admin';
+            $user->username = 'admin';
+            $user->password = 'admin';
+            $user->role = 'ROLE_ADMIN';
+            $user->save();
         }
-        
-        // regardless go to users screen
-        return $this->redirect($this->generateUrl('admin_user_index'));
     }
     
     public function indexAction()
