@@ -28,6 +28,7 @@ function pdo_execute($db, $sql) {
         var_dump($error);
         die;
     }
+    var_dump($stmt);
     if ($stmt->rowCount()) {
         $result = $stmt->fetchAll();
         $stmt->closeCursor();

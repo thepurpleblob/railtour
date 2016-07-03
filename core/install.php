@@ -10,7 +10,9 @@
 $db = ORM::get_db();
 $db->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, 0);
 
-if (!pdo_execute($db, 'SHOW TABLES LIKE "purchase"')) {
+$query = $db->query('SHOW TABLES');
+$show = $query->fetchAll(PDO::FETCH_COLUMN);
+if (!$show) {
 
     // load schema
     require(dirname(__FILE__) . '/../src/schema/schema.php');

@@ -17,6 +17,10 @@ var components = {
             "main": "bootstrap-datepicker-built.js"
         },
         {
+            "name": "jquery-validation",
+            "main": "jquery-validation-built.js"
+        },
+        {
             "name": "tinymce",
             "main": "tinymce-built.js"
         }
