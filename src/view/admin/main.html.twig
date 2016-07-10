@@ -11,7 +11,7 @@
                 <br /><br />
                 <a class="btn btn-primary" href="{{ path('booking/index', service.code) }}">Book now</a>
                 {% if system.loggedin %}
-                    <a class="btn btn-default" href="{{ path('booking/telephone', service.code) }}">Telephone booking</a>
+                    <a class="btn btn-warning" href="{{ path('booking/telephone', service.code) }}">Telephone booking</a>
                 {% endif %}
             </div>
         </div>

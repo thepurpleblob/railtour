@@ -123,6 +123,8 @@ class BookingController extends coreController
                     throw new \Exception('User record unexpectedly not found in session!');
                 }
                 $username = $user->username;
+
+                // This means it's a telephone booking
                 $purchase->bookedby = $username;
 
                 $purchase->save();
