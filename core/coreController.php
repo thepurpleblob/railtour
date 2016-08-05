@@ -83,7 +83,7 @@ class coreController {
 
     /**
      * Instantiate class in library
-     * @param type $name
+     * @param string $name
      */
     public function getLib($name) {
         $namespace = 'lib';
@@ -287,7 +287,7 @@ class coreController {
         $eol = "\r\n";
 
         // Forget if if debugging not enabled.
-        if (!$CFG->debugging) {
+        if (empty($CFG->debugging)) {
             return;
         }
 

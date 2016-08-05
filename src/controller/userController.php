@@ -22,7 +22,7 @@ class UserController extends coreController
             $user->firstname = 'admin';
             $user->lastname = 'admin';
             $user->username = 'admin';
-            $user->password = 'admin';
+            $user->password = md5('admin');
             $user->role = 'ROLE_ADMIN';
             $user->save();
         }
@@ -177,7 +177,7 @@ class UserController extends coreController
     public function deleteAction($username) {
         
         // check it isn't admin
-        if ('admin'==$username) {
+        if ('admin' == $username) {
             throw new \Exception("may not delete primary admin");
         }
         
