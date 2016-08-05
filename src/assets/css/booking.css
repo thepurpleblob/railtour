@@ -5,9 +5,28 @@ body {
     background-color: #DBE7F3;
 }
 
+#srpscontainer {
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+    background: #fff;
+    padding: 15px;
+}
+
+#srpsrow {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
 #maincontent {
     background-color: #ffffff;
     padding-bottom: 20px;
+}
+
+#eldlink {
+    text-align: right;
+    font-size: 12px;
+    margin-top: 25px;
 }
 
 div#srpsuser {

@@ -19,22 +19,25 @@
 {% block title %}SRPS Railtours{% endblock title %}
 
 {% block body %}
-    <div class="container-fluid">
-        <div class="row">
-            <div id="maincontent" class="col-md-10 col-md-offset-1">
-                <div id="header_wrapper" class="row">
-                    <div id="srpsheader" class="col-md-8">
-                        <img src="{{ asset('images/srps_coach.png') }}">
-                        <span class="srpsfont">S.R.P.S. RAILTOURS</span>
-                    </div>
-                    <div id="srpsuser" class="col-md-4">
-                        {% if system.fullname %}
-                            Logged in as <b>{{ system.fullname }}</b><br />
-                            <a class="btn btn-primary btn-xs" href="{{ path('user/logout') }}">Logout</a>
-                        {% endif %}
-                    </div>
+    <div class="container" id="srpscontainer">
+        <div class="row" id="srpsrow">
+
+            <header id="header_wrapper">
+                <div id="srpsheader">
+                    <img src="{{ asset('images/srps_coach.png') }}">
+                    <span class="srpsfont">S.R.P.S. RAILTOURS</span>
                 </div>
-                {% block content %}{% endblock content %}
+                <div id="srpsuser" class="col-md-4">
+                    {% if system.fullname %}
+                        Logged in as <b>{{ system.fullname }}</b><br />
+                        <a class="btn btn-primary btn-xs" href="{{ path('user/logout') }}">Logout</a>
+                    {% endif %}
+                </div>
+            </header>
+            {% block content %}{% endblock content %}
+
+            <div id="eldlink">
+                Hosting of this site is kindly donated by <a href="http://www.e-learndesign.co.uk">E-Learn Design Limited</a>
             </div>
         </div>
     </div>
