@@ -52,6 +52,7 @@ ul#adminmenu {
 #srpsheader .srpsfont {
     font-size: 30px;
     padding: 10px 0 0 10px;
+    white-space: nowrap;
 }
 
 #adminmenu li {
