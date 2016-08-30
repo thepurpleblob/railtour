@@ -3,8 +3,8 @@
 {% block stylesheets %}
     {{ parent() }}
 
-     <link href='https://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
-     <link href='https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700' rel='stylesheet' type='text/css'>
+     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+
      <!--
      <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.5/spacelab/bootstrap.min.css" rel="stylesheet" >
      <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker.css" rel="stylesheet">
@@ -14,30 +14,46 @@
     <link href="{{ vendor('eternicode/bootstrap-datepicker/dist/css/bootstrap-datepicker.css') }}" rel="stylesheet">
     <link href="{{ asset('jquery-selectboxit/jquery.selectBoxIt.css') }}" rel="stylesheet">
     <link href="{{ asset('css/booking.css') }}" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="{{  asset('css/font-awesome/css/font-awesome.min.css') }}">
 {% endblock stylesheets %}
 
 {% block title %}SRPS Railtours{% endblock title %}
 
 {% block body %}
-    <div class="container" id="srpscontainer">
-        <div class="row" id="srpsrow">
-
-            <header id="header_wrapper">
-                <div id="srpsheader">
-                    <img src="{{ asset('images/srps_coach.png') }}">
-                    <span class="srpsfont">S.R.P.S. RAILTOURS</span>
+    <div class="wrapper"
+        <nav>
+            <div class="navwrapper clearfix">
+                <div class="navcontent">
+                    <div class="logo col-sm-6 col-xs-12">
+                        <h1>SRPS Railtours <span class="onlinebooking">Online Booking</span></h1>
+                    </div>
+                    <div class="col-sm-6 col-xs-12">
+                        {% if system.fullname %}
+                            Logged in as <b>{{ system.fullname }}</b><br />
+                            <a class="btn btn-primary btn-xs" href="{{ path('user/logout') }}">Logout</a>
+                        {% endif %}
+                    </div>
                 </div>
-                <div id="srpsuser" class="col-md-4">
-                    {% if system.fullname %}
-                        Logged in as <b>{{ system.fullname }}</b><br />
-                        <a class="btn btn-primary btn-xs" href="{{ path('user/logout') }}">Logout</a>
-                    {% endif %}
-                </div>
-            </header>
-            {% block content %}{% endblock content %}
+            </div>
+        </nav>
 
-            <div id="eldlink">
-                Hosting of this site is kindly donated by <a href="http://www.e-learndesign.co.uk">E-Learn Design Limited</a>
+        <div class="container" id="srpscontainer">
+            <div class="row" id="srpsrow">
+                <div class="col-xs-10 col-xs-offset-1">
+                    <div class="box">
+
+                        {% if service.name %}
+                            <h1 class="servicename">{{ service.name }}</h1>
+
+                        {% endif %}
+
+                        {% block content %}{% endblock content %}
+
+                        <div id="eldlink">
+                            Hosting of this site is kindly donated by <a href="http://www.e-learndesign.co.uk">E-Learn Design Limited</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
