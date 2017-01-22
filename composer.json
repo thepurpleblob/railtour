@@ -21,7 +21,8 @@
     "tinymce/tinymce": "^4.3",
     "eternicode/bootstrap-datepicker": "^1.6",
     "hsalazr/jquery-validation": "dev-master",
-    "components/jqueryui": "^1.11"
+    "components/jqueryui": "^1.11",
+    "mustache/mustache": "^2.11"
   },
   "autoload": {
     "psr-4": {
