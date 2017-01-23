@@ -15,7 +15,7 @@ class AdminController extends coreController
         $services = $booking->availableServices();
 
         // Display the services
-        $this->View('admin/main.html.twig', array(
+        $this->View('admin/main', array(
             'services' => $services,
         ));
     }

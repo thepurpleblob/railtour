@@ -140,20 +140,20 @@ class coreController {
 
     /**
      * render a view
+     * @param string $viewname name of view (minus extension)
+     * @param array $variables array of variables to be passed
      */
-    public function View($viewname, $variables=null)
+    public function View($viewname, $variables=array())
     {
         global $CFG;
 
-        // also need the form class in the variables
-        if ($variables) {
-            $variables['form'] = $this->form;
-        } else {
-            $variables = array($this->form);
-        }
+        // get/setup Mustache.
+        $mustache = new \Mustache_Engine(array(
+            'loader' => new \Mustache_Loader_FilesystemLoader($CFG->dirroot . '/src/view'),
+        ));
 
         // TODO
-        // Some global stuff gets passed in system variable
+        // Add some extra variables to array
         $user = $this->getUser();
         $system = new \stdClass();
         if ($user) {
@@ -167,8 +167,11 @@ class coreController {
         }
         $variables['system'] = $system;
 
-        // Render
-        echo $this->twig->render($viewname, $variables);
+        // Get template
+        $template = $mustache->loadTemplate($viewname);
+
+        // and render.
+        echo $template->render($variables);
 
         // The view is always the last thing we do, so just in case...
         die;

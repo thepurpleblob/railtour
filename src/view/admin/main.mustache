@@ -1,0 +1,21 @@
+
+
+<h3>Railtour Services</h3>
+
+{{# services }}
+    <div class="panel panel-primary">
+        <div class="panel-heading">{{ date }} : {{ name }}</div>
+        <div class="panel-body">
+            {{ description }}
+            <br /><br />
+            <a class="btn btn-primary" href="{{ path('booking/index', service.code) }}">Book now</a>
+            {% if system.loggedin %}
+                <a class="btn btn-warning" href="{{ path('booking/telephone', service.code) }}">Telephone booking</a>
+            {% endif %}
+        </div>
+    </div>
+{{/ services }}
+
+<div>
+
+</div>
