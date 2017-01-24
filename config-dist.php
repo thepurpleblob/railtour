@@ -12,6 +12,9 @@ $CFG->dbpass = '';
 // (Needs to match composer autoloader \\thepurpleblob\\projectname\\)
 $CFG->projectname = 'railtour';
 
+// Title for header
+$CFG->titleheader = 'SRPS Railtours Booking';
+
 // Routes (default if none specified)
 $CFG->defaultroute = '/admin/index';
 $CFG->logoutpath = 'service/index';

@@ -16,13 +16,9 @@
     "twig/twig": "1.6.5",
     "servo/fluidxml": "^1.20",
     "swiftmailer/swiftmailer": "@stable",
-    "components/jquery": "1.11.3",
     "twbs/bootstrap": "3.3.6",
-    "tinymce/tinymce": "^4.3",
-    "eternicode/bootstrap-datepicker": "^1.6",
-    "hsalazr/jquery-validation": "dev-master",
-    "components/jqueryui": "^1.11",
-    "mustache/mustache": "^2.11"
+    "mustache/mustache": "^2.11",
+    "kriswallsmith/assetic": "1.2.*@dev"
   },
   "autoload": {
     "psr-4": {

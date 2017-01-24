@@ -2,6 +2,11 @@
 
 namespace thepurpleblob\core;
 
+use Assetic\Asset\AssetCollection;
+use Assetic\Asset\FileAsset;
+use Assetic\Asset\GlobAsset;
+use Assetic\AssetWriter;
+
 class coreController {
 
     protected $gump;
@@ -22,16 +27,15 @@ class coreController {
         $this->paths = $paths;
     }
 
-    public function getHeaderAssets() {
+    public function writeCssAssets() {
         global $CFG;
 
         $css = new AssetCollection(array(
-            new HttpAsset('//maxcdn.bootstrapcdn.com/bootswatch/3.2.0/cerulean/bootstrap.min.css'),
-            //new HttpAsset('//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css'),
-            new GlobAsset($CFG->dirroot . '/assets/css/*'),
+            new FileAsset($CFG->dirroot . '/src/assets/css/bootstrap/bootstrap.min.css'),
         ));
 
-        return $css->dump();
+        $writer = new AssetWriter($CFG->dirroot . '/cache');
+        $writer->writeManagerAssets($css);
     }
 
     public function getFooterAssets() {
@@ -166,6 +170,10 @@ class coreController {
             $system->loggedin = false;
         }
         $variables['system'] = $system;
+        $variables['config'] = $CFG;
+
+        // Write various assets
+        $this->writeCssAssets();
 
         // Get template
         $template = $mustache->loadTemplate($viewname);
