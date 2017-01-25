@@ -2,18 +2,11 @@
 
 namespace thepurpleblob\core;
 
-use Assetic\Asset\AssetCollection;
-use Assetic\Asset\FileAsset;
-use Assetic\Asset\GlobAsset;
-use Assetic\AssetWriter;
-
 class coreController {
 
     protected $gump;
 
     protected $form;
-
-    protected $twig;
 
     protected $paths;
 
@@ -25,29 +18,6 @@ class coreController {
      */
     public function setPaths($paths) {
         $this->paths = $paths;
-    }
-
-    public function writeCssAssets() {
-        global $CFG;
-
-        $css = new AssetCollection(array(
-            new FileAsset($CFG->dirroot . '/src/assets/css/bootstrap/bootstrap.min.css'),
-        ));
-
-        $writer = new AssetWriter($CFG->dirroot . '/cache');
-        $writer->writeManagerAssets($css);
-    }
-
-    public function getFooterAssets() {
-        global $CFG;
-
-        $js = new AssetCollection(array(
-            new HttpAsset('//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'),
-            new HttpAsset('//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js'),
-            new GlobAsset($CFG->dirroot . '/assets/js/*'),
-        ));
-
-        return $js->dump();
     }
 
     private function extendGump() {
@@ -76,16 +46,6 @@ class coreController {
     }
 
     /**
-     * Get twig resource
-     */
-    private function getTwig() {
-        global $CFG;
-
-        $twigloader = new \Twig_Loader_Filesystem($CFG->dirroot . '/src/view');
-        $this->twig = new \Twig_Environment($twigloader);
-    }
-
-    /**
      * Instantiate class in library
      * @param string $name
      */
@@ -102,8 +62,6 @@ class coreController {
             $this->form = new coreForm();
             $this->extendGump();
             $this->gump = new \GUMP();
-            $this->getTwig();
-            $this->twig->addExtension(new twigextension());
             if (isset($_SESSION['back'])) {
                 $this->back = $_SESSION['back'];
             } else {
@@ -171,9 +129,6 @@ class coreController {
         }
         $variables['system'] = $system;
         $variables['config'] = $CFG;
-
-        // Write various assets
-        $this->writeCssAssets();
 
         // Get template
         $template = $mustache->loadTemplate($viewname);
