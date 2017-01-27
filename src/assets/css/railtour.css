@@ -1,0 +1,23 @@
+body {
+    font-family: Ubuntu, Helvetica, SansSerif;
+    background-color: #fff;
+}
+
+#banner {
+    background-color: #000;
+    height: 70px;
+    padding: 4px;
+    margin-bottom: 10px;
+}
+
+#banner h1 {
+    font-size: 30px;
+    font-weight: normal;
+    color: #fff;
+    margin-top: 12px;
+    margin-left: 20px;
+}
+
+#content {
+    background-color: #fff;
+}

@@ -1,32 +1,29 @@
-{% extends 'admin/admin.html.twig' %}
-
-{% block content %}   
-    
-    <h3>SRPS Railtours</h3>
+{{> header }}
 
     <div class="alert alert-info">
         Enter your username and password to login.
     </div>
    
     <div class="row-fluid">
-        {% if error %}
+        {{# error.message }}
             <div>{{ error.message }}</div>
-        {% endif %}
+        {{/ error.message }}
 
         <form action="{{ path('user/login') }}" method="post">
             <div class="form-group">
                 <label for="username">Username:</label>
-                <input type="text" class="form-control" id="username" name="username" value="{{ last_username }}" />
+                <input type="text" class="form-control form-control-lg" id="username" name="username" value="{{ last_username }}" />
             </div>
 
             <div class="form-group">
                 <label for="password">Password:</label>
-                <input type="password" class="form-control" id="password" name="password" />
+                <input type="password" class="form-control form-control-lg" id="password" name="password" />
             </div>
 
             {{ form_errors(errors) }}
 
-            <button type="submit" class="btn btn-default">login</button>
+            <button type="submit" class="btn btn-default">Login</button>
         </form>
     </div>
-{% endblock content %}
+
+{{> footer }}

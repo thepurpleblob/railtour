@@ -82,7 +82,7 @@ class UserController extends coreController
             }
         }
 
-        $this->View('user/login.html.twig', array(
+        $this->View('user/login.mustache', array(
             'errors' => $errors,
             'last_username' => $username,
         ));
