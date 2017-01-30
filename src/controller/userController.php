@@ -82,7 +82,7 @@ class UserController extends coreController
             }
         }
 
-        $this->View('user/login.mustache', array(
+        $this->View('user/login', array(
             'errors' => $errors,
             'last_username' => $username,
         ));

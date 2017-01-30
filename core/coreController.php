@@ -131,7 +131,7 @@ class coreController {
         $variables['config'] = $CFG;
 
         // Get template
-        $template = $mustache->loadTemplate($viewname);
+        $template = $mustache->loadTemplate($viewname . '.mustache');
 
         // and render.
         echo $template->render($variables);
