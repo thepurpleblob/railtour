@@ -77,12 +77,13 @@ class UserController extends coreController
                     }
                     $this->redirect($redirect);
                 } else {
-                    $errors[] = 'Login is invalid';
+                    $errors[] = 'Username or password incorrect';
                 }
             }
         }
 
         $this->View('user/login', array(
+            'haserrors' => !empty($errors),
             'errors' => $errors,
             'last_username' => $username,
         ));

@@ -2,26 +2,32 @@
    
     <div class="row">
         <div class="col-md-4 offset-md-4 col-10 col-offset-2" id="logincol">
-            {{# error.message }}
-                <div>{{ error.message }}</div>
-            {{/ error.message }}
+            <p id="loginheading">Login</p>
+
+            {{# haserrors }}
+                <ul class="formerrors alert alert-danger">
+                    {{# errors }}
+                        <li>{{ . }}</li>
+                    {{/ errors }}
+                </ul>
+            {{/ haserrors }}
 
             <form action="{{ path('user/login') }}" method="post">
                 <div class="form-group">
-                    <label for="username">Username:</label>
+                    <label for="username">Username</label>
                     <input type="text" class="form-control form-control-lg" id="username" name="username" value="{{ last_username }}" />
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password:</label>
+                    <label for="password">Password</label>
                     <input type="password" class="form-control form-control-lg" id="password" name="password" />
                 </div>
 
                 {{ form_errors(errors) }}
 
-                <button type="submit" class="btn btn-default">Login</button>
+                <button type="submit" id="loginbtn" class="btn btn-primary">Login</button>
             </form>
-        </div>
+        </ul>
     </div>
 
 {{> footer }}
