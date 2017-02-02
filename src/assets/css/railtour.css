@@ -24,6 +24,12 @@ body {
     background-color: #fff;
 }
 
+/* errors */
+
+.validateerror {
+    background-color: green;
+}
+
 /* login page */
 
 #loginbtn {
