@@ -7,35 +7,35 @@ use thepurpleblob\core\coreController;
 class UserController extends coreController
 {
 
+    protected $userlib;
+
+    /**
+     * Constructor
+     */
+    public function __construct($exception = false)
+    {
+        parent::__construct($exception);
+
+        // Library
+        $this->userlib = $this->getLibrary('User');
+    }
+
     /**
      * Not an action really
      */
-    public function installAction() 
-    {
+    public function installAction() {
 
-        // Get all our users
-        $users = \ORM::forTable('User')->findMany();
-        
-        // if there are none, we will create the default admin user
-        if (!$users) {
-            $user = \ORM::forTable('User')->create();
-            $user->firstname = 'admin';
-            $user->lastname = 'admin';
-            $user->username = 'admin';
-            $user->password = md5('admin');
-            $user->role = 'ROLE_ADMIN';
-            $user->save();
-        }
+        // Create new admin user if required
+        $this->userlib->installAdmin();
     }
     
     public function indexAction()
     {
         $this->require_login('ROLE_ADMIN', 'user/index');
 
-        // Get all our users
-        $users = \ORM::forTable('srps_users')->findMany();
+        $users = $this->userlib->getUsers();
 
-        $this->View('user/index.html.twig', array(
+        $this->View('user/index', array(
             'users' => $users,
         ));
     }
@@ -62,12 +62,8 @@ class UserController extends coreController
                 $password = $data['password'];
 
                 // Validate user
-                $user = \ORM::for_table('srps_users')
-                    ->where(array(
-                        'username' => $username,
-                        'password' => md5($password),
-                    ))
-                    ->findOne();
+                $user = $this->userlib->validate($username, $password);
+
                 if ($user) {
                     $_SESSION['user'] = $user;
                     if (!empty($_SESSION['wantsurl'])) {
@@ -83,6 +79,7 @@ class UserController extends coreController
         }
 
         $this->View('user/login', array(
+            'action' => $this->Url('user/login'),
             'haserrors' => !empty($errors),
             'errors' => $errors,
             'last_username' => $username,

@@ -6,7 +6,7 @@
 
             {{> formerrors }}
 
-            <form id="loginform" action="{{ path('user/login') }}" method="post">
+            <form id="loginform" action="{{ action }}" method="post">
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input type="text" class="form-control form-control-lg" id="username" name="username" value="{{ last_username }}" />
@@ -17,14 +17,12 @@
                     <input type="password" class="form-control form-control-lg" id="password" name="password" />
                 </div>
 
-                <label class="validateerror">Test label</label>
-
                 <button type="submit" id="loginbtn" class="btn btn-primary">Login</button>
             </form>
         </ul>
     </div>
 
-    {{!
+
     <script>
         $("#loginform").validate({
             rules: {
@@ -35,10 +33,10 @@
                     required: true
                 }
             },
-            errorClass: "validateerror"
+            errorClass: "validateerror",
         }
         )
     </script>
-    }}
+
 
 {{> footer }}

@@ -1,6 +1,4 @@
-{% extends 'admin/admin.html.twig' %}
-
-{% block content %}
+{{> header }}
     <h3>Railtour Admin Users</h3>
 
     <table class="table table-striped">
@@ -15,13 +13,13 @@
             </tr>
         </thead>
         <tbody>
-        {% for user in users %}
+        {{# users }}
                 <tr>
-                    <td><strong>{{ user.username }}</strong></td>
-                    <td>{{ user.firstname }}</td>
-                    <td>{{ user.lastname }}</td>     
-                    <td>{{ user.role }}</td>                      
-                    <td>{{ user.is_active ? 'Yes' : 'No' }}</td>
+                    <td><strong>{{ username }}</strong></td>
+                    <td>{{ firstname }}</td>
+                    <td>{{ lastname }}</td>
+                    <td>{{ role }}</td>
+                    <td>{{ is_active ? 'Yes' : 'No' }}</td>
                     <td>
                         <a class="btn btn-primary btn-sm" href="{{ path('user/edit', user.username) }}">Edit</a>
                         {% if user.username == 'admin' %}
@@ -31,7 +29,7 @@
                         {% endif %}
                     </td>
                 </tr>
-        {% endfor %}
+        {{/ users }}
             </tbody>
         </table>
 
@@ -40,4 +38,5 @@
                 Add a new user
             </a>
         </div>
-{% endblock content %}
+
+{{> footer }}

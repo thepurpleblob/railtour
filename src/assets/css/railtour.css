@@ -27,7 +27,11 @@ body {
 /* errors */
 
 .validateerror {
-    background-color: green;
+    color: #ff0000;
+}
+
+.formerrors {
+    list-style-type: none;
 }
 
 /* login page */
