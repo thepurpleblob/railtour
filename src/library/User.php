@@ -67,6 +67,35 @@ class User
     public function getUsers() {
         $users = \ORM::forTable('srps_users')->findMany();
 
+        // Check if editable
+        foreach ($users as $user) {
+            $user->editable = $user->username != 'admin';
+        }
+
         return $users;
+    }
+
+    /**
+     * Find user
+     * Create empty user record if required
+     * @param string $username username to find or empty for new
+     * @return object user record
+     */
+    public function getUser($username) {
+        if (!empty($username)) {
+            $user = \ORM::forTable('srps_users')->where('username', $username)->findOne();
+            if (!$user) {
+                throw new \Exception("User $username not found in db");
+            }
+        } else {
+            $user = \ORM::forTable('srps_users')->create();
+            $user->username = '';
+            $user->firstname = '';
+            $user->lastname = '';
+            $user->role = 'ROLE_ORGANISER';
+            $user->is_active = 1;
+        }
+
+        return $user;
     }
 }

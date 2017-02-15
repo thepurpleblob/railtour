@@ -108,19 +108,7 @@ class UserController extends coreController
         );
 
         // find/create the user
-        if (!empty($username)) {
-            $user = \ORM::forTable('srps_users')->where('username', $username)->findOne();
-            if (!$user) {
-                throw new \Exception("User $username not found in db");
-            }
-        } else {
-            $user = \ORM::forTable('srps_users')->create();
-            $user->username = '';
-            $user->firstname = '';
-            $user->lastname = '';
-            $user->role = 'ROLE_ORGANISER';
-            $user->is_active = 1;
-        }
+        $user = $this->userlib->getUser($username);
 
         // hopefully no errors
         $errors = null;
@@ -162,12 +150,22 @@ class UserController extends coreController
             }
         }
 
+        // Create form
+        $form = new \stdClass();
+        $form->username = $this->form->text('username', 'Username', $user->username);
+        $form->firstname = $this->form->text('firstname', 'First name', $user->firstname);
+        $form->lastname = $this->form->text('lastname', 'Last name', $user->lastname);
+        $form->password = $this->form->password('password', 'Password');
+        $form->role = $this->form->select('role', 'Role', $user->role, $rolechoice);
+        $form->is_active = $this->form->yesno('is_active', 'Active account?', $user->is_active);
         
         // display form
-        $this->View('user/edit.html.twig', array(
+        $this->View('user/edit', array(
             'username' => $username,
+            'haserrors' => !empty($errors),
             'user' => $user,
             'rolechoice' => $rolechoice,
+            'form' => $form,
             'errors' => $errors,
         ));        
     }

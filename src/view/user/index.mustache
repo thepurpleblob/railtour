@@ -19,14 +19,15 @@
                     <td>{{ firstname }}</td>
                     <td>{{ lastname }}</td>
                     <td>{{ role }}</td>
-                    <td>{{ is_active ? 'Yes' : 'No' }}</td>
+                    <td>{{# yesno }}{{ is_active }}{{/ yesno }}</td>
                     <td>
-                        <a class="btn btn-primary btn-sm" href="{{ path('user/edit', user.username) }}">Edit</a>
-                        {% if user.username == 'admin' %}
+                        <a class="btn btn-primary btn-sm" href="{{# path }}user/edit/{{/ path }}/{{ username }}">Edit</a>
+                        {{^ editable }}
                             <a class="btn btn-danger btn-sm disabled">Delete</a>
-                        {% else %}
-                            <a class="btn btn-danger btn-sm" href="{{ path('user/delete', user.username) }}">Delete</a>
-                        {% endif %}
+                        {{/ editable }}
+                        {{# editable }}
+                            <a class="btn btn-danger btn-sm" href="{{# path }}user/delete{{/path}}/{{ username }}">Delete</a>
+                        {{/ editable }}
                     </td>
                 </tr>
         {{/ users }}
@@ -34,7 +35,7 @@
         </table>
 
         <div class="btn-group">
-            <a class="btn btn-primary" href="{{ path('user/edit', ' ') }}">
+            <a class="btn btn-primary" href="{{# path }}user/edit{{/ path }}">
                 Add a new user
             </a>
         </div>

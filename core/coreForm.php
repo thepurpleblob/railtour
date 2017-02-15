@@ -32,15 +32,17 @@ class coreForm {
     public function text($name, $label, $value, $required=false, $attrs=null) {
         $id = $name . 'Text';
         $reqclass = $required ? 'form-required' : '';
-        echo '<div class="form-group '.$reqclass.'">';
+        $html = '<div class="form-group '.$reqclass.'">';
         if ($label) {
-            echo '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
+            $html .= '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
         }
-        echo '    <div class="col-sm-8">';
-        echo '    <input type="text" class="form-control input-sm" name="'.$name.'" id="'.$id.'" value="'.$value.'" '.
+        $html .= '    <div class="col-sm-8">';
+        $html .= '    <input type="text" class="form-control input-sm" name="'.$name.'" id="'.$id.'" value="'.$value.'" '.
             $this->attributes($attrs).'/>';
 
-        echo '</div></div>';
+        $html .= '</div></div>';
+
+        return $html;
     }
 
     /**
@@ -55,54 +57,59 @@ class coreForm {
         $localdate = date('d/m/Y', $timestamp);
         $id = $name . 'Date';
         $reqclass = $required ? 'form-required' : '';
-        echo '<div class="form-group '.$reqclass.'">';
+        $html = '<div class="form-group '.$reqclass.'">';
         if ($label) {
-            echo '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
+            $html .= '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
         }
-        echo '    <div class="col-sm-8">';
-        echo '    <input type="text" class="form-control input-sm datepicker" name="'.$name.'" id="'.$id.'" value="'.$localdate.'" '.
+        $html .= '    <div class="col-sm-8">';
+        $html .= '    <input type="text" class="form-control input-sm datepicker" name="'.$name.'" id="'.$id.'" value="'.$localdate.'" '.
             $this->attributes($attrs).'/>';
 
-        echo '</div></div>';
+        $html .= '</div></div>';
+
+        return $html;
     }
 
     public function textarea($name, $label, $value, $required=false, $attrs=null) {
         $id = $name . 'Textarea';
         $reqclass = $required ? 'form-required' : '';
-        echo '<div class="form-group '.$reqclass.'">';
+        $html = '<div class="form-group '.$reqclass.'">';
         if ($label) {
-            echo '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
+            $html .= '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
         }
-        echo '    <div class="col-sm-8">';
-        echo '    <textarea class="form-control input-sm" name="'.$name.'" id="'.$id.'" '.$this->attributes($attrs).'/>';
-        echo $value;
-        echo '    </textarea>';
+        $html .= '    <div class="col-sm-8">';
+        $html .= '    <textarea class="form-control input-sm" name="'.$name.'" id="'.$id.'" '.$this->attributes($attrs).'/>';
+        $html .= $value;
+        $html .= '    </textarea>';
+        $html .= '</div></div>';
 
-        echo '</div></div>';
+        return $html;
     }
     
     public function password($name, $label) {
         $id = $name . 'Password';
-        echo '<div class="form-group">';
+        $html = '<div class="form-group">';
         if ($label) {
-            echo '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
+            $html .= '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
         }
-        echo '    <div class="col-sm-8">';
-        echo '    <input type="password" class="form-control input-sm" name="'.$name.'" id="'.$id.'" />';
-        echo '</div></div>';
+        $html .= '    <div class="col-sm-8">';
+        $html .= '    <input type="password" class="form-control input-sm" name="'.$name.'" id="'.$id.'" />';
+        $html .= '</div></div>';
+
+        return $html;
     }   
     
     public function select($name, $label, $selected, $options, $choose='', $labelcol=4) {
         $id = $name . 'Select';
         $inputcol = 12 - $labelcol;
-        echo '<div class="form-group">';
+        $html = '<div class="form-group">';
         if ($label) {
-            echo '    <label for="' . $id . '" class="col-sm-' . $labelcol . ' control-label">' . $label . '</label>';
+            $html .= '    <label for="' . $id . '" class="col-sm-' . $labelcol . ' control-label">' . $label . '</label>';
         }
-        echo '    <div class="col-sm-' . $inputcol .'">';
-        echo '    <select class="form-control input-sm" name="'.$name.'" id="' . $id . '"">';
+        $html .= '    <div class="col-sm-' . $inputcol .'">';
+        $html .= '    <select class="form-control input-sm" name="'.$name.'" id="' . $id . '"">';
         if ($choose) {
-        	echo '<option selected disabled="disabled">'.$choose.'</option>';
+        	$html .= '<option selected disabled="disabled">'.$choose.'</option>';
         }
         foreach ($options as $value => $option) {
             if ($value == $selected) {
@@ -110,35 +117,39 @@ class coreForm {
             } else {
                 $strsel = '';
             }
-            echo '<option value="'.$value.'" '.$strsel.'>'.$option.'</option>';            
+            $html .= '<option value="'.$value.'" '.$strsel.'>'.$option.'</option>';
         }
-        echo '    </select></div>';
-        echo "</div>";
+        $html .= '    </select></div>';
+        $html .= "</div>";
+
+        return $html;
     }
 
     public function radio($name, $label, $selected, $options, $labelcol=4) {
         $id = $name . 'Radio';
         $inputcol = 12 - $labelcol;
-        echo '<div class="form-group">';
+        $html = '<div class="form-group">';
         if ($label) {
-            echo '    <label for="' . $id . '" class="col-sm-' . $labelcol . ' control-label">' . $label . '</label>';
+            $html .= '    <label for="' . $id . '" class="col-sm-' . $labelcol . ' control-label">' . $label . '</label>';
         }
-        echo '    <div class="col-sm-' . $inputcol .'">';
+        $html .= '    <div class="col-sm-' . $inputcol .'">';
         foreach ($options as $value => $option) {
             if ($value == $selected) {
                 $checked = 'checked';
             } else {
                 $checked = '';
             }
-            echo '<div class="radio">';
-            echo '<label>';
-            echo '<input type="radio" name="' . $name .'" id="optionsRadios1" value="' . $value . '" ' . $checked . '>';
-            echo $option;
-            echo '</label>';
-            echo '</div>';
+            $html .= '<div class="radio">';
+            $html .= '<label>';
+            $html .= '<input type="radio" name="' . $name .'" id="optionsRadios1" value="' . $value . '" ' . $checked . '>';
+            $html .= $option;
+            $html .= '</label>';
+            $html .= '</div>';
         }
-        echo '    </div>';
-        echo "</div>";
+        $html .= '    </div>';
+        $html .= "</div>";
+
+        return $html;
     }
 
     public function yesno($name, $label, $yes) {
@@ -147,7 +158,7 @@ class coreForm {
             1 => 'Yes',
         );
         $selected = $yes ? 1 : 0;
-        $this->select($name, $label, $selected, $options);
+        return $this->select($name, $label, $selected, $options);
     }
 
     public function errors($errors) {
@@ -162,20 +173,22 @@ class coreForm {
     }
     
     public function hidden($name, $value) {
-        echo '<input type="hidden" name="'.$name.'" value="'.$value.'" />';
+        return '<input type="hidden" name="'.$name.'" value="'.$value.'" />';
     }
     
     public function buttons($save='Save', $cancel='Cancel', $swap=false) {
-        echo '<div class="form-group">';
-        echo '<div class="col-sm-offset-4 col-sm-8">';
+        $html = '<div class="form-group">';
+        $html .= '<div class="col-sm-offset-4 col-sm-8">';
         if (!$swap) {
-            echo '    <button type="submit" name="save" value="save" class="btn btn-primary">'.$save.'</button>';
-            echo '    <button type="submit" name="cancel" value="cancel" class="btn btn-warning">'.$cancel.'</button>'; 
+            $html .= '    <button type="submit" name="save" value="save" class="btn btn-primary">'.$save.'</button>';
+            $html .= '    <button type="submit" name="cancel" value="cancel" class="btn btn-warning">'.$cancel.'</button>';
         } else {
-        	echo '    <button type="submit" name="cancel" value="cancel" class="btn btn-warning">'.$cancel.'</button>';
-        	echo '    <button type="submit" name="save" value="save" class="btn btn-primary">'.$save.'</button>';        	
+        	$html .= '    <button type="submit" name="cancel" value="cancel" class="btn btn-warning">'.$cancel.'</button>';
+        	$html .= '    <button type="submit" name="save" value="save" class="btn btn-primary">'.$save.'</button>';
         }       
-        echo '</div></div>';
+        $html .= '</div></div>';
+
+        return $html;
     }
 }
 

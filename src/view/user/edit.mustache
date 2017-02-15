@@ -1,17 +1,18 @@
-{% extends 'admin/admin.html.twig' %}
+{{> header }}
 
-{% block content %}
-    <h3>User edit</h3>
+<h3>User edit</h3>
+
+    {{> formerrors }}
 
     <form id="user-edit-form" class="form-horizontal" action="{{ path('user/edit', username) }}" method="post">
-        {% if not username %}
-            {{ form_text('username', 'Username', '') }}
-        {% endif %}
-        {{ form_text('firstname', 'First name', user.firstname) }}
-        {{ form_text('lastname', 'Last name', user.lastname) }}
-        {{ form_password('password', 'Password') }}
-        {{ form_select('role', 'Role', user.role, rolechoice) }}
-        {{ form_yesno('is_active', 'Active account?', user.is_active) }}
+        {{# username }}
+            {{{ form.username }}}
+        {{/ username }}
+        {{{ form.firstname }}}
+        {{{ form.lastname }}}
+        {{{ form.password }}}
+        {{{ form.role }}}
+        {{{ form.is_active }}}
 
         {{ form_errors(errors) }}
 
@@ -21,10 +22,8 @@
         </div>
     </form>
 
-{% endblock content %}
 
-{% block javascripts %}
-    {{ parent() }}
+
     <script>
         $('#user-edit-form').validate({
             errorClass: "validateError",
@@ -46,5 +45,6 @@
             }
         });
     </script>
-{% endblock javascripts %}
+
+{{> footer }}
     
