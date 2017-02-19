@@ -49,7 +49,7 @@ class ServiceController extends coreController
         // get booking status
         $enablebooking = $CFG->enablebooking;
 
-        $this->View('service/index.html.twig',
+        $this->View('service/index',
             array('services' => $services,
                   'enablebooking' => $enablebooking,
                   'years' => $years,

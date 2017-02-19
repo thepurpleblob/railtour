@@ -1,25 +1,31 @@
 
 <div id="adminmenu">
-    {{# system.fullname }}
-        <p><i>Welcome {{ system.fullname }} (<a href="{{# path }}user/logout{{/ path }}">logout</a>)</i></p>
-    {{/ system.fullname }}
 
-    <ul id="adminmenu">
+    <ul id="adminmenu" class="row">
         <li>
             <a href="{{# path }}service/index{{/path}}">
                 <span class="fa-stack fa-3x">
                     <i class="menubackground fa fa-circle fa-stack-2x"></i>
                     <i class="fa fa-subway fa-stack-1x fa-inverse"></i>
                 </span>
+                <span class="admintext">
+                    Services
+                </span>
             </a>
         </li>
-        {{# admin }}
+        {{# system.admin }}
             <li>
-                <a class="btn btn-warning" href="{{ path('service/edit', serviceid) }}">
-                    Edit service
+                <a href="{{# path }}user/index{{/path}}">
+                    <span class="fa-stack fa-3x">
+                        <i class="menubackground fa fa-circle fa-stack-2x"></i>
+                        <i class="fa fa-users fa-stack-1x fa-inverse"></i>
+                    </span>
+                    <span class="admintext">
+                        Users
+                    </span>
                 </a>
             </li>
-        {{/ admin }}
+        {{/ system.admin }}
         {{# serviceid }}
             {% if system.userrole == 'ROLE_ADMIN' %}
                 <li>

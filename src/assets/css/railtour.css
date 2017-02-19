@@ -37,8 +37,18 @@ label.error {
 }
 
 /* admin menu */
+
+#adminmenu ul {
+    list-style: none;
+}
+
 .fa-circle::before {
     text-shadow: 2px 2px 2px #888;
+}
+
+.admintext {
+    display: block;
+    text-align: center;
 }
 
 /* login page */

@@ -1,6 +1,7 @@
-{% extends 'admin/admin.html.twig' %}
+{{> header }}
 
-{% block content %}
+{{> adminmenu }}
+
     <h3>Railtour Services</h3>
 
     <form id="services_filter_form" class="form-horizontal" action="{{ path('service/index') }}"
@@ -24,10 +25,10 @@
             </tr>
         </thead>
         <tbody>
-        {% for service in services %}
+        {{# services }}
                 <tr>
-                    <td><strong>{{ service.code }}</strong></td>
-                    <td>{{ service.name }}</td>
+                    <td><strong>{{ code }}</strong></td>
+                    <td>{{ name }}</td>
                     <td>
                         {% if service.visible %}
                             <a href="{{ path('service/visible', [service.id, 0]) }}">Yes</a>
@@ -50,8 +51,8 @@
                         <a class="btn btn-sm btn-danger" href="{{ path('service/delete', service.id) }}">Delete</a>
                     </td>
                 </tr>
-        {% endfor %}
             </tbody>
+        {{/services }}
         </table>
 
         {% if not enablebooking %}
@@ -67,10 +68,9 @@
                 </a>
             </div>
         {% endif %}
-{% endblock content %}
+
     
-{% block javascripts %}
-    {{ parent() }}
+
     <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
     <script type="text/javascript">
         $('#services_filter_year').change(
@@ -78,5 +78,6 @@
                     $('#services_filter_form').submit();
                 }
             );
-    </script>    
-{% endblock javascripts %}
+    </script>
+
+{{> footer }}
