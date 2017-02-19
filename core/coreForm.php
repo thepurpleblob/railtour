@@ -1,6 +1,10 @@
 <?php
 
+
 namespace thepurpleblob\core;
+
+define('FORM_REQUIRED', true);
+define('FORM_OPTIONAL', false);
 
 class coreForm {
     
@@ -28,17 +32,26 @@ class coreForm {
         }
         return implode(' ', $squash);
     }
-    
-    public function text($name, $label, $value, $required=false, $attrs=null) {
+
+    /**
+     * @param $name
+     * @param $label
+     * @param $value
+     * @param bool $required
+     * @param null $attrs
+     * @param string $type option HTML5 type
+     * @return string
+     */
+    public function text($name, $label, $value, $required=false, $attrs=null, $type='text') {
         $id = $name . 'Text';
-        $reqclass = $required ? 'form-required' : '';
-        $html = '<div class="form-group '.$reqclass.'">';
+        $reqstr = $required ? 'required' : '';
+        $html = '<div class="form-group">';
         if ($label) {
             $html .= '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
         }
         $html .= '    <div class="col-sm-8">';
-        $html .= '    <input type="text" class="form-control input-sm" name="'.$name.'" id="'.$id.'" value="'.$value.'" '.
-            $this->attributes($attrs).'/>';
+        $html .= '    <input type="' . $type . '" class="form-control input-sm" name="'.$name.'" id="'.$id.'" value="'.$value.'" '.
+            $this->attributes($attrs) . ' ' . $reqstr . '/>';
 
         $html .= '</div></div>';
 
@@ -56,29 +69,37 @@ class coreForm {
         $timestamp = strtotime($date);
         $localdate = date('d/m/Y', $timestamp);
         $id = $name . 'Date';
-        $reqclass = $required ? 'form-required' : '';
-        $html = '<div class="form-group '.$reqclass.'">';
+        $reqstr = $required ? 'required' : '';;
+        $html = '<div class="form-group">';
         if ($label) {
             $html .= '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
         }
         $html .= '    <div class="col-sm-8">';
         $html .= '    <input type="text" class="form-control input-sm datepicker" name="'.$name.'" id="'.$id.'" value="'.$localdate.'" '.
-            $this->attributes($attrs).'/>';
+            $this->attributes($attrs) . ' ' . $reqstr . '/>';
 
         $html .= '</div></div>';
 
         return $html;
     }
 
+    /**
+     * @param $name
+     * @param $label
+     * @param $value
+     * @param bool $required
+     * @param null $attrs
+     * @return string
+     */
     public function textarea($name, $label, $value, $required=false, $attrs=null) {
         $id = $name . 'Textarea';
-        $reqclass = $required ? 'form-required' : '';
-        $html = '<div class="form-group '.$reqclass.'">';
+        $reqstr = $required ? 'required' : '';
+        $html = '<div class="form-group">';
         if ($label) {
             $html .= '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
         }
         $html .= '    <div class="col-sm-8">';
-        $html .= '    <textarea class="form-control input-sm" name="'.$name.'" id="'.$id.'" '.$this->attributes($attrs).'/>';
+        $html .= '    <textarea class="form-control input-sm" name="'.$name.'" id="'.$id.'" '.$this->attributes($attrs) . ' ' . $reqstr . '/>';
         $html .= $value;
         $html .= '    </textarea>';
         $html .= '</div></div>';

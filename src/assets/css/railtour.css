@@ -26,12 +26,19 @@ body {
 
 /* errors */
 
-.validateerror {
+label.error {
     color: #ff0000;
+    font-size: 80%;
+    margin-bottom: 0;
 }
 
 .formerrors {
     list-style-type: none;
+}
+
+/* admin menu */
+.fa-circle::before {
+    text-shadow: 2px 2px 2px #888;
 }
 
 /* login page */

@@ -1,5 +1,12 @@
 {{> header }}
+
+{{> adminmenu }}
+
     <h3>Railtour Admin Users</h3>
+
+    {{# status }}
+        <div class="alert alert-success"><i>{{ status }}</i></div>
+    {{/status}}
 
     <table class="table table-striped">
         <thead>

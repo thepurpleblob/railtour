@@ -28,8 +28,11 @@ class UserController extends coreController
         // Create new admin user if required
         $this->userlib->installAdmin();
     }
-    
-    public function indexAction()
+
+    /**
+     * @param $status status from previous screen
+     */
+    public function indexAction($status = '')
     {
         $this->require_login('ROLE_ADMIN', 'user/index');
 
@@ -37,6 +40,7 @@ class UserController extends coreController
 
         $this->View('user/index', array(
             'users' => $users,
+            'status' => $status,
         ));
     }
 
@@ -118,7 +122,7 @@ class UserController extends coreController
 
             // Cancel?
             if (!empty($data['cancel'])) {
-                $this->redirect('user/index');
+                $this->redirect('user/index/Cancelled');
             }
 
             // Validate
@@ -128,7 +132,12 @@ class UserController extends coreController
                 'role' => 'required',
             );
             if (!$username) {
-                $rules['username'] = 'required';
+                $rules = array(
+                    'username' => 'required',
+                    'firstname' => 'required',
+                    'lastname' => 'required'
+                );
+
             }
             $this->gump->validation_rules($rules);
 
@@ -144,7 +153,7 @@ class UserController extends coreController
                     $user->password = md5($data['password']);
                 }
                 $user->save();
-                $this->redirect('user/index');
+                $this->redirect('user/index/User saved');
             } else {
                 $errors = $this->gump->get_readable_errors(false);
             }
@@ -152,9 +161,10 @@ class UserController extends coreController
 
         // Create form
         $form = new \stdClass();
-        $form->username = $this->form->text('username', 'Username', $user->username);
-        $form->firstname = $this->form->text('firstname', 'First name', $user->firstname);
-        $form->lastname = $this->form->text('lastname', 'Last name', $user->lastname);
+        $usernameattrs = $user->username ? ['disabled' => 'disabled'] : [];
+        $form->username = $this->form->text('username', 'Username', $user->username, FORM_REQUIRED, $usernameattrs);
+        $form->firstname = $this->form->text('firstname', 'First name', $user->firstname, FORM_REQUIRED);
+        $form->lastname = $this->form->text('lastname', 'Last name', $user->lastname, FORM_REQUIRED);
         $form->password = $this->form->password('password', 'Password');
         $form->role = $this->form->select('role', 'Role', $user->role, $rolechoice);
         $form->is_active = $this->form->yesno('is_active', 'Active account?', $user->is_active);
@@ -177,16 +187,9 @@ class UserController extends coreController
             throw new \Exception("may not delete primary admin");
         }
         
-        // find the user
-        $user = \ORM::forTable('srps_users')->where('username', $username)->findOne();
-        if (!$user) {
-            throw new \Exception("User $username not found in db");
-        }
-        
-        // Delete the user
-        $user->delete();
+        $this->userlib->delete($username);
 
-        $this->redirect('user/index');
+        $this->redirect('user/index/User deleted');
     }    
 }
 

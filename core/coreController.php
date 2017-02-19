@@ -129,10 +129,12 @@ class coreController {
         $system = new \stdClass();
         if ($user) {
             $system->userrole = $user->role;
+            $system->admin = $user->role == 'ROLE_ADMIN';
             $system->fullname = $user->firstname . ' ' . $user->lastname;
             $system->loggedin = true;
         } else {
             $system->userrole = '';
+            $system->admin = false;
             $system->fullname = '';
             $system->loggedin = false;
         }

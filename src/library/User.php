@@ -98,4 +98,20 @@ class User
 
         return $user;
     }
+
+    /**
+     * Delete user
+     * @param string $username
+     */
+    public function delete($username) {
+
+        // find the user
+        $user = \ORM::forTable('srps_users')->where('username', $username)->findOne();
+        if (!$user) {
+            throw new \Exception("User $username not found in db");
+        }
+
+        // Delete the user
+        $user->delete();
+    }
 }

@@ -1,20 +1,18 @@
 {{> header }}
 
+{{> adminmenu }}
+
 <h3>User edit</h3>
 
     {{> formerrors }}
 
-    <form id="user-edit-form" class="form-horizontal" action="{{ path('user/edit', username) }}" method="post">
-        {{# username }}
-            {{{ form.username }}}
-        {{/ username }}
+    <form id="user-edit-form" class="form-horizontal" action="{{# path }}user/edit{{/path}}/{{ username }}" method="post">
+        {{{ form.username }}}
         {{{ form.firstname }}}
         {{{ form.lastname }}}
         {{{ form.password }}}
         {{{ form.role }}}
         {{{ form.is_active }}}
-
-        {{ form_errors(errors) }}
 
         <div>
             <input type="submit" name="submit" value="Save" class="btn btn-primary" />
@@ -25,25 +23,7 @@
 
 
     <script>
-        $('#user-edit-form').validate({
-            errorClass: "validateError",
-            rules: {
-                {% if not username %}
-                    username: {
-                        required: true
-                    },
-                {% endif %}
-                firstname: {
-                    required: true
-                },
-                lastname: {
-                    required: true
-                },
-                role: {
-                    required: true
-                }
-            }
-        });
+        $('#user-edit-form').validate();
     </script>
 
 {{> footer }}
