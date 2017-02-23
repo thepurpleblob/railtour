@@ -4,14 +4,9 @@
 
     <h3>Railtour Services</h3>
 
-    <form id="services_filter_form" class="form-horizontal" action="{{ path('service/index') }}"
+    <form id="services_filter_form" class="form-horizontal" action="{{# path }}service/index{{/path}}"
           novalidate="novalidate" method="post">
-        <label>Tour season</label>
-        <select id="services_filter_year" name="filter_year">
-            {% for year in years %}
-                <option {{ year==filteryear ? 'selected="selected"' : '' }}>{{ year }}</option>
-            {% endfor %}
-        </select>
+        {{{ form.filter_year }}}
     </form>
 
     <table class="table table-striped">

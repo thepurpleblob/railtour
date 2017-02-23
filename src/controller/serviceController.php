@@ -10,6 +10,19 @@ use thepurpleblob\core\coreController;
  */
 class ServiceController extends coreController
 {
+    protected $adminlib;
+
+    /**
+     * Constructor
+     */
+    public function __construct($exception = false)
+    {
+        parent::__construct($exception);
+
+        // Library
+        $this->adminlib = $this->getLibrary('Admin');
+    }
+
     /**
      * Lists all Service entities.
      *
@@ -19,7 +32,7 @@ class ServiceController extends coreController
 
         $this->require_login('ROLE_ORGANISER');
 
-        $allservices = \ORM::forTable('service')->order_by_asc('date')->findMany();
+        $allservices = $this->adminlib->getServices();
 
         // submitted year
         $thisyear = date('Y');
@@ -45,16 +58,20 @@ class ServiceController extends coreController
             }
         }
 
-
         // get booking status
         $enablebooking = $CFG->enablebooking;
 
-        $this->View('service/index',
-            array('services' => $services,
-                  'enablebooking' => $enablebooking,
-                  'years' => $years,
-                  'filteryear' => $filteryear,
-                ));
+        // Create form
+        $form = new \stdClass();
+        $form->filter_year = $this->form->select('filter_year', 'Tour season', $filteryear, $years);
+
+        $this->View('service/index', array(
+            'services' => $services,
+            'enablebooking' => $enablebooking,
+            'form' => $form,
+            'years' => $years,
+            'filteryear' => $filteryear,
+        ));
     }
 
     /**
