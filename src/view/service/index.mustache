@@ -50,11 +50,11 @@
         {{/services }}
         </table>
 
-        {% if not enablebooking %}
+        {{^ enablebooking }}
             <div class="alert">
                 NOTE: Booking is currently disabled on this site
             </div>
-        {% endif %}
+        {{/ enablebooking }}
 
         {% if system.userrole == 'ROLE_ADMIN' %}
             <div class="btn-group">

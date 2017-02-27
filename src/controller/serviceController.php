@@ -58,6 +58,8 @@ class ServiceController extends coreController
             }
         }
 
+        //echo "<pre>"; var_dump($filteryear); var_dump($services); die;
+
         // get booking status
         $enablebooking = $CFG->enablebooking;
 
