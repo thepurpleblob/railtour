@@ -9,6 +9,12 @@
         {{{ form.filter_year }}}
     </form>
 
+    {{^ is_services }}
+        <div class="alert alert-danger">No services for selected year</div>
+    {{/ is_services }}
+
+    {{# is_services }}
+
     <table class="table table-striped">
         <thead>
             <tr>
@@ -21,34 +27,38 @@
         </thead>
         <tbody>
         {{# services }}
-                <tr>
-                    <td><strong>{{ code }}</strong></td>
-                    <td>{{ name }}</td>
-                    <td>
-                        {% if service.visible %}
-                            <a href="{{ path('service/visible', [service.id, 0]) }}">Yes</a>
-                        {% else %}
-                            <a href="{{ path('service/visible', [service.id, 1]) }}">No</a>
-                        {% endif %}
-                    </td>
-                    <td>{% if service.date %}{{ service.date|date('d/m/Y') }}{% endif %}</td>
-                    <td>
-                        <a class="btn btn-sm btn-success" href="{{ path('service/show', service.id) }}">Show</a>
-                        <a class="btn btn-sm btn-primary" href="{{  path('limits/edit', service.id) }}">Limits</a>
-                        {% if service.visible and enablebooking %}
-                            <a class="btn btn-sm btn-info" href="{{ path('booking/index', service.code) }}">Book</a>
-                        {% else %}
-                            <a class="btn btn-sm btn-info disabled">Book</a>
-                        {% endif %}
-                        <a class="btn btn-sm btn-warning" href="{{ path('report/list', service.id) }}">Report</a>
-                        <a class="btn btn-sm btn-warning" href="{{ path('report/export', service.id) }}">Export</a>
-                        <a class="btn btn-sm btn-danger" href="{{ path('service/duplicate', service.id) }}">Duplicate</a>
-                        <a class="btn btn-sm btn-danger" href="{{ path('service/delete', service.id) }}">Delete</a>
-                    </td>
-                </tr>
-            </tbody>
+            <tr>
+                <td><strong>{{ code }}</strong></td>
+                <td>{{ name }}</td>
+                <td>
+                    {{# visible }}
+                        <a href="{{# path }}service/visible{{/ path }}/{{ id }}/0">Yes</a>
+                    {{/ visible }}
+                    {{^ visible }}
+                        <a href="{{# path }}service/visible{{/ path }}/{{ id }}/1">No</a>
+                    {{/ visible }}
+                </td>
+                <td>{{# date }}{{ formatteddate }}{{/ date }}</td>
+                <td>
+                    <a class="btn btn-sm btn-success" href="{{# path }}service/show{{/ path }}/{{ id }}">Show</a>
+                    <a class="btn btn-sm btn-primary" href="{{# path }}limits/edit{{/ path }}/{{ id }}">Limits</a>
+                    {{# showbookingbutton }}
+                        <a class="btn btn-sm btn-info" href="{{# path }}booking/index{{/ path }}/{{ code }}">Book</a>
+                    {{/ showbookingbutton }}
+                    {{^ showbookingbutton }}
+                        <a class="btn btn-sm btn-info disabled">Book</a>
+                    {{/ showbookingbutton }}
+                    <a class="btn btn-sm btn-warning" href="{{# path }}report/list{{/ path }}/{{ id }}">Report</a>
+                    <a class="btn btn-sm btn-warning" href="{{# path }}report/expot{{/ path }}/{{ id }}">Export</a>
+                    <a class="btn btn-sm btn-danger" href="{{# path }}report/duplicate{{/ path }}/{{ id }}">Duplicate</a>
+                    <a class="btn btn-sm btn-danger" href="{{# path }}report/delete{{/ path }}/{{ id }}">Delete</a>
+                </td>
+            </tr>
         {{/services }}
-        </table>
+        </tbody>
+    </table>
+
+    {{/ is_services }}
 
         {{^ enablebooking }}
             <div class="alert">
@@ -56,23 +66,12 @@
             </div>
         {{/ enablebooking }}
 
-        {% if system.userrole == 'ROLE_ADMIN' %}
+        {{# system.admin }}
             <div class="btn-group">
-                <a class="btn btn-primary" href="{{ path('service/edit') }}">
+                <a class="btn btn-primary" href="{{# path }}service/edit{{/ path }}">
                     Add a new service
                 </a>
             </div>
-        {% endif %}
-
-    
-
-    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
-    <script type="text/javascript">
-        $('#services_filter_year').change(
-                function() {
-                    $('#services_filter_form').submit();
-                }
-            );
-    </script>
+        {{/ system.admin }}
 
 {{> footer }}

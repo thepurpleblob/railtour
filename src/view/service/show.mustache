@@ -1,21 +1,23 @@
-{% extends 'admin/admin.html.twig' %}
+{{> header }}
 
-{% block content %}
-    <h3>{{service.name}} ({{ service.code }})</h3>
+{{> adminmenu }}
 
-    {% if system.userrole == 'ROLE_ADMIN' %}
-        <a class="btn btn-info btn-sm pull-right" href="{{ path('service/edit', service.id) }}">
+    <h2>{{ service.name }} ({{ service.code }})</h2>
+
+    {{# system.admin }}
+        <a class="btn btn-info btn-sm pull-right" href="{{# path }}service/edit{{/path}}{{ id }}">
             Edit service
         </a>
-    {% endif %}
+    {{/ system.admin }}
+
     <h3>Summary</h3>
 
-    {% if not service.visible %}
+    {{^ service.visible }}
     <div class="text-error">
         This service is not currently available for booking. Change <i>Visble</i>
         to <i>Yes</i> if required.
     </div>
-    {% endif %}
+    {{/ service.visible }}
 
     <table class="table">
         <tbody>
@@ -29,27 +31,27 @@
             </tr>
             <tr>
                 <th>Description</th>
-                <td>{{ service.description|raw }}</td>
+                <td>{{{ service.description }}}</td>
             </tr>
             <tr>
                 <th>Visible</th>
-                <td>{{ service.visible ? 'Yes' : 'No' }}</td>
+                <td>{{ service.formattedvisible }}</td>
             </tr>
             <tr>
                 <th>Date</th>
-                <td>{{ service.date|date('d/m/Y') }}</td>
+                <td>{{ service.formatteddate }}</td>
             </tr>
             <tr>
                 <th>First window/single supplement</th>
-                <td>&pound;{{ service.singlesupplement | number_format(2) }}</td>
+                <td>&pound;{{ service.singlesupplement }}</td>
             </tr>
             <tr>
                 <th>Display comment field</th>
-                <td>{{ service.commentbox ? 'Yes' : 'No' }}</td>
+                <td>{{ service.formattedcommentbox }}</td>
             </tr>
             <tr>
                 <th>ETicket mode</th>
-                <td>{{ etmode }}</td>
+                <td>{{ service.formattedetmode }}</td>
             </tr>
         </tbody>
     </table>
@@ -70,47 +72,51 @@
                     <tr>
                         <th class="lead">A</th>
                         <td>{{ service.mealaname }}</td>
-                        <td>{{ service.mealavisible ? 'Yes' : 'No' }}</td>
-                        <td>&pound;{{ service.mealaprice | number_format(2) }}</td>
+                        <td>{{ service.formattedmealavisible }}</td>
+                        <td>&pound;{{ service.mealaprice }}</td>
                     </tr>
                     <tr>
                         <th class="lead">B</th>
                         <td>{{ service.mealbname }}</td>
-                        <td>{{ service.mealbvisible ? 'Yes' : 'No' }}</td>
-                        <td>&pound;{{ service.mealbprice | number_format(2) }}</td>
+                        <td>{{ service.formattedmealbvisible }}</td>
+                        <td>&pound;{{ service.mealbprice }}</td>
                     </tr>
                     <tr>
                         <th class="lead">C</th>
                         <td>{{ service.mealcname }}</td>
-                        <td>{{ service.mealcvisible ? 'Yes' : 'No' }}</td>
-                        <td>&pound;{{ service.mealcprice | number_format(2) }}</td>
+                        <td>{{ service.formattedmealcvisible }}</td>
+                        <td>&pound;{{ service.mealcprice }}</td>
                     </tr>
                     <tr>
                         <th class="lead">D</th>
                         <td>{{ service.mealdname }}</td>
-                        <td>{{ service.mealdvisible ? 'Yes' : 'No' }}</td>
-                        <td>&pound;{{ service.mealdprice | number_format(2) }}</td>
+                        <td>{{ service.formattedmealdvisible }}</td>
+                        <td>&pound;{{ service.mealdprice }}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        {% if system.userrole == 'ROLE_ADMIN' %}
-            <a class="btn btn-info btn-sm pull-right" href="{{ path('destination/index', service.id) }}">
-                {% if destinations is defined %}
-                    {{ destinations ? 'Edit destinations' : 'New destination' }}
-                {% else %}
+        {{# system.admin }}
+            <a class="btn btn-info btn-sm pull-right" href="{{# path }}destination/index{{/ path }}/{{ id }}">
+                {{# isdestinations }}
                     Edit destinations
-                {% endif %}
+                {{/ isdestinations }}
+                {{^ isdestinations }}
+                    New destination
+                {{/ isdestinations }}
             </a>
-        {% endif %}
+        {{/ system.admin }}
+
         <h3>Destinations</h3>
+
         <div>
-            {% if destinations is empty %}
+            {{^ isdestinations }}
                 <div class="alert alert-block alert-error">
                     There are no destinations. You need to create at least one destination first.
                 </div>
-            {% else %}
+            {{/ isdestinations }}
+            {{# isdestinations }}
                 <table class="table table-condensed table-striped">
                     <thead>
                         <tr>
@@ -119,32 +125,33 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for destination in destinations %}
+                        {{# destinations }}
                             <tr>
-                                <td>{{ destination.name }} <span class="badge">{{ destination.crs }}</span></td>
-                                <td>{{ destination.description | raw }}</td>
+                                <td>{{ name }} <span class="badge">{{ crs }}</span></td>
+                                <td>{{{ description }}}</td>
                             </tr>
-                        {% endfor %}
+                        {{/ destinations }}
                     </tbody>
                 </table>
-            {% endif %}
+            {{/ isdestinations }}
         </div>
 
-        {% if system.userrole == 'ROLE_ADMIN' %}
-            <a class="btn btn-info btn-sm pull-right" href="{{ path('priceband/index', service.id) }}">
-                {% if pricebandgroups is defined %}
-                    {{ pricebandgroups ? 'Edit price bands' : 'New price band' }}
-                {% else %}
-                    Edit price bands
-                {% endif %}
+        {{# system.admin }}
+            <a class="btn btn-info btn-sm pull-right" href="{{# path }}priceband/index{{/ path }}/{{ id }}">
+                {{# ispricebandgroups }}Edit price bands{{/ ispricebandgroups }}
+                {{^ ispricebandgroups }}New price band{{/ ispricebandgroups }}
             </a>
-        {% endif %}
+        {{/ system.admin }}
+
         <h3>Price bands</h3>
-        {% if pricebandgroups is empty %}
+
+        {{^ ispricebandgroups }}
             <div class="alert alert-block alert-error">
                 There are no price bands. You need to create at least one price band first.
             </div>
-        {% else %}
+        {{/ ispricebandgroups }}
+
+        {{# ispricebandgroups }}
             <table class="table table-condensed table-striped">
                 <thead>
                     <tr>
@@ -152,9 +159,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for pricebandgroup in pricebandgroups %}
+                    {{# pricebandgroups }}
                         <tr>
-                            <td>{{ pricebandgroup.name }}</td>
+                            <td>{{ name }}</td>
                         </tr>
                         <tr>
                             <td colspan="3">
@@ -168,38 +175,43 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    {% for priceband in pricebandgroup.bandtable %}
+                                    {{# bandtable }}
                                         <tr>
-                                            <td>{{ priceband.name }}</td>
-                                            <td>&pound;{{ priceband.first }}</td>
-                                            <td>&pound;{{ priceband.standard }}</td>
-                                            <td>&pound;{{ priceband.child }}</td>
+                                            <td>{{ name }}</td>
+                                            <td>&pound;{{ first }}</td>
+                                            <td>&pound;{{ standard }}</td>
+                                            <td>&pound;{{ child }}</td>
                                         </tr>
-                                    {% endfor %}
+                                    {{/ bandtable }}
                                     </tbody>
                                 </table>
                             </td>
                         </tr>
-                    {% endfor %}
+                    {{/ pricebandgroups }}
                 </tbody>
             </table>
-        {% endif %}
+        {{/ ispricebandgroups }}
 
-        {% if system.userrole == 'ROLE_ADMIN' %}
-            <a class="btn btn-info btn-sm pull-right" href="{{ path('joining/index', service.id) }}">
-                {% if joinings is defined %}
-                    {{ joinings ? 'Edit joining stations' : 'New joining station' }}
-                {% else %}
+        {{# system.admin }}
+            <a class="btn btn-info btn-sm pull-right" href="{{# path }}joining/index{{/ path }}/{{ id }}">
+                {{# isjoinings }}
                     Edit joining stations
-                {% endif %}
+                {{/ isjoinings }}
+                {{^ isjoinings }}
+                    New joining station
+                {{/ isjoinings }}
             </a>
-        {% endif %}
+        {{/ system.admin }}
+
         <h3>Joining stations</h3>
-        {% if joinings is empty %}
+
+        {{^ isjoinings }}
             <div class="alert alert-block alert-error">
                 There are no joining stations. You need to add at least one joining station first.
             </div>
-        {% else %}
+        {{/ isjoinings }}
+
+        {{# isjoinings }}
             <table class="table table-condensed table-striped">
                 <thead>
                     <tr>
@@ -208,20 +220,22 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for joining in joinings %}
+                    {{# joinings }}
                         <tr>
-                            <td>{{ joining.station }} <span class="badge">{{ joining.crs }}</span></td>
-                            <td>{{ joining.pricebandname }}</td>
+                            <td>{{ station }} <span class="badge">{{ crs }}</span></td>
+                            <td>{{ pricebandname }}</td>
                         </tr>
-                    {% endfor %}
+                    {{/ joinings }}
                 </tbody>
             </table>
-        {% endif %}
+        {{/ isjoinings }}
 
-        <a class="btn btn-info btn-sm pull-right" href="{{ path('limits/edit', service.id) }}">
+        <a class="btn btn-info btn-sm pull-right" href="{{# path }}limits/edit{{/ path }}/{{ id }}">
             Booking limits
         </a>
+
         <h3>Booking limits</h3>
+
         <table class="table table-condensed table-striped">
             <thead>
                 <tr>
@@ -243,19 +257,19 @@
                     <td>{{ limits.firstsingles }}
                 </td>
                 <tr>
-                    <td><b>Meal A:</b> {{ service.mealaname | default('Meal A') }}</td>
+                    <td><b>Meal A:</b> {{ service.formattedmealaname }}</td>
                     <td>{{ limits.meala }}</td>
                 </tr>
                 <tr>
-                    <td><b>Meal B:</b> {{ service.mealbname | default('Meal B') }}</td>
+                    <td><b>Meal B:</b> {{ service.formattedmealbname }}</td>
                     <td>{{ limits.mealb }}</td>
                 </tr>
                 <tr>
-                    <td><b>Meal C:</b> {{ service.mealcname | default('Meal C') }}</td>
+                    <td><b>Meal C:</b> {{ service.formattedmealcname }}</td>
                     <td>{{ limits.mealc }}</td>
                 </tr>
                 <tr>
-                    <td><b>Meal D:</b> {{ service.mealdname | default('Meal D') }}</td>
+                    <td><b>Meal D:</b> {{ service.formattedmealdname }}</td>
                     <td>{{ limits.meald }}</td>
                 </tr>
                 <tr>
@@ -272,8 +286,9 @@
     </div> <!-- accordion wrapper -->
 
     <div>
-        <a class="btn btn-success" href="{{ path('service/index') }}">
+        <a class="btn btn-success" href="{{# path }}service/index{{/ path }}">
             Back to the list
         </a>
     </div>
-{% endblock content %}
+
+{{> footer }}

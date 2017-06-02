@@ -101,6 +101,22 @@ class coreController {
     }
 
     /**
+     * Specify required modules
+     * These are added to an array to be included by require.js
+     * The
+     * @param string $name module name (sans js)
+     * @param string $method method name to execute
+     * @param array $params array of params to pass to method
+     */
+    public function requirejs($name, $method, $params = null) {
+        $module = new stdClass;
+        $module->name = $name;
+        $module->method = $method;
+        $module->params = $params;
+        $this->js[] = $module;
+    }
+
+    /**
      * render a view
      * @param string $viewname name of view (minus extension)
      * @param array $variables array of variables to be passed

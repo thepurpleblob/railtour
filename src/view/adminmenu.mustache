@@ -1,7 +1,6 @@
 
 <div id="adminmenu">
-
-    <ul id="adminmenu" class="row">
+    <ul class="row">
         <li>
             <a href="{{# path }}service/index{{/path}}">
                 <span class="fa-stack fa-3x">
@@ -27,38 +26,50 @@
             </li>
         {{/ system.admin }}
         {{# serviceid }}
-            {% if system.userrole == 'ROLE_ADMIN' %}
+            {{# system.admin }}
                 <li>
-                    <a class="btn btn-warning" href="{{ path('destination/index', serviceid) }}">
-                        {% if destinations is defined %}
-                            {{ destinations ? 'Edit destinations' : 'New destination' }}
-                        {% else %}
-                            Edit destinations
-                        {% endif %}
+                    <a href="{{# path }}destination/index{{/ path }}/{{ serviceid }}">
+                        <span class="fa-stack fa-3x">
+                            <i class="menubackground fa fa-circle fa-stack-2x"></i>
+                            <i class="fa fa-map-marker fa-stack-1x fa-inverse"></i>
+                        </span>
+                        <span class="admintext">
+                            Destinations
+                        </span>
                     </a>
                 </li>
                 <li>
-                    <a class="btn btn-warning" href="{{ path('priceband/index', serviceid) }}">
-                        {% if pricebandgroups is defined %}
-                            {{ pricebandgroups ? 'Edit price bands' : 'New price band' }}
-                        {% else %}
-                            Edit price bands
-                        {% endif %}
+                    <a href="{{# path }}priceband/index{{/ path }}/{{ serviceid }}">
+                        <span class="fa-stack fa-3x">
+                            <i class="menubackground fa fa-circle fa-stack-2x"></i>
+                            <i class="fa fa-gbp fa-stack-1x fa-inverse"></i>
+                        </span>
+                        <span class="admintext">
+                            Price bands
+                        </span>
                     </a>
                 </li>
                 <li>
-                    <a class="btn btn-warning" href="{{ path('joining/index', serviceid) }}">
-                        {% if joinings is defined %}
-                            {{ joinings ? 'Edit joining stations' : 'New joining station' }}
-                        {% else %}
-                            Edit joining stations
-                        {% endif %}
+                    <a href="{{# path }}joining/index{{/ path }}/{{ serviceid }}">
+                        <span class="fa-stack fa-3x">
+                            <i class="menubackground fa fa-circle fa-stack-2x"></i>
+                            <i class="fa fa-building fa-stack-1x fa-inverse"></i>
+                        </span>
+                        <span class="admintext">
+                            Stations
+                        </span>
                     </a>
                 </li>
-            {% endif %}
+            {{/ system.admin }}
             <li>
-                <a class="btn btn-primary" href="{{ path('limits/edit', serviceid) }}">
-                    Booking limits
+                <a href="{{# path }}limits/edit{{/ path }}/{{ serviceid }}">
+                    <span class="fa-stack fa-3x">
+                        <i class="menubackground fa fa-circle fa-stack-2x"></i>
+                        <i class="fa fa-line-chart fa-stack-1x fa-inverse"></i>
+                    </span>
+                    <span class="admintext">
+                            Limits
+                    </span>
                 </a>
             </li>
         {{/ serviceid }}

@@ -48,6 +48,10 @@ class ServiceController extends coreController
         $years = array();
         $years['All'] = 'All';        
         foreach ($allservices as $service) {
+
+            // munge some data for template while here
+            $service->showbookingbutton = $service->visible and $CFG->enablebooking;
+
             $servicedate = $service->date;
             $year = substr($servicedate, 0, 4);
             $years[$year] = $year;
@@ -58,17 +62,18 @@ class ServiceController extends coreController
             }
         }
 
-        //echo "<pre>"; var_dump($filteryear); var_dump($services); die;
-
         // get booking status
         $enablebooking = $CFG->enablebooking;
 
         // Create form
         $form = new \stdClass();
-        $form->filter_year = $this->form->select('filter_year', 'Tour season', $filteryear, $years);
+        $form->filter_year = $this->form->select('filter_year', 'Tour season', $filteryear, $years, '', 4, array(
+            'class' => 'select_autosubmit'
+        ));
 
         $this->View('service/index', array(
             'services' => $services,
+            'is_services' => !empty($services),
             'enablebooking' => $enablebooking,
             'form' => $form,
             'years' => $years,
@@ -84,7 +89,7 @@ class ServiceController extends coreController
 
         $this->require_login('ROLE_ORGANISER');
 
-        $service = \ORM::forTable('service')->findOne($id);
+        $service = $this->adminlib->getService($id);
 
         if (!$service) {
             throw new \Exception('Unable to find Service entity.');
@@ -109,47 +114,27 @@ class ServiceController extends coreController
     {
         $this->require_login('ROLE_ORGANISER', 'service/show/' . $id);
 
-        $booking = $this->getLibrary('Booking');
-        $service = $booking->Service($id);
+        $service = $this->adminlib->getService($id);
 
         if (!$service) {
             throw new \Exception('Unable to find Service entity.');
         }
 
         // Get the other information stored for this service
-        $destinations = \ORM::forTable('destination')->where('serviceid', $id)->findMany();
-        $pricebandgroups = \ORM::forTable('pricebandgroup')->where('serviceid', $id)->findMany();
-        $joinings = \ORM::forTable('joining')->where('serviceid', $id)->findMany();
-        $limits = \ORM::forTable('limits')->where('serviceid', $id)->findOne();
+        $destinations = $this->adminlib->getDestinations($id);
+        $pricebandgroups = $this->adminlib->getPricebandgroups($id);
+        $joinings = $this->adminlib->getJoinings($id);
+        $limits = $this->adminlib->getLimits($id);
 
-        // iterate over these and get destinations
-        // (very inefficiently)
-        foreach ($pricebandgroups as $band) {
-            $pricebandgroupid = $band->id;
-            $bandtable = $booking->getPricebands($id, $pricebandgroupid);
-            $band->bandtable = $bandtable;
-        }
-
-        // add pricebandgroup names
-        foreach ($joinings as $joining) {
-            $pricebandgroup = \ORM::forTable('pricebandgroup')->findOne($joining->pricebandgroupid);
-            $joining->pricebandname = $pricebandgroup->name;
-        }
-
-        // ETicket selected
-        if ($service->eticketenabled) {
-            $etmode = $service->eticketforce ? 'Enabled: Forced' : 'Enabled: Optional';
-        } else {
-            $etmode = 'Disabled';
-        }
-
-        $this->View('service/show.html.twig', array(
+        $this->View('service/show', array(
             'service' => $service,
             'destinations' => $destinations,
+            'isdestinations' => !empty($destinations),
             'pricebandgroups' => $pricebandgroups,
+            'ispricebandgroups' => !empty($pricebandgroups),
+            'isjoinings' => !empty($joinings),
             'joinings' => $joinings,
             'limits' => $limits,
-            'etmode' => $etmode,
             'serviceid' => $id,
         ));
     }

@@ -192,42 +192,7 @@ class Booking
         return true;
     }
 
-    /**
-     * Get pricebands ordered by destinations (create any new missing ones)
-     */
-    public function getPricebands($serviceid, $pricebandgroupid, $save=true) {
-        $destinations = \ORM::forTable('destination')->where('serviceid', $serviceid)->order_by_asc('destination.name')->findMany();
-        if (!$destinations) {
-            throw new Exception('No destinations found for serviceid = ' . $serviceid);
-        }
-        $pricebands = array();
-        foreach ($destinations as $destination) {
-            $priceband = \ORM::forTable('priceband')->where(array(
-                'pricebandgroupid' => $pricebandgroupid,
-                'destinationid' => $destination->id,
-            ))->findOne();
-            if (!$priceband) {
-                $priceband = \ORM::forTable('priceband')->create();
-                $priceband->serviceid = $serviceid;
-                $priceband->pricebandgroupid = $pricebandgroupid;
-                $priceband->destinationid = $destination->id;
-                $priceband->first = 0;
-                $priceband->standard = 0;
-                $priceband->child = 0;
 
-                // In some cases we don't want to create it (yet)
-                if ($save) {
-                    $priceband->save();
-                }
-            }
-
-            // Add the destination name as a spurious field
-            $priceband->name = $destination->name;
-            $pricebands[] = $priceband;
-        }
-
-        return $pricebands;
-    }
 
     /**
      * Create new pricebands (as required)

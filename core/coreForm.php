@@ -120,15 +120,19 @@ class coreForm {
         return $html;
     }   
     
-    public function select($name, $label, $selected, $options, $choose='', $labelcol=4) {
+    public function select($name, $label, $selected, $options, $choose='', $labelcol=4, $attrs=null) {
         $id = $name . 'Select';
         $inputcol = 12 - $labelcol;
+        if (empty($attrs['class'])) {
+            $attrs['class'] = '';
+        }
+        $attrs['class'] .= ' form-control input-sm';
         $html = '<div class="form-group">';
         if ($label) {
             $html .= '    <label for="' . $id . '" class="col-sm-' . $labelcol . ' control-label">' . $label . '</label>';
         }
         $html .= '    <div class="col-sm-' . $inputcol .'">';
-        $html .= '    <select class="form-control input-sm" name="'.$name.'" id="' . $id . '"">';
+        $html .= '    <select name="'.$name.'" id="' . $id . '" ' . $this->attributes($attrs) . '">';
         if ($choose) {
         	$html .= '<option selected disabled="disabled">'.$choose.'</option>';
         }
