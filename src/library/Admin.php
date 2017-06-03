@@ -59,12 +59,50 @@ class Admin {
     }
 
     /**
-     * Get a single service
-     * @param int serviceid
+     * Create new Service
      * @return object
      */
-    public function getService($id) {
+    public function createService() {
+        $service = \ORM::for_table('service')->create();
+        $service->code = '';
+        $service->name = '';
+        $service->description = '';
+        $service->visible = true;
+        $service->date = date('Y-m-d', time());
+        $service->mealaname = 'Breakfast';
+        $service->mealbname = 'Lunch';
+        $service->mealcname = 'Dinner';
+        $service->mealdname = 'Not used';
+        $service->mealaprice = 0;
+        $service->mealbprice = 0;
+        $service->mealcprice = 0;
+        $service->mealdprice = 0;
+        $service->mealavisible = 0;
+        $service->mealbvisible = 0;
+        $service->mealcvisible = 0;
+        $service->mealdvisible = 0;
+        $service->singlesupplement = 10.00;
+        $service->maxparty = 16;
+        $service->commentbox = 0;
+        $service->eticketenabled = 0;
+        $service->eticketforce = 0;
+
+        return $service;
+    }
+
+    /**
+     * Get a single service
+     * @param int serviceid (0 = new one)
+     * @return object
+     */
+    public function getService($id = 0) {
         $service = \ORM::forTable('service')->findOne($id);
+
+        if ($service === 0) {
+            $service = $this->createService();
+            $this->mungeService($service);
+            return $service;
+        }
 
         if (!$service) {
             throw new Exception('Unable to find Service record for id = ' . $id);

@@ -2,7 +2,7 @@
  * Created by howard on 02/06/2017.
  */
 
-define(["jquery"], function($) {
+define(["jquery", "validate"], function($) {
 
     return {
         init: function() {
@@ -13,6 +13,9 @@ define(["jquery"], function($) {
                     this.form.submit();
                 }
             );
+
+            // Initialise form validation
+            $('.validate-form').validate();
 
         }
     };

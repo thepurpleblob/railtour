@@ -6,7 +6,7 @@
 
     {{> formerrors }}
 
-    <form id="user-edit-form" class="form-horizontal" action="{{# path }}user/edit{{/path}}/{{ username }}" method="post">
+    <form id="user-edit-form" class="form-validate form-horizontal" action="{{# path }}user/edit{{/path}}/{{ username }}" method="post">
         {{{ form.username }}}
         {{{ form.firstname }}}
         {{{ form.lastname }}}
@@ -19,12 +19,6 @@
             <input type="submit" name="cancel" value="Cancel" class="btn btn-warning" />
         </div>
     </form>
-
-
-
-    <script>
-        $('#user-edit-form').validate();
-    </script>
 
 {{> footer }}
     

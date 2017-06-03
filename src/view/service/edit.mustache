@@ -1,0 +1,67 @@
+{{> header }}
+
+{{> adminmenu }}
+
+    {{# service.name }}
+        <h3 class="adminpage_title">{{service.name}} ({{ service.code }})</h3>
+    {{/ service.name }}
+    {{^ service.name }}
+        <h3 class="adminpage_title">Create new service</h3>
+    {{/ service.name }}
+
+    {{> formerrors }}
+
+    <form id="service-edit-form" class="validate-form form-horizontal" action="{{# path }}service/edit{{/ path }}/{{ id }}" method="post" >
+        {{{ form.code }}}
+        {{{ form.name  }}}
+        {{{ form.description }}}
+        {{{ form.visible }}}
+        {{{ form.date }}}
+        {{{ form.singlesupplement }}}
+        {{{ form.commentbox }}}
+        {{{ form.eticket }}}
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>&nbsp;</th>
+                    <th>Meal name</th>
+                    <th>Visible?</th>
+                    <th>Meal price</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th class="lead">A</th>
+                    <td>{{{ form.mealaname }}}</td>
+                    <td>{{{ form.mealavisible }}}</td>
+                    <td>{{{ form.mealaprice }}}</td>
+                </tr>
+                <tr>
+                    <th class="lead">B</th>
+                    <td>{{{ form.mealbname }}}</td>
+                    <td>{{{ form.mealbvisible }}}</td>
+                    <td>{{{ form.mealbprice }}}</td>
+                </tr>
+                <tr>
+                    <th class="lead">C</th>
+                    <td>{{{ form.mealcname }}}</td>
+                    <td>{{{ form.mealcvisible }}}</td>
+                    <td>{{{ form.mealcprice }}}</td>
+                </tr>
+                <tr>
+                    <th class="lead">D</th>
+                    <td>{{{ form.mealdname }}}</td>
+                    <td>{{{ form.mealdvisible }}}</td>
+                    <td>{{{ form.mealdprice }}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div>
+            <input type="submit" name="submit" value="Save" class="btn btn-primary" />
+            <input type="submit" name="cancel" value="Cancel" class="btn btn-warning" />
+        </div>
+    </form>
+
+{{> footer }}

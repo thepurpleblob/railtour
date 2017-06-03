@@ -2,7 +2,7 @@
 
 {{> adminmenu }}
 
-    <h2>{{ service.name }} ({{ service.code }})</h2>
+    <h2 class="adminpage_title">{{ service.name }} ({{ service.code }})</h2>
 
     {{# system.admin }}
         <a class="btn btn-info btn-sm pull-right" href="{{# path }}service/edit{{/path}}{{ id }}">
@@ -13,9 +13,9 @@
     <h3>Summary</h3>
 
     {{^ service.visible }}
-    <div class="text-error">
-        This service is not currently available for booking. Change <i>Visble</i>
-        to <i>Yes</i> if required.
+    <div class="alert alert-danger">
+        This service is not currently available for booking. Change <b>Visble</b>
+        to <b>Yes</b> if required.
     </div>
     {{/ service.visible }}
 
@@ -152,7 +152,7 @@
         {{/ ispricebandgroups }}
 
         {{# ispricebandgroups }}
-            <table class="table table-condensed table-striped">
+            <table class="table table-condensed table-hover">
                 <thead>
                     <tr>
                         <th>Name</th>

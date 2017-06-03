@@ -147,15 +147,11 @@ class ServiceController extends coreController
     {
         $this->require_login('ROLE_ADMIN', 'service/show/' . $id);
 
+        // Get or create service
         if ($id) {
-            $service = \ORM::forTable('service')->findOne($id);
-
-            if (!$service) {
-                throw new \Exception('Unable to find Service.');
-            }
+            $service = $this->adminlib->getService($id);
         } else {
-            $booking = $this->getLibrary('Booking');
-            $service = $booking->createService();
+            $service = $this->adminlib->createService();
         }
 
         // ETicket options
@@ -171,6 +167,29 @@ class ServiceController extends coreController
         } else {
             $etselected = 0;
         }
+
+        // Create form
+        $form = new \stdClass;
+        $form->code = $this->form->text('code', 'Code', $service->code, FORM_REQUIRED );
+        $form->name = $this->form->text('name', 'Name', $service->name, FORM_REQUIRED );
+        $form->description = $this->form->textarea('description', 'Description', $service->description, FORM_REQUIRED );
+        $form->visible = $this->form->yesno('visible', 'Visible', $service->visible);
+        $form->date = $this->form->date('date', 'Date', $service->date, FORM_REQUIRED);
+        $form->singlesupplement = $this->form->text('singlesupplement', 'Single supplement', $service->singlesupplement);
+        $form->commentbox = $this->form->yesno('commentbox', 'Comment box', $service->commentbox);
+        $form->eticket = $this->form->select('eticket', 'ETicket mode', $service->eticket, $etoptions);
+        $form->mealaname = $this->form->text('mealaname', '', $service->mealaname, FORM_REQUIRED);
+        $form->mealavisible = $this->form->yesno('mealavisible', '', $service->mealavisible);
+        $form->mealaprice = $this->form->text('mealaprice', '', $service->mealaprice);
+        $form->mealbname = $this->form->text('mealbname', '', $service->mealbname, FORM_REQUIRED);
+        $form->mealbvisible = $this->form->yesno('mealbvisible', '', $service->mealbvisible);
+        $form->mealbprice = $this->form->text('mealbprice', '', $service->mealbprice);
+        $form->mealcname = $this->form->text('mealcname', '', $service->mealcname, FORM_REQUIRED);
+        $form->mealcvisible = $this->form->yesno('mealcvisible', '', $service->mealcvisible);
+        $form->mealcprice = $this->form->text('mealcprice', '', $service->mealcprice);
+        $form->mealdname = $this->form->text('mealdname', '', $service->mealdname, FORM_REQUIRED);
+        $form->mealdvisible = $this->form->yesno('mealdvisible', '', $service->mealdvisible);
+        $form->mealdprice = $this->form->text('mealdprice', '', $service->mealdprice);
 
         // hopefully no errors
         $errors = null;
@@ -249,9 +268,10 @@ class ServiceController extends coreController
             }
         }
 
-        $this->View('service/edit.html.twig', array(
-            'service'      => $service,
+        $this->View('service/edit', array(
+            'service'  => $service,
             'serviceid' => $id,
+            'form' => $form,
             'etoptions' => $etoptions,
             'etselected' => $etselected,
             'errors' => $errors

@@ -3,6 +3,7 @@
 body {
     font-family: Ubuntu, Helvetica, SansSerif;
     background-color: #fff;
+    font-size: 0.9em;
 }
 
 #banner {
@@ -24,6 +25,10 @@ body {
     background-color: #fff;
 }
 
+footer {
+    margin-top: 20px;
+}
+
 /* errors */
 
 label.error {
@@ -42,6 +47,10 @@ label.error {
     list-style: none;
 }
 
+#adminmenu li {
+    padding-right: 15px;
+}
+
 .fa-circle::before {
     text-shadow: 2px 2px 2px #888;
 }
@@ -49,6 +58,13 @@ label.error {
 .admintext {
     display: block;
     text-align: center;
+}
+
+/* admin pages */
+
+.adminpage_title {
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 /* login page */
@@ -61,4 +77,9 @@ label.error {
     font-size: 35px;
     text-align: center;
     margin: 20px 0;
+}
+
+/* service show */
+.table-priceband {
+    font-size: 80%;
 }
