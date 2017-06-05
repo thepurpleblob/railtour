@@ -18,7 +18,7 @@ class Admin {
      * @param object $service
      * @return object
      */
-    private function mungeService($service) {
+    public function formatService($service) {
         $service->unixdate = strtotime($service->date);
         $service->formatteddate = date('d/m/Y', $service->unixdate);
         $service->formattedvisible = $service->visible ? 'Yes' : 'No';
@@ -44,16 +44,24 @@ class Admin {
     }
 
     /**
+     * munge services for display
+     * @param array $services
+     * @return array
+     */
+    public function formatServices($services) {
+        foreach ($services as $service) {
+            $this->formatService($service);
+        }
+
+        return $services;
+    }
+
+    /**
      * Get all services
      * @return array
      */
     public function getServices() {
         $allservices = \ORM::forTable('service')->order_by_asc('date')->findMany();
-
-        // Run through for (some) mods
-        foreach ($allservices as $service) {
-            $this->mungeService($service);
-        }
 
         return $allservices;
     }
@@ -100,15 +108,12 @@ class Admin {
 
         if ($service === 0) {
             $service = $this->createService();
-            $this->mungeService($service);
             return $service;
         }
 
         if (!$service) {
             throw new Exception('Unable to find Service record for id = ' . $id);
         }
-
-        $this->mungeService($service);
 
         return $service;
     }
@@ -163,6 +168,62 @@ class Admin {
         $destinations = \ORM::forTable('destination')->where('serviceid', $serviceid)->findMany();
 
         return $destinations;
+    }
+
+    /**
+     * Get single destination
+     * @param int $destinationid
+     * @return object
+     */
+    public function getDestination($destinationid) {
+        $destination = \ORM::forTable('destination')->findOne($destinationid);
+        if (!$destination) {
+            throw new Exception('Destination was not found id=' . $destinationid);
+        }
+
+        return $destination;
+    }
+
+    /**
+     * Create new Destination
+     * @param int $serviceid
+     * @return object
+     */
+    public function createDestination($serviceid) {
+        $destination = \ORM::forTable('destination')->create();
+        $destination->serviceid = $serviceid;
+        $destination->name = '';
+        $destination->crs = '';
+        $destination->description = '';
+        $destination->bookinglimit = 0;
+
+        return $destination;
+    }
+
+    /**
+     * Is destination used?
+     * Checks if destination can be deleted
+     * @param object $destination
+     * @return boolean true if used
+     */
+    public function isDestinationUsed($destination) {
+
+        // find pricebands that specify this destination
+        $pricebands = \ORM::forTable('priceband')->where('destinationid', $destination->id)->findMany();
+
+        // if there are non then not used
+        if (!$pricebands) {
+            return false;
+        }
+
+        // otherwise, all prices MUST be 0
+        foreach ($pricebands as $priceband) {
+            if (($priceband->first > 0) || ($priceband->standard > 0) && ($priceband->child > 0)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

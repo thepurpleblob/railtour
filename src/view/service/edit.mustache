@@ -11,7 +11,7 @@
 
     {{> formerrors }}
 
-    <form id="service-edit-form" class="validate-form form-horizontal" action="{{# path }}service/edit{{/ path }}/{{ id }}" method="post" >
+    <form id="service-edit-form" class="validate-form form-horizontal" action="{{# path }}service/edit{{/ path }}/{{ service.id }}" method="post" >
         {{{ form.code }}}
         {{{ form.name  }}}
         {{{ form.description }}}

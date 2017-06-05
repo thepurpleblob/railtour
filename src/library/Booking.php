@@ -80,19 +80,6 @@ class Booking
         return $services;
     }
 
-    /**
-     * Create new Destination
-     */
-    public function createDestination($serviceid) {
-        $destination = \ORM::forTable('destination')->create();
-        $destination->serviceid = $serviceid;
-        $destination->name = '';
-        $destination->crs = '';
-        $destination->description = '';
-        $destination->bookinglimit = 0;
-
-        return $destination;
-    }
 
     /**
      * Create new pricebandgroup
@@ -313,32 +300,6 @@ class Booking
         return $stations;
     }
 
-    /**
-     * Is destination used?
-     * Checks if destination can be deleted
-     * @param object $destination
-     * @return boolean true if used
-     */
-    public function isDestinationUsed($destination) {
-
-        // find pricebands that specify this destination
-        $pricebands = \ORM::forTable('priceband')->where('destinationid', $destination->id)->findMany();
-
-        // if there are non then not used
-        if (!$pricebands) {
-            return false;
-        }
-
-        // otherwise, all prices MUST be 0
-        foreach ($pricebands as $priceband) {
-            if (($priceband->first>0) or ($priceband->standard>0)
-                    and ($priceband->child>0)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     /**
      * Creates an array of destinations with extra stuff to enhance the

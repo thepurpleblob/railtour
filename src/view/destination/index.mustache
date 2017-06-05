@@ -1,0 +1,46 @@
+{{> header }}
+
+{{> adminmenu }}
+
+    <h3 class="adminpage_title">Destinations</h3>
+    <h4>{{ service.name }}</h4>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>CRS</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+        {{# destinations }}
+                <tr>
+                    <td>{{ name }}</td>
+                    <td>{{ crs }}</td>
+                    <td>{{{ description }}}</td>
+                    <td>
+                        <a class="btn btn-sm btn-warning"
+                            href="{{# path }}destination/edit{{/ path }}/{{ service.id }}/{{ destination.id }}">Edit</a>
+                        {{^ used }}
+                            <a class="btn btn-sm btn-danger" href="{{# path }}destination/delete{{/ path }}/ {{ id }}">Delete</a>
+                        {{/ used }}
+                        {{# used }}
+                            <a class="btn btn-sm btn-danger disabled">Delete</a>
+                        {{/ used }}
+                    </td>
+                </tr>
+        {{/ destinations }}
+            </tbody>
+        </table>
+
+        <div>
+            <a class="btn btn-primary" href="{{# path }}destination/edit{{/ path }}/{{ service.id }}/0">
+                Add a new destination
+            </a>&nbsp;
+            <a class="btn btn-warning" href="{{# path }}service/show{{/path}}/{{ service.id }}">
+                Back
+            </a>
+        </div>
+
+{{> footer }}

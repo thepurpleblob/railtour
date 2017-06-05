@@ -5,7 +5,7 @@
     <h2 class="adminpage_title">{{ service.name }} ({{ service.code }})</h2>
 
     {{# system.admin }}
-        <a class="btn btn-info btn-sm pull-right" href="{{# path }}service/edit{{/path}}{{ id }}">
+        <a class="btn btn-info btn-sm pull-right" href="{{# path }}service/edit{{/path}}/{{ service.id }}">
             Edit service
         </a>
     {{/ system.admin }}
@@ -98,7 +98,7 @@
         </div>
 
         {{# system.admin }}
-            <a class="btn btn-info btn-sm pull-right" href="{{# path }}destination/index{{/ path }}/{{ id }}">
+            <a class="btn btn-info btn-sm pull-right" href="{{# path }}destination/index{{/ path }}/{{ service.id }}">
                 {{# isdestinations }}
                     Edit destinations
                 {{/ isdestinations }}
@@ -137,7 +137,7 @@
         </div>
 
         {{# system.admin }}
-            <a class="btn btn-info btn-sm pull-right" href="{{# path }}priceband/index{{/ path }}/{{ id }}">
+            <a class="btn btn-info btn-sm pull-right" href="{{# path }}priceband/index{{/ path }}/{{ service.id }}">
                 {{# ispricebandgroups }}Edit price bands{{/ ispricebandgroups }}
                 {{^ ispricebandgroups }}New price band{{/ ispricebandgroups }}
             </a>
@@ -193,7 +193,7 @@
         {{/ ispricebandgroups }}
 
         {{# system.admin }}
-            <a class="btn btn-info btn-sm pull-right" href="{{# path }}joining/index{{/ path }}/{{ id }}">
+            <a class="btn btn-info btn-sm pull-right" href="{{# path }}joining/index{{/ path }}/{{ service.id }}">
                 {{# isjoinings }}
                     Edit joining stations
                 {{/ isjoinings }}
@@ -230,7 +230,7 @@
             </table>
         {{/ isjoinings }}
 
-        <a class="btn btn-info btn-sm pull-right" href="{{# path }}limits/edit{{/ path }}/{{ id }}">
+        <a class="btn btn-info btn-sm pull-right" href="{{# path }}limits/edit{{/ path }}/{{ service.id }}">
             Booking limits
         </a>
 

@@ -10,26 +10,37 @@ use thepurpleblob\core\coreController;
  */
 class DestinationController extends coreController
 {
+    protected $adminlib;
+
+    /**
+     * Constructor
+     */
+    public function __construct($exception = false)
+    {
+        parent::__construct($exception);
+
+        // Library
+        $this->adminlib = $this->getLibrary('Admin');
+    }
+
     /**
      * Lists all Service entities.
-     *
+     * @param int $serviceid
      */
     public function indexAction($serviceid)
     {
         $this->require_login('ROLE_ADMIN', 'destination/index/' . $serviceid);
 
-        $booking = $this->getLibrary('Booking');
+        $service = $this->adminlib->getService($serviceid);
 
-        $service = $booking->Service($serviceid);
-
-        $destinations = \ORM::forTable('destination')->where('serviceid', $serviceid)->findMany();
+        $destinations = $this->adminlib->getDestinations($serviceid);
 
         // Check if used
         foreach ($destinations as $destination) {
-            $destination->used = $booking->isDestinationUsed($destination);
+            $destination->used = $this->adminlib->isDestinationUsed($destination);
         }
 
-        $this->View('destination/index.html.twig',
+        $this->View('destination/index',
             array(
                 'destinations' => $destinations,
                 'service' => $service,
@@ -39,31 +50,34 @@ class DestinationController extends coreController
 
     /**
      * Displays a form to edit an existing Destination entity.
+     * @param int $serviceid
+     * @param int $destinationid
      */
-    public function editAction($serviceid, $id) {
+    public function editAction($serviceid, $destinationid) {
 
         $this->require_login('ROLE_ADMIN', 'destination/index/' . $serviceid);
 
-        $booking = $this->getLibrary('Booking');
-
-        if ($id) {
-            $destination = \ORM::forTable('destination')->findOne($id);
+        if ($destinationid) {
+            $destination = $this->adminlib->getDestination($destinationid);
         } else {
-            $destination = $booking->createDestination($serviceid);
+            $destination = $this->adminlib->createDestination($serviceid);
         }
 
         // Service
         if ($destination->serviceid != $serviceid) {
             throw $this->Exception('Service ID mismatch');
         }
-        $service = $booking->Service($serviceid);
-
-        if (!$destination) {
-            throw $this->Exception('Unable to find Destination entity.');
-        }
+        $service = $this->adminlib->getService($serviceid);
 
         // hopefully no errors
         $errors = null;
+
+        // Create form
+        $form = new \stdClass();
+        $form->crs = $this->form->text('crs', 'CRS', destination.crs);
+        $form->name = $this->form->text('name', 'Name', destination.name);
+        $form->description = $this->form->textarea('description', 'Description', $destination.description);
+
 
         // anything submitted?
         if ($data = $this->getRequest()) {
@@ -84,7 +98,7 @@ class DestinationController extends coreController
                 $destination->name = $data['name'];
                 $destination->description = $data['description'];
                 $destination->save();
-                $id = $destination->id();
+                $destinationid = $destination->id();
                 $this->redirect('destination/index/' . $serviceid);
                 return;
             } else {
@@ -92,7 +106,8 @@ class DestinationController extends coreController
             }
         }
 
-        $this->View('destination/edit.html.twig', array(
+        $this->View('destination/edit', array(
+            'form' => $form,
             'errors' => $errors,
             'destination' => $destination,
             'service' => $service,

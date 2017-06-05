@@ -72,7 +72,7 @@ class ServiceController extends coreController
         ));
 
         $this->View('service/index', array(
-            'services' => $services,
+            'services' => $this->adminlib->formatServices($services),
             'is_services' => !empty($services),
             'enablebooking' => $enablebooking,
             'form' => $form,
@@ -116,10 +116,6 @@ class ServiceController extends coreController
 
         $service = $this->adminlib->getService($id);
 
-        if (!$service) {
-            throw new \Exception('Unable to find Service entity.');
-        }
-
         // Get the other information stored for this service
         $destinations = $this->adminlib->getDestinations($id);
         $pricebandgroups = $this->adminlib->getPricebandgroups($id);
@@ -127,7 +123,7 @@ class ServiceController extends coreController
         $limits = $this->adminlib->getLimits($id);
 
         $this->View('service/show', array(
-            'service' => $service,
+            'service' => $this->adminlib->formatService($service),
             'destinations' => $destinations,
             'isdestinations' => !empty($destinations),
             'pricebandgroups' => $pricebandgroups,

@@ -1,0 +1,50 @@
+{{> header }}
+
+{{> adminmenu }}
+
+    <h3>Destination edit</h3>
+    <h4>{{ service.name }}</h4>
+
+    <div class="alert alert-info">
+        The description will be shown to the user to select their destination.
+        This can be a simple destination station or a destination station plus
+        an 'optional extra' (e.g. "Grange-over-Sands plus Windermere Cruise").
+        Please make sure you include all possible combinations as destinations.
+    </div>
+
+    {{> form_errors }}
+
+    <form id="destination-edit-form" class="form-horizontal" action="{{# path }}destination/edit{{/ path }}/{{ service.id }}/{{ destination.id }}"
+          method="post" >
+        {{{ form.crs }}}
+        {{{ form.name }}}
+        {{{ form.description }}}
+
+        <div>
+            <input type="submit" name="submit" value="Save" class="btn btn-primary" />
+            <input type="submit" name="cancel" value="Cancel" class="btn btn-warning" />
+        </div>
+    </form>
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+
+
+        $('#destination-edit-form').validate({
+            errorClass: "validateError",
+            rules: {
+                crs: {
+                    required: true
+                },
+                name: {
+                    required: true
+                },
+                description: {
+                    required: true
+                }
+            }
+        });
+    </script>
+
+{{> footer }}
