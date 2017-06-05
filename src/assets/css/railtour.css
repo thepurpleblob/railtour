@@ -83,3 +83,11 @@ label.error {
 .table-priceband {
     font-size: 80%;
 }
+
+/* report pages */
+
+tr.purchase_not_ok {
+    background-color: #f2dede;
+    border-color: #ebcccc;
+    color: #a94442;
+}

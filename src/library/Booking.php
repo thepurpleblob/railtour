@@ -5,8 +5,6 @@ namespace thepurpleblob\railtour\library;
 // Lifetime of incomplete purchases in seconds
 use Exception;
 
-define('PURCHASE_LIFETIME', 3600);
-
 /**
  * Class Booking
  * @package thepurpleblob\railtour\library
@@ -400,18 +398,6 @@ class Booking
         }
     }
 
-    /**
-     * Clear the current session data and delete any expired purchases
-     */
-    public function cleanPurchases() {
-
-        // TODO (fix) remove the key and the purchaseid
-        unset($_SESSION['key']);
-        unset($_SESSION['purchaseid']);
-
-        // get incomplete purchases
-        $this->deleteOldPurchases();
-    }
 
     /**
      * Duplicates a db record

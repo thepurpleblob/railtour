@@ -4,30 +4,41 @@ namespace thepurpleblob\railtour\controller;
 
 use thepurpleblob\core\coreController;
 
-class reportController extends coreController
-{
-    public function listAction($serviceid)
+class reportController extends coreController {
+
+    protected $adminlib;
+
+    /**
+     * Constructor
+     */
+    public function __construct($exception = false)
+    {
+        parent::__construct($exception);
+
+        // Library
+        $this->adminlib = $this->getLibrary('Admin');
+    }
+
+    /**
+     * List all purchases
+     * @param $serviceid
+     * @param string $sort
+     */
+    public function listAction($serviceid, $sort = '')
     {
         $this->require_login('ROLE_ORGANISER', 'service/show/' . $serviceid);
 
-        $booking = $this->getLibrary('Booking');
-        $service = $booking->Service($serviceid);
+        $service = $this->adminlib->getService($serviceid);;
 
         // Clear session and delete expired purchases
-        $booking->cleanPurchases();
+        $this->adminlib->cleanPurchases();
 
         // get the purchases for this service
-        $purchases = \ORM::forTable('purchase')
-            ->where(array(
-                'serviceid' => $serviceid,
-                'completed' => 1,
-            ))
-            ->order_by_asc('timestamp')
-            ->findMany();
+        $purchases = $this->adminlib->getPurchases($serviceid);
 
-        $this->View('report/list.html.twig', array(
+        $this->View('report/list', array(
             'service' => $service,
-            'purchases' => $purchases,
+            'purchases' => $this->adminlib->formatPurchases($purchases),
         ));
     }
 

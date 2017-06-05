@@ -3,6 +3,8 @@
 namespace thepurpleblob\railtour\library;
 
 // Lifetime of incomplete purchases in seconds
+define('PURCHASE_LIFETIME', 3600);
+
 use Exception;
 
 
@@ -309,6 +311,92 @@ class Admin {
         $limits = \ORM::forTable('limits')->where('serviceid', $serviceid)->findOne();
 
         return $limits;
+    }
+
+    /**
+     * Clear incomplete purchases that are time expired
+     */
+    public function deleteOldPurchases() {
+        $oldtime = time() - PURCHASE_LIFETIME;
+        \ORM::forTable('purchase')
+            ->where('completed', 0)
+            ->where_lt('timestamp', $oldtime)
+            ->delete_many();
+
+        // IF we've deleted the current purchase then we have
+        // an interesting problem!
+
+        // See if the current purchase still exists
+        if (isset($_SESSION['purchaseid'])) {
+            $purchaseid = $_SESSION['purchaseid'];
+            $purchase = \ORM::forTable('purchase')->findOne($purchaseid);
+            if (!$purchase) {
+                unset($_SESSION['key']);
+                unset($_SESSION['purchaseid']);
+
+                // Redirect out of here
+                $this->controller->View('booking/timeout.html.twig');
+            }
+        }
+    }
+
+    /**
+     * Clear the current session data and delete any expired purchases
+     */
+    public function cleanPurchases() {
+
+        // TODO (fix) remove the key and the purchaseid
+        unset($_SESSION['key']);
+        unset($_SESSION['purchaseid']);
+
+        // get incomplete purchases
+        $this->deleteOldPurchases();
+    }
+
+    /**
+     * Format purchase for UI
+     * @param object $purchase
+     * @return object
+     */
+    public function formatPurchase($purchase) {
+        $purchase->unixdate = strtotime($purchase->date);
+        $purchase->formatteddate = date('d/m/Y', $purchase->unixdate);
+        $purchase->statusok = $purchase->status == 'OK';
+
+        return $purchase;
+    }
+
+    /**
+     * Format list of purchases for UI
+     * @param array $purchases
+     * @return array
+     */
+    public function formatPurchases($purchases) {
+        foreach ($purchases as $purchase) {
+            $this->formatPurchase($purchase);
+        }
+
+        return $purchases;
+    }
+
+    /**
+     * Get purchases for service
+     * @param int service id
+     * @parm bool $complete, only complete purchases
+     * @return array
+     */
+    public function getPurchases($serviceid, $completed = true) {
+        $dbcompleted = $completed ? 1 : 0;
+
+        $purchases = \ORM::forTable('purchase')
+            ->where(array(
+                'serviceid' => $serviceid,
+                'completed' => $dbcompleted,
+            ))
+            ->order_by_asc('timestamp')
+            ->findMany();
+
+        return $purchases;
     }
 
 }
