@@ -74,9 +74,9 @@ class DestinationController extends coreController
 
         // Create form
         $form = new \stdClass();
-        $form->crs = $this->form->text('crs', 'CRS', destination.crs);
-        $form->name = $this->form->text('name', 'Name', destination.name);
-        $form->description = $this->form->textarea('description', 'Description', $destination.description);
+        $form->crs = $this->form->text('crs', 'CRS', $destination->crs);
+        $form->name = $this->form->text('name', 'Name', $destination->name);
+        $form->description = $this->form->textarea('description', 'Description', $destination->description);
 
 
         // anything submitted?

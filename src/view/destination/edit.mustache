@@ -2,8 +2,7 @@
 
 {{> adminmenu }}
 
-    <h3>Destination edit</h3>
-    <h4>{{ service.name }}</h4>
+    <h3 class="adminpage_title">Destination edit <i>"{{ service.name }}"</i></h3>
 
     <div class="alert alert-info">
         The description will be shown to the user to select their destination.
@@ -25,26 +24,5 @@
             <input type="submit" name="cancel" value="Cancel" class="btn btn-warning" />
         </div>
     </form>
-
-{% block javascripts %}
-    {{ parent() }}
-    <script type="text/javascript">
-
-
-        $('#destination-edit-form').validate({
-            errorClass: "validateError",
-            rules: {
-                crs: {
-                    required: true
-                },
-                name: {
-                    required: true
-                },
-                description: {
-                    required: true
-                }
-            }
-        });
-    </script>
 
 {{> footer }}

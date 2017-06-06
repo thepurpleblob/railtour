@@ -361,7 +361,16 @@ class Admin {
     public function formatPurchase($purchase) {
         $purchase->unixdate = strtotime($purchase->date);
         $purchase->formatteddate = date('d/m/Y', $purchase->unixdate);
-        $purchase->statusok = $purchase->status == 'OK';
+        $purchase->statusclass = '';
+        if (!$purchase->status) {
+            $purchase->statusclass = 'warning';
+        } else if ($purchase->status != 'OK') {
+            $purchase->statusclass = 'danger';
+        }
+        $purchase->formattedeticket = $purchase->eticket ? 'Yes' : 'No';
+        $purchase->formattedeinfo = $purchase->einfo ? 'Yes' : 'No';
+        $purchase->formattedseatsupplement = $purchase->setsupplement ? 'Yes' : 'No';
+        $purchase->formattedclass = $purchase->class == 'F' ? 'First' : 'Standard';
 
         return $purchase;
     }
@@ -397,6 +406,21 @@ class Admin {
             ->findMany();
 
         return $purchases;
+    }
+
+    /**
+     * Get single purchase
+     * @param int $purchaseid
+     * @return object
+     */
+    public function getPurchase($purchaseid) {
+        $purchase = \ORM::forTable('purchase')->findOne($purchaseid);
+
+        if (!$purchase) {
+            throw new \Exception('Purchase record not found, id=' . $purchaseid);
+        }
+
+        return $purchase;
     }
 
 }

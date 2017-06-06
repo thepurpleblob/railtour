@@ -46,20 +46,16 @@ class reportController extends coreController {
     {
         $this->require_login('ROLE_ORGANISER');
 
-        $booking = $this->getLibrary('Booking');
 
         // Get the purchase record
-        $purchase = \ORM::forTable('purchase')->findOne($purchaseid);
-        if (!$purchase) {
-            throw new \Exception('purchase item could not be found, id = ' . $purchaseid);
-        }
+        $purchase = $this->adminlib->getPurchase($purchaseid);
 
         // ...and the service record
-        $service = $booking->Service($purchase->serviceid);
+        $service = $this->adminlib->getService($purchase->serviceid);
 
-        $this->View('report/view.html.twig', array(
+        $this->View('report/view', array(
             'service' => $service,
-            'purchase' => $purchase,
+            'purchase' => $this->adminlib->formatPurchase($purchase),
         ));
     }
     
