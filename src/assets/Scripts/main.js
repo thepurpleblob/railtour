@@ -10,7 +10,7 @@ require.config({
     },
     shim: {
         'validate' :  ['jquery'],
-        'tinymce' : { exports: 'tinymce'}
+        'tinymce' : {exports: 'tinymce'}
     }
 });
 
