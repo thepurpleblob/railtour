@@ -126,25 +126,7 @@ class Booking
         return $joining;
     }
 
-    /**
-     * Do pricebands exist for service
-     */
-    public function isPricebandsConfigured($serviceid) {
 
-        // presumably we need at least one pricebandgroup
-        $pricebandgroup_count = \ORM::forTable('pricebandgroup')->where('serviceid', $serviceid)->count();
-        if (!$pricebandgroup_count) {
-            return false;
-        }
-
-        // ...and there must be some pricebands too
-        $priceband_count = \ORM::forTable('priceband')->where('serviceid', $serviceid)->count();
-        if (!$priceband_count) {
-            return false;
-        }
-
-        return true;
-    }
 
 
 

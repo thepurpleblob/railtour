@@ -35,13 +35,15 @@ require(["jquery", "validate", "tinymce"], function($, validate, tinymce) {
     $("#crsText").change(
         function() {
             crs = $(this).val();
+            console.log("Got the new CRS " + crs);
             name = $("#nameText").val();
+            console.log("Got the name " + name);
             //if (!name) {
             if (true) {
                 $.ajax({
 
                     // TODO: Need to find a way to feed this ajax path in!!!
-                    url: "{{ path('destination/ajax') }}",
+                    url: rtconfig.www + "/index.php/destination/ajax",
                     data: { 'crstyped': crs },
                     type: 'post',
                     success: function(output) {

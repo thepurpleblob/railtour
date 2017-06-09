@@ -288,6 +288,19 @@ class Admin {
     }
 
     /**
+     * Munge joinings
+     * @param array $joinings
+     * @return array
+     */
+    public function mungeJoinings($joinings) {
+        foreach ($joinings as $joining) {
+            $this->mungeJoining($joining);
+        }
+
+        return $joinings;
+    }
+
+    /**
      * Get joining stations
      * @param int $serviceid
      * @return array
@@ -421,6 +434,28 @@ class Admin {
         }
 
         return $purchase;
+    }
+
+    /**
+     * Do pricebands exist for service
+     * @param int $serviceid
+     * @return boolean
+     */
+    public function isPricebandsConfigured($serviceid) {
+
+        // presumably we need at least one pricebandgroup
+        $pricebandgroup_count = \ORM::forTable('pricebandgroup')->where('serviceid', $serviceid)->count();
+        if (!$pricebandgroup_count) {
+            return false;
+        }
+
+        // ...and there must be some pricebands too
+        $priceband_count = \ORM::forTable('priceband')->where('serviceid', $serviceid)->count();
+        if (!$priceband_count) {
+            return false;
+        }
+
+        return true;
     }
 
 }

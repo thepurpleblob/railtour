@@ -33,37 +33,3 @@
     </form>
 {% endblock content %}
 
-{% block javascripts %}
-    {{ parent() }}
-    <script type="text/javascript">
-        $("#crsText").change(
-            function() {
-                crs = $(this).val();
-                name = $("#stationText").val();
-                //if (!name) {
-                if (true) {
-                    $.ajax({
-                        url: "{{ path('destination/ajax') }}",
-                        data: { 'crstyped': crs },
-                        type: 'post',
-                        success: function(output) {
-                                $("#stationText").val(output);
-                            }
-                    });
-                }
-            }
-        );
-
-        $('#joining-edit-form').validate({
-            errorClass: "validateError",
-            rules: {
-                crs: {
-                    required: true
-                },
-                station: {
-                    required: true
-                }
-            }
-        });
-    </script>
-{% endblock javascripts %}

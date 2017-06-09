@@ -1,0 +1,50 @@
+{{> header }}
+
+{{> adminmenu }}
+
+    <h3 class="adminpage_title">Joining stations <i>"{{ service.name }}"</i></h3>
+
+    {{^ setup }}
+        <div class="alert alert-block alert-error">
+            There are no pricebands. You need to create at least one priceband (and
+            at least one destination) first.
+        </div>
+    {{/ setup }}
+    {{# setup }}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Station</th>
+                    <th>CRS</th>
+                    <th>Price band</th>
+                    <th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+            {{# joinings }}
+                    <tr>
+                        <td>{{ station }}</td>
+                        <td><span class="badge">{{ crs }}</span>
+                        <td>{{ pricebandname }}</td>
+                        <td>
+                            <a class="btn btn-sm btn-primary" href="{{# path }}joining/edit{{/ path }}/{{ serviceid }}/{{ id }}">
+                                Edit</a>
+                            <a class="btn btn-sm btn-danger" href="{{# path }}joining/delete{{/ path }}/{{ id }}">
+                                Delete</a>
+                        </td>
+                    </tr>
+            {{/ joinings }}
+            </tbody>
+        </table>
+
+        <div>
+            <a class="btn btn-primary" href="{{# path }}joining/edit{{/ path }}/{{ service.id }}/0">
+                New station
+            </a>&nbsp;
+            <a class="btn btn-warning" href="{{# path }}service/show{{/ path }}/{{ service.id }}">
+                Back
+            </a>
+        </div>
+    {{/ setup }}
+
+{{> footer }}

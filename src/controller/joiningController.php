@@ -8,37 +8,39 @@ use thepurpleblob\core\coreController;
  * Joining controller.
  *
  */
-class JoiningController extends coreController
-{
+class JoiningController extends coreController {
+
+    protected $adminlib;
+
+    /**
+     * Constructor
+     */
+    public function __construct($exception = false)
+    {
+        parent::__construct($exception);
+
+        // Library
+        $this->adminlib = $this->getLibrary('Admin');
+    }
+
     /**
      * Lists all Joining entities.
-     *
+     * @param int $serviceid
      */
     public function indexAction($serviceid)
     {
         $this->require_login('ROLE_ADMIN', 'joining/index/' . $serviceid);
 
-        $booking = $this->getLibrary('Booking');
-
         // Fetch basic data
-        $service = $booking->Service($serviceid);
-        $joinings = \ORM::forTable('joining')->where('serviceid', $serviceid)->findMany();
+        $service = $this->adminlib->getService($serviceid);
+        $joinings = $this->adminlib->getJoinings($serviceid);
 
-        // add pricebandgroup names
-        foreach ($joinings as $joining) {
-            $pricebandgroup = \ORM::forTable('pricebandgroup')->findOne($joining->pricebandgroupid);
-            if (!$pricebandgroup) {
-                throw new \Exception('No pricebandgroup found for id = ' . $joining->pricebandgroupid);
-            }
-            $joining->pricebandname = $pricebandgroup->name;
-        }
-
-        $this->View('joining/index.html.twig',
+        $this->View('joining/index',
             array(
-                'joinings' => $joinings,
+                'joinings' => $this->adminlib->mungeJoinings($joinings),
                 'service' => $service,
                 'serviceid' => $serviceid,
-                'setup' => $booking->isPricebandsConfigured($serviceid),
+                'setup' => $this->adminlib->isPricebandsConfigured($serviceid),
                 ));
     }
 
