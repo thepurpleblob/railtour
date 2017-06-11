@@ -1,0 +1,35 @@
+{{> header }}
+
+{{> adminmenu }}
+
+<h3 class="adminpage_title">Joining station edit <i>"{{ service.name }}"</i></h3>
+
+    {{> form_errors }}
+
+    <form id="joining-edit-form" class="form-horizontal" action="{{# path }}joining/edit{{/path}}/{{ serviceid }}/{{ joining.id }}"
+          method="post">
+        {{{ form.crs }}}
+        {{{ form.station }}}
+        {{{ form.pricebandgroupid }}}
+
+        {{# service.mealavisible }}
+            {{{ form.meala }}}
+        {{/ service.mealavisible }}
+        {{# service.mealbvisible }}
+            {{{ form.mealb }}}
+        {{/ service.mealbvisible }}
+        {{# service.mealcvisible }}
+            {{{ form.mealc }}}
+        {{/ service.mealcvisible }}
+        {{# service.mealdvisible }}
+            {{{ form.meald }}}
+        {{/ service.mealdvisible }}
+
+        <div>
+            <input type="submit" name="submit" value="Save" class="btn btn-primary" />
+            <input type="submit" name="cancel" value="Cancel" class="btn btn-warning" />
+        </div>
+    </form>
+
+{{> footer }}
+

@@ -126,7 +126,7 @@ class ServiceController extends coreController
             'service' => $this->adminlib->formatService($service),
             'destinations' => $destinations,
             'isdestinations' => !empty($destinations),
-            'pricebandgroups' => $pricebandgroups,
+            'pricebandgroups' => $this->adminlib->mungePricebandgroups($pricebandgroups),
             'ispricebandgroups' => !empty($pricebandgroups),
             'isjoinings' => !empty($joinings),
             'joinings' => $joinings,

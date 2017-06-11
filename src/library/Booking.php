@@ -90,43 +90,6 @@ class Booking
         return $pricebandgroup;
     }
 
-    /**
-     * Create options list for pricebandgroup select dropdown(s)
-     *
-     */
-    public function pricebandgroupOptions($pricebandgroups) {
-        $options = array();
-        foreach ($pricebandgroups as $pricebandgroup) {
-            $options[$pricebandgroup->id] = $pricebandgroup->name;
-        }
-
-        return $options;
-    }
-
-    /**
-     * Create new joining thing
-     * @param $serviceid int
-     * @param $pricebandgroups array
-     * @return object new (empty) joining object
-     */
-    public function createJoining($serviceid, $pricebandgroups) {
-        $joining = \ORM::forTable('joining')->create();
-        $joining->serviceid = $serviceid;
-        $joining->station = '';
-        $joining->crs = '';
-        $joining->meala = 0;
-        $joining->mealb = 0;
-        $joining->mealc = 0;
-        $joining->meald = 0;
-
-        // find and set to the first pricebandgoup
-        $pricebandgroup = array_shift($pricebandgroups);
-        $joining->pricebandgroupid = $pricebandgroup->id;
-
-        return $joining;
-    }
-
-
 
 
 

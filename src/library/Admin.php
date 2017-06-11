@@ -243,17 +243,24 @@ class Admin {
     }
 
     /**
+     * @param array $pricebandgroups
+     * @param return array
+     */
+    public function mungePricebandgroups($pricebandgroups) {
+        foreach ($pricebandgroups as $pricebandgroup) {
+            $this->mungePricebandgroup($pricebandgroup);
+        }
+
+        return $pricebandgroups;
+    }
+
+    /**
      * Get pricebandgroups
      * @param int $serviceid
      * @return array
      */
     public function getPricebandgroups($serviceid) {
         $pricebandgroups = \ORM::forTable('pricebandgroup')->where('serviceid', $serviceid)->findMany();
-
-        // Munge price bands
-        foreach ($pricebandgroups as $pricebandgroup) {
-            $this->mungePricebandgroup($pricebandgroup);
-        }
 
         return $pricebandgroups;
     }
@@ -273,6 +280,20 @@ class Admin {
         $this->mungePricebandgroup($pricebandgroup);
 
         return $pricebandgroup;
+    }
+
+    /**
+     * Create options list for pricebandgroup select dropdown(s)
+     * @param array $pricebandgroups
+     * @return associative array
+     */
+    public function pricebandgroupOptions($pricebandgroups) {
+        $options = array();
+        foreach ($pricebandgroups as $pricebandgroup) {
+            $options[$pricebandgroup->id] = $pricebandgroup->name;
+        }
+
+        return $options;
     }
 
     /**
@@ -313,6 +334,43 @@ class Admin {
         }
 
         return $joinings;
+    }
+
+    /**
+     * Get joining station
+     * $param int $joiningid
+     * @return object
+     */
+    public function getJoining($joiningid) {
+        $joining = \ORM::forTable('joining')->findOne($joiningid);
+        if (!$joining) {
+            throw new \Exception('Unable to find joining, id = ' . $joiningid);
+        }
+
+        return $joining;
+    }
+
+    /**
+     * Create new joining thing
+     * @param $serviceid int
+     * @param $pricebandgroups array
+     * @return object new (empty) joining object
+     */
+    public function createJoining($serviceid, $pricebandgroups) {
+        $joining = \ORM::forTable('joining')->create();
+        $joining->serviceid = $serviceid;
+        $joining->station = '';
+        $joining->crs = '';
+        $joining->meala = 0;
+        $joining->mealb = 0;
+        $joining->mealc = 0;
+        $joining->meald = 0;
+
+        // find and set to the first pricebandgoup
+        $pricebandgroup = array_shift($pricebandgroups);
+        $joining->pricebandgroupid = $pricebandgroup->id;
+
+        return $joining;
     }
 
     /**

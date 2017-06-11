@@ -51,28 +51,21 @@ class JoiningController extends coreController {
     {
         $this->require_login('ROLE_ADMIN', 'joining/index/' . $serviceid);
 
-        $booking = $this->getLibrary('Booking');
-
         // Fetch basic data
-        $service = $booking->Service($serviceid);
-
-        // Price bands
-        $pricebandgroups = \ORM::forTable('pricebandgroup')->where('serviceid', $serviceid)->findMany();
+        $service = $this->adminlib->getService($serviceid);
+        $pricebandgroups = $this->adminlib->getPricebandgroups($serviceid);
         if (!$pricebandgroups) {
             throw new \Exception('No pricebandgroups found for serviceid = ' . $serviceid);
         }
 
         // Find/create joining to edit
         if ($joiningid) {
-            $joining = \ORM::forTable('joining')->findOne($joiningid);
-            if (!$joining) {
-                throw new \Exception('Unable to find joining, id = ' . $joiningid);
-            }
+            $joining = $this->adminlib->getJoining($joiningid);
             if ($joining->serviceid != $serviceid) {
                 throw new \Exception('Service ID mismatch for joining id = ' . $joiningid . ', service id = ' . $serviceid);
             }
         } else {
-            $joining = $booking->createJoining($serviceid, $pricebandgroups);
+            $joining = $this->adminlib->createJoining($serviceid, $pricebandgroups);
         }
 
         // hopefully no errors
@@ -114,12 +107,23 @@ class JoiningController extends coreController {
             }
         }
 
-        $this->View('joining/edit.html.twig', array(
+        // Create form
+        $form = new \stdClass();
+        $form->crs = $this->form->text('crs', 'CRS', $joining->crs);
+        $form->station = $this->form->text('station', 'Station name', $joining->station);
+        $pricebandgroupoptions = $this->adminlib->pricebandgroupOptions($pricebandgroups);
+        $form->pricebandgroupid = $this->form->select('pricebandgroupid', 'Priceband', $joining->pricebandgroupid, $pricebandgroupoptions);
+        $form->meala = $this->form->yesno('meala', $service->mealaname . ' available from this station', $joining->meala);
+        $form->mealb = $this->form->yesno('mealb', $service->mealbname . ' available from this station', $joining->mealb);
+        $form->mealc = $this->form->yesno('mealc', $service->mealcname . ' available from this station', $joining->mealc);
+        $form->meald = $this->form->yesno('meald', $service->mealdname . ' available from this station', $joining->meald);
+
+        $this->View('joining/edit', array(
             'joining' => $joining,
             'service' => $service,
             'serviceid' => $serviceid,
             'errors' => $errors,
-            'pricebandgroupoptions' => $booking->pricebandgroupOptions($pricebandgroups),
+            'form' => $form,
         ));
     }
 

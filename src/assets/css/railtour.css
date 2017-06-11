@@ -67,6 +67,10 @@ label.error {
     margin-bottom: 20px;
 }
 
+span.badge-crs {
+    font-size: 1.2em;
+}
+
 /* login page */
 
 #loginbtn {
