@@ -8,38 +8,52 @@ use thepurpleblob\core\coreController;
  * Service controller.
  *
  */
-class PricebandController extends coreController
-{
-    
+class PricebandController extends coreController {
+
+    protected $adminlib;
+
+    /**
+     * Constructor
+     */
+    public function __construct($exception = false)
+    {
+        parent::__construct($exception);
+
+        // Library
+        $this->adminlib = $this->getLibrary('Admin');
+    }
+
     /**
      * Lists all Priceband entities.
+     * @param int $serviceid
      *
      */
     public function indexAction($serviceid)
     {
         $this->require_login('ROLE_ADMIN', 'priceband/index/' . $serviceid);
 
-        $booking = $this->getLibrary('Booking');
-        $service = $booking->Service($serviceid);
+        $service = $this->adminlib->getService($serviceid);
         
         // Get the Pricebandgroup
-        $pricebandgroups = \ORM::forTable('Pricebandgroup')->where('serviceid', $serviceid)->findMany();
+        $pricebandgroups = $this->adminlib->getPricebandgroups($serviceid);
         
         // Get destinations mostly to check that there are some
-        $destinations = \ORM::forTable('destination')->where('serviceid', $serviceid)->findMany();
+        $destinations = $this->adminlib->getDestinations($serviceid);
         
         // Get the band info to go with bands
         foreach ($pricebandgroups as $group) {
-            $group->bandtable = $booking->getPricebands($serviceid, $group->id);
-            $group->used = $booking->isPricebandUsed($group);
+            $group->bandtable = $this->adminlib->getPricebands($serviceid, $group->id);
+            $group->used = $this->adminlib->isPricebandUsed($group);
         }
 
-        $this->View('priceband/index.html.twig',
+        $this->View('priceband/index',
             array(
                 'pricebandgroups' => $pricebandgroups,
                 'destinations' => $destinations,
                 'service' => $service,
-                'serviceid' => $serviceid
+                'serviceid' => $serviceid,
+                'setup' => $this->adminlib->isPricebandsConfigured($serviceid),
+                'pricebandgroupsdefined' => !empty($pricebandgroups)
                 ));
     }
 

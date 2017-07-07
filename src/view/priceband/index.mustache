@@ -1,20 +1,21 @@
-{% extends 'admin/admin.html.twig' %}
+{{> header }}
 
-{% block content %}
-    <h2>Price bands</h2>
-    <h4>{{ service.name }}</h4>
+{{> adminmenu }}
 
-    {% if destinations is empty %}
+    <h3 class="adminpage_title">Price bands <i>"{{ service.name }}"</i></h3>
+
+    {{^ setup }}
         <div class="alert alert-block alert-error">
             There are no destinations. You need to create at least one destination first.
         </div>
-    {% else %}
+    {{/ setup }}
+    {{# setup }}
 
-        {% if pricebandgroups is empty %}
+        {{^ pricebandgroupsdefined  }}
             <div class="alert alert-block alert-warning">
                 No price bands have been defined.
             </div>
-        {% endif %}
+        {{/ pricebandgroupsdefined }}
 
         <table class="table table-striped">
             <thead>
@@ -25,18 +26,17 @@
             </thead>
             <tbody>
 
-            {% for pricebandgroup in pricebandgroups %}
+            {{# pricebandgroups }}
                     <tr>
-                        <td><b>{{ pricebandgroup.name }}</b></td>
+                        <td><b>{{ name }}</b></td>
                         <td>
-                            <a class="btn btn-warning btn-sm" href="{{ path('priceband/edit', {
-                                'serviceid': service.id,
-                                'id': pricebandgroup.id }) }}">Edit</a>
-                            {% if band.used == 0 %}
-                                <a class="btn btn-danger btn-sm" href="{{ path('priceband/delete', { 'pricebandgroupid': pricebandgroup.id }) }}">Delete</a>
-                            {% else %}
+                            <a class="btn btn-warning btn-sm" href="{{# path }}priceband/edit{{/ path }}/{{ service.id }}/{{ id }}">Edit</a>
+                            {{^ used }}
+                            <a class="btn btn-danger btn-sm" href="{{# path }}priceband/delete{{/ path }}{{ id }}">Delete</a>
+                            {{/ used }}
+                            {{# used }}
                                 <a class="btn btn-danger btn-sm disabled">Delete</a>
-                            {% endif %}
+                            {{/ used }}
                         </td>
                     </tr>
                     <tr>
@@ -51,26 +51,27 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                {% for priceband in pricebandgroup.bandtable %}
+                                {{# bandtable }}
                                     <tr>
-                                        <td>{{ priceband.name }}</td>
-                                        <td>&pound;{{ priceband.first }}</td>
-                                        <td>&pound;{{ priceband.standard }}</td>
-                                        <td>&pound;{{ priceband.child }}</td>
+                                        <td>{{ name }}</td>
+                                        <td>&pound;{{ first }}</td>
+                                        <td>&pound;{{ standard }}</td>
+                                        <td>&pound;{{ child }}</td>
                                     </tr>
-                                {% endfor %}
+                                {{/ bandtable }}
                                 </tbody>
                             </table>
                         </td>
                     </tr>
-            {% endfor %}
+            {{/ pricebandgroups }}
             </tbody>
         </table>
 
         <div>
-            <a class="btn btn-primary" href="{{ path('priceband/edit', [service.id, 0]) }}">Add a new price band</a>
+            <a class="btn btn-primary" href="{{# path }}priceband/edit{{/ path }}/{{ service.id }}/0">Add a new price band</a>
             &nbsp;
-            <a class="btn btn-warning" href="{{ path('service/show', service.id) }}">Close</a>
+            <a class="btn btn-warning" href="{{# path }}service/show{{/ path }}/{{ service.id }}">Close</a>
         </div>
-    {% endif %}
-{% endblock content %}
+    {{/ setup }}
+
+{{> footer }}

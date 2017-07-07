@@ -162,6 +162,24 @@ class Admin {
     }
 
     /**
+     * Is the priceband group assigned
+     * in any joining station
+     * @param object $pricebandgroup
+     */
+    public function isPricebandUsed($pricebandgroup) {
+
+        // find joining stations that specify this group
+        $joinings = \ORM::forTable('joining')->where('pricebandgroupid', $pricebandgroup->id)->findMany();
+
+        // if there are any then it is used
+        if ($joinings) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Get destinations
      * @param int $serviceid
      * @return array
@@ -295,6 +313,10 @@ class Admin {
 
         return $options;
     }
+
+    /**
+     * Get
+     */
 
     /**
      * Munge joining

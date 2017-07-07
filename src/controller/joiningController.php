@@ -40,7 +40,7 @@ class JoiningController extends coreController {
                 'joinings' => $this->adminlib->mungeJoinings($joinings),
                 'service' => $service,
                 'serviceid' => $serviceid,
-                'setup' => $this->adminlib->isPricebandsConfigured($serviceid),
+                'setup' => $this->adminlib->isPricebandsConfigured($serviceid) && !empty($joinings),
                 ));
     }
 
