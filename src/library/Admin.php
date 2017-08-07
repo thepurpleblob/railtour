@@ -9,11 +9,12 @@ use Exception;
 
 
 /**
- * Class Booking
+ * Class Admin
  * @package thepurpleblob\railtour\library
  * @return array list of services
  */
 class Admin {
+
 
     /**
      * munge service for formatting
@@ -296,6 +297,19 @@ class Admin {
         }
 
         $this->mungePricebandgroup($pricebandgroup);
+
+        return $pricebandgroup;
+    }
+
+    /**
+     * Create new pricebandgroup
+     * @param int $serviceid
+     * @return object pricebandgroup
+     */
+    public function createPricebandgroup($serviceid) {
+        $pricebandgroup = \ORM::forTable('pricebandgroup')->create();
+        $pricebandgroup->serviceid = $serviceid;
+        $pricebandgroup->name = '';
 
         return $pricebandgroup;
     }

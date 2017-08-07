@@ -81,15 +81,13 @@ class PricebandController extends coreController {
     {
         $this->require_login('ROLE_ADMIN', 'priceband/index/' . $serviceid);
 
-        $booking = $this->getLibrary('Booking');
-
         // Get pricebandgroup and pricebands (new ones if no $id)
         if ($pricebandgroupid) {
-            $pricebandgroup = \ORM::forTable('pricebandgroup')->findOne($pricebandgroupid);
-            $pricebands = $booking->getPricebands($serviceid, $pricebandgroupid);
+            $pricebandgroup = $this->adminlib->getPricebandgroup($pricebandgroupid);
+            $pricebands = $this->adminlib->getPricebands($serviceid, $pricebandgroupid);
         } else {
-            $pricebandgroup = $booking->createPricebandgroup($serviceid);
-            $pricebands = $booking->getPricebands($serviceid, $pricebandgroupid, false);
+            $pricebandgroup = $this->adminlib->createPricebandgroup($serviceid);
+            $pricebands = $this->adminlib->getPricebands($serviceid, $pricebandgroupid, false);
         }
         if (!$pricebandgroup) {
             throw new \Exception('Price band group not found for id ' . $pricebandgroupid);
@@ -99,7 +97,7 @@ class PricebandController extends coreController {
         if ($serviceid != $pricebandgroup->serviceid) {
             throw new \Exception('Service id mismatch');
         }
-        $service = $booking->Service($serviceid);
+        $service = $this->adminlib->getService($serviceid);
 
         // hopefully no errors
         $errors = null;
@@ -144,7 +142,24 @@ class PricebandController extends coreController {
             }
         }
 
-        $this->View('priceband/edit.html.twig', array(
+        // Create form
+        $form = new \stdClass();
+        $form->name = $this->form->text('name', 'Name', $pricebandgroup->name);
+        $count = 1;
+        $form->pricebands = array();
+        foreach ($pricebands as $priceband) {
+            $pbform = new \stdClass();
+            $pbform->name = $priceband->name;
+            $pbform->first = $this->form->text('first_' . $count, '', $priceband->first);
+            $pbform->standard = $this->form->text('standard_' . $count, '', $priceband->standard);
+            $pbform->child = $this->form->text('child_' . $count, '', $priceband->child);
+            $pbform->child = "Some shite";
+            $form->pricebands[$count] = $pbform;
+            $count++;
+        }
+
+        $this->View('priceband/edit', array(
+            'form' => $form,
             'pricebandgroup' => $pricebandgroup,
             'pricebands' => $pricebands,
             'service' => $service,

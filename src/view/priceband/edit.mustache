@@ -1,0 +1,43 @@
+{{> header }}
+
+{{> adminmenu }}
+
+    <h3 class="adminpage_title">Edit price bands <i>"{{ service.name }}"</i></h3>
+
+    {{> form_errors }}
+
+    <form id="priceband-edit-form" class="form-horizontal" action="{{# path }}priceband/edit{{/ path }}/{{ serviceid }}/{{ pricebandgroup.id}}" method="post">
+        
+        <div>
+            {{{ form.name }}}
+        </div>        
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Destination</th>
+                    <th>First</th>
+                    <th>Standard</th>
+                    <th>Child</th>
+                </tr>
+            </thead>
+            <tbody>
+            {{# form.pricebands }}
+                <tr>
+                    <td>{{ name }}</td>
+                    <td>{{{ first }}}</td>
+                    <td>{{{ standard }}}</td>
+                    <td>{{{ child }}}</td>
+                </tr>
+            {{/ form.pricebands }}
+            </tbody>
+        </table>
+
+        <div>
+            <input type="submit" name="submit" value="Save" class="btn btn-primary" />
+            <input type="submit" name="cancel" value="Cancel" formnovalidate="formnovalidate" class="btn btn-warning" />
+        </div>
+    </form>
+
+{{> footer }}
+ 

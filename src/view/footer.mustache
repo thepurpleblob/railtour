@@ -1,6 +1,11 @@
     </div>
 </div>
 <footer>
-
+    {{^ system.loggedin }}
+        <a href="{{# path }}user/login{{/path}}"> admin login</a>
+    {{/ system.loggedin }}
+    {{# system.loggedin }}
+        Logged in as {{ system.fullname }}. <a href="{{# path }}user/logout{{/path}}">logout</a>
+    {{/ system.loggedin }}
 </footer>
 </html>

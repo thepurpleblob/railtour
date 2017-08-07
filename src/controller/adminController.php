@@ -4,19 +4,30 @@ namespace thepurpleblob\railtour\controller;
 
 use thepurpleblob\core\coreController;
 
-class AdminController extends coreController
-{
+class AdminController extends coreController {
+
+    protected $bookinglib;
+
+    /**
+     * Constructor
+     */
+    public function __construct($exception = false) {
+        parent::__construct($exception);
+
+        // Library
+        $this->bookinglib = $this->getLibrary('Booking');
+    }
+
     // default (no route) page shows available services
     public function mainAction() {
 
-        $booking = $this->getLibrary('Booking');
-
         // Find available services
-        $services = $booking->availableServices();
+        $services = $this->bookinglib->availableServices();
 
         // Display the services
         $this->View('admin/main', array(
             'services' => $services,
+            'anyservices' => !empty($services),
         ));
     }
 }
