@@ -34,16 +34,15 @@ require(["jquery", "validate", "tinymce"], function($, validate, tinymce) {
     // CRS loader
     $("#crsText").change(
         function() {
-            crs = $(this).val();
+            var crs = $(this).val();
             console.log("Got the new CRS " + crs);
-            name = $("#nameText").val();
-            console.log("Got the name " + name);
+            var name = $("#nameText").val();
+            var path = $("#ajaxpathHidden").val();
+            console.log("Got the path " + path);
             //if (!name) {
             if (true) {
                 $.ajax({
-
-                    // TODO: Need to find a way to feed this ajax path in!!!
-                    url: rtconfig.www + "/index.php/destination/ajax",
+                    url: path,
                     data: { 'crstyped': crs },
                     type: 'post',
                     success: function(output) {

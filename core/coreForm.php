@@ -198,7 +198,8 @@ class coreForm {
     }
     
     public function hidden($name, $value) {
-        return '<input type="hidden" name="'.$name.'" value="'.$value.'" />';
+        $id = $name . 'Hidden';
+        return '<input type="hidden" name="'.$name.'" value="'.$value.'" id="' . $id . '"/>';
     }
     
     public function buttons($save='Save', $cancel='Cancel', $swap=false) {

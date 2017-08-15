@@ -74,6 +74,12 @@ span.badge-crs {
     font-size: 1.2em;
 }
 
+/* pricebands */
+
+.pricebandrow {
+    font-size: 110%;
+}
+
 /* login page */
 
 #loginbtn {

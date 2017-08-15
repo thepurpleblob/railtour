@@ -296,7 +296,7 @@ class Admin {
             throw new Exception('Unable to find Pricebandgroup record for id = ' . $pricebandgroupid);
         }
 
-        $this->mungePricebandgroup($pricebandgroup);
+        //$this->mungePricebandgroup($pricebandgroup);
 
         return $pricebandgroup;
     }

@@ -54,6 +54,7 @@ class DestinationController extends coreController
      * @param int $destinationid
      */
     public function editAction($serviceid, $destinationid) {
+        global $CFG;
 
         $this->require_login('ROLE_ADMIN', 'destination/index/' . $serviceid);
 
@@ -77,6 +78,7 @@ class DestinationController extends coreController
         $form->crs = $this->form->text('crs', 'CRS', $destination->crs);
         $form->name = $this->form->text('name', 'Name', $destination->name);
         $form->description = $this->form->textarea('description', 'Description', $destination->description);
+        $form->ajaxpath = $this->form->hidden('ajaxpath', $this->Url('destination/ajax'));
 
 
         // anything submitted?
@@ -98,7 +100,6 @@ class DestinationController extends coreController
                 $destination->name = $data['name'];
                 $destination->description = $data['description'];
                 $destination->save();
-                $destinationid = $destination->id();
                 $this->redirect('destination/index/' . $serviceid);
                 return;
             } else {
@@ -146,11 +147,14 @@ class DestinationController extends coreController
      */
     public function ajaxAction() {
 
+
        // Get post variable for CRS
        $crs = $_POST['crstyped'];
+        error_log('CRS TYPED - ' . $crs);
 
        // Attempt to find in db
        $station = \ORM::forTable('station')->where('crs', $crs)->findOne();
+       error_log('Name returned - ' . $station);
        if ($station) {
            echo $station->name;
        } else {

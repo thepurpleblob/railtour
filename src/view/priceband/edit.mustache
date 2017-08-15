@@ -23,11 +23,11 @@
             </thead>
             <tbody>
             {{# form.pricebands }}
-                <tr>
-                    <td>{{ name }}</td>
-                    <td>{{{ first }}}</td>
-                    <td>{{{ standard }}}</td>
-                    <td>{{{ child }}}</td>
+                <tr class="pricebandrow">
+                    <td><b>{{ name }}</b></td>
+                    <td><i class="fa fa-gbp" aria-hidden="true"></i>{{{ first }}}</td>
+                    <td><i class="fa fa-gbp" aria-hidden="true"></i>{{{ standard }}}</td>
+                    <td><i class="fa fa-gbp" aria-hidden="true"></i>{{{ child }}}</td>
                 </tr>
             {{/ form.pricebands }}
             </tbody>

@@ -150,13 +150,14 @@ class PricebandController extends coreController {
         foreach ($pricebands as $priceband) {
             $pbform = new \stdClass();
             $pbform->name = $priceband->name;
-            $pbform->first = $this->form->text('first_' . $count, '', $priceband->first);
-            $pbform->standard = $this->form->text('standard_' . $count, '', $priceband->standard);
-            $pbform->child = $this->form->text('child_' . $count, '', $priceband->child);
-            $pbform->child = "Some shite";
-            $form->pricebands[$count] = $pbform;
+            $pbform->first = '<input type="text" name="first_' . $count . '" value="' . $priceband->first . '">';
+            $pbform->standard = '<input type="text" name="standard_' . $count . '" value="' . $priceband->standard . '">';
+            $pbform->child = '<input type="text" name="child_' . $count . '" value="' . $priceband->child . '">';
+            $form->pricebands[] = $pbform;
             $count++;
         }
+
+        //echo "<pre>"; var_dump($formpricebands); die;
 
         $this->View('priceband/edit', array(
             'form' => $form,
