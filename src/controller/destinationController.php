@@ -21,6 +21,9 @@ class DestinationController extends coreController
 
         // Library
         $this->adminlib = $this->getLibrary('Admin');
+
+        // Initialise station CRS codes
+        $this->adminlib->initialiseStations();
     }
 
     /**
@@ -150,15 +153,15 @@ class DestinationController extends coreController
 
        // Get post variable for CRS
        $crs = $_POST['crstyped'];
-        error_log('CRS TYPED - ' . $crs);
+        //error_log('CRS TYPED - ' . $crs);
 
        // Attempt to find in db
-       $station = \ORM::forTable('station')->where('crs', $crs)->findOne();
-       error_log('Name returned - ' . $station);
-       if ($station) {
-           echo $station->name;
+       if ($location = $this->adminlib->getCRSLocation($crs)) {
+           $station = $location->name;
        } else {
-           echo '';
+           $station = '';
        }
+       //error_log('Name returned - ' . $station);
+       echo $station;
     }
 }

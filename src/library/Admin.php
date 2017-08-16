@@ -15,6 +15,38 @@ use Exception;
  */
 class Admin {
 
+    private $stations = null;
+
+
+    /**
+     * Set up the stations json data
+     * Need to call this first, if you want to use this data
+     */
+    public function initialiseStations() {
+        global $CFG;
+
+        $stationsjson = file_get_contents($CFG->dirroot . '/src/assets/json/stations.json');
+        $locations = json_decode($stationsjson);
+        $locations = $locations->locations;
+        $crs = array();
+        foreach ($locations as $location) {
+            $crs[$location->crs] = $location;
+        }
+        $this->stations = $crs;
+    }
+
+    /**
+     * Find station/location from crs
+     * @param string $crs
+     * @return location object
+     */
+    public function getCRSLocation($crs) {
+        if (isset($this->stations[$crs])) {
+            return $this->stations[$crs];
+        } else {
+            return null;
+        }
+    }
 
     /**
      * munge service for formatting
