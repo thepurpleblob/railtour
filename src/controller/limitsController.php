@@ -8,35 +8,55 @@ use thepurpleblob\core\coreController;
  * Limits controller.
  *
  */
-class LimitsController extends coreController
-{
+class LimitsController extends coreController {
+
+    protected $adminlib;
+
+    protected $bookinglib;
+
+    /**
+     * Constructor
+     */
+    public function __construct($exception = false)
+    {
+        parent::__construct($exception);
+
+        // Library
+        $this->adminlib = $this->getLibrary('Admin');
+        $this->bookinglib = $this->getLibrary('Booking');
+    }
 
     /**
      * Edits the existing Limits entity.
      */
     public function editAction($serviceid)
     {
-        $booking = $this->getLibrary('Booking');
-        $service = $booking->Service($serviceid);
+        $service = $this->adminlib->getService($serviceid);
+        $this->require_login('ROLE_ORGANISER', 'service/show/' . $serviceid);
 
-        $limits = $booking->getLimits($serviceid);
+        $limits = $this->adminlib->getLimits($serviceid);
 
         // Get destinations (for destination limits)
-        $destinations = \ORM::forTable('destination')->where('serviceid', $serviceid)->findMany();
+        $destinations = $this->adminlib->getDestinations($serviceid);
+
+        // Get the current counts of everything
+        $count = $this->bookinglib->countStuff($serviceid);
 
         // Create array of destinations limits
         $destinationlimits = array();
         $jsvalidatelist = array();
         $gump_rules = array();
         foreach ($destinations as $destination) {
+            $crs = $destination->crs;
+            $data = clone $count->destinations[$crs];
+            $data->crs = $crs;
             $fieldname = 'destination_' . $destination->crs;
-            $destinationlimits[$destination->crs] = $destination->bookinglimit;
+            $data->fieldname = $fieldname;
+            $data->bookinglimit = $destination->bookinglimit;
+            $destinationlimits[] = $data;
             $jsvalidatelist[] = "$fieldname: {required:true, number:true}";
             $gump_rules[$fieldname] = 'required|integer';
         }
-
-        // Get the current counts of everything
-        $count = $booking->countStuff($serviceid);
 
         // hopefully no errors
         $errors = null;
@@ -85,7 +105,7 @@ class LimitsController extends coreController
             }
         }
 
-        $this->View('limits/edit.html.twig', array(
+        $this->View('limits/edit', array(
             'limits' => $limits,
             'count' => $count,
             'service' => $service,

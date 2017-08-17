@@ -1,10 +1,10 @@
-{% extends 'admin/admin.html.twig' %}
+{{> header }}
 
-{% block content %}
-    <h3>Booking limits edit</h3>
-    <h4>{{ service.name }}</h4>
+{{> adminmenu }}
 
-    <form id="limits-edit-form" class="form-horizontal" action="{{ path('limits/edit', serviceid) }}" method="post">
+    <h3 class="adminpage_title">Booking limits edit <i>"{{ service.name }}"</i></h3>
+
+    <form id="limits-edit-form" class="form-horizontal" action="{{# path }}limits/edit{{/ path }}/{{ serviceid }}" method="post">
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -18,8 +18,8 @@
             <tbody>
                 <tr>
                     <td>First</td>
-                    <td>
-                        {{ form_text('first', '', limits.first) }}
+                    <td class="has-danger">
+                        <input type="number" class="form-control" name="first" value="{{ limits.first }}" required="true">
                     </td>
                     <td>{{ count.bookedfirst }}</td>
                     <td>{{ count.pendingfirst }}</td>
@@ -27,8 +27,8 @@
                 </tr>
                 <tr>
                     <td>Standard</td>
-                    <td>
-                        {{ form_text('standard', '', limits.standard) }}
+                    <td class="has-danger">
+                        <input type="number" class="form-control" name="standard" value="{{ limits.standard }}" required="true">
                     </td>
                     <td>{{ count.bookedstandard }}</td>
                     <td>{{ count.pendingstandard }}</td>
@@ -36,8 +36,8 @@
                 </tr>
                 <tr>
                     <td><b>Meal A</b> ({{ service.mealaname }})</td>
-                    <td>
-                        {{ form_text('meala', '', limits.meala) }}
+                    <td class="has-danger">
+                        <input type="number" class="form-control" name="meala" value="{{ limits.meala }}" required="true">
                     </td>
                     <td>{{ count.bookedmeala }}</td>
                     <td>{{ count.pendingmeala }}</td>
@@ -45,8 +45,8 @@
                 </tr>
                 <tr>
                     <td><b>Meal B</b> ({{ service.mealbname }})</td>
-                    <td>
-                        {{ form_text('mealb', '', limits.mealb) }}
+                    <td class="has-danger">
+                        <input type="number" class="form-control" name="mealb" value="{{ limits.mealb }}" required="true">
                     </td>
                     <td>{{ count.bookedmealb }}</td>
                     <td>{{ count.pendingmealb }}</td>
@@ -54,8 +54,8 @@
                 </tr>
                 <tr>
                     <td><b>Meal C</b> ({{ service.mealcname }})</td>
-                    <td>
-                        {{ form_text('mealc', '', limits.mealc) }}
+                    <td class="has-danger">
+                        <input type="number" class="form-control" name="mealc" value="{{ limits.mealc }}" required="true">
                     </td>
                     <td>{{ count.bookedmealc }}</td>
                     <td>{{ count.pendingmealc }}</td>
@@ -63,8 +63,8 @@
                 </tr>
                 <tr>
                     <td><b>Meal D</b> ({{ service.mealdname }})</td>
-                    <td>
-                        {{ form_text('meald', '', limits.meald) }}
+                    <td class="has-danger">
+                        <input type="number" class="form-control" name="meald" value="{{ limits.meald }}" required="true">
                     </td>
                     <td>{{ count.bookedmeald }}</td>
                     <td>{{ count.pendingmeald }}</td>
@@ -72,32 +72,34 @@
                 </tr>
                 <tr>
                     <td>First Singles/Window</td>
-                    <td>
+                    <td class="has-danger">
+                        <input type="number" class="form-control" name="firstsingles" value="{{ limits.firstsingles }}" required="true">
                         {{ form_text('firstsingles', '', limits.firstsingles) }}
                     </td>
                     <td>{{ count.bookedfirstsingles }}</td>
                     <td>{{ count.pendingfirstsingles }}</td>
                     <td>{{ count.remainingfirstsingles }}</td>
                 </tr>
-                {% for crs, destinationlimit in destinationlimits %}
-                    {% set destinationcount = attribute(count.destinations, crs) %}
+                {{# destinationlimits }}
                     <tr>
                         <td>
-                            <b>Destination</b> {{ destinationcount.name }}<br />
+                            <b>Destination</b> {{ name }}<br />
                             <small class="text-info">0 entry disables limit</small>
                         </td>
-                        <td>
+                        <td class="has-danger">
+                            <input type="number" class="form-control" name="{{ fieldname }}" value="{{ bookinglimit }}" required="true">
                             {{ form_text('destination_' ~ crs, '', destinationlimit) }}
                         </td>
-                        <td>{{ destinationcount.booked }}</td>
-                        <td>{{ destinationcount.pending }}</td>
-                        <td>{{ destinationcount.remaining }}</td>
+                        <td>{{ booked }}</td>
+                        <td>{{ pending }}</td>
+                        <td>{{ remaining }}</td>
                 </tr>
-                {% endfor %}
+                {{/ destinationlimits }}
+
                 <tr>
                     <td>Maximum party size</td>
-                    <td>
-                        {{ form_text('maxparty', '', limits.maxparty) }}
+                    <td class="has-danger">
+                        <input type="number" class="form-control" name="maxparty" value="{{ limits.maxparty }}" required="true">
                     </td>
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
@@ -105,8 +107,8 @@
                 </tr>
                 <tr>
                     <td>Maximum party size in first<br /><small class="text-info">Only applied if non-zero</small></td>
-                    <td>
-                        {{ form_text('maxpartyfirst', '', limits.maxpartyfirst) }}
+                    <td class="has-danger">
+                        <input type="number" class="form-control" name="maxpartyfirst" value="{{ limits.maxpartyfirst }}" required="true">
                     </td>
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
@@ -122,53 +124,5 @@
             <input type="submit" name="cancel" value="Cancel" class="btn btn-warning" />
         </div>
     </form>
-{% endblock content %}
 
-{% block javascripts %}
-    {{ parent() }}
-
-    <script>
-        $('#limits-edit-form').validate({
-            errorClass: "validateError",
-            rules: {
-                first: {
-                    required: true,
-                    number: true
-                },
-                standard: {
-                    required: true,
-                    number: true
-                },
-                meala: {
-                    required: true,
-                    number: true
-                },
-                mealb: {
-                    required: true,
-                    number: true
-                },
-                mealc: {
-                    required: true,
-                    number: true
-                },
-                meald: {
-                    required: true,
-                    number: true
-                },
-                firstsingles: {
-                    required: true,
-                    number: true
-                },
-                maxparty: {
-                    required: true,
-                    number: true
-                },
-                maxpartyfirst: {
-                    required: true,
-                    number: true
-                },
-                {{ jsvalidate }}
-            }
-        });
-    </script>
-{% endblock javascripts %}
+{{> footer }}
