@@ -144,7 +144,7 @@ class PricebandController extends coreController {
 
         // Create form
         $form = new \stdClass();
-        $form->name = $this->form->text('name', 'Name', $pricebandgroup->name);
+        $form->name = $this->form->text('name', 'Name', $pricebandgroup->name, true);
         $count = 1;
         $form->pricebands = array();
         foreach ($pricebands as $priceband) {
@@ -160,6 +160,7 @@ class PricebandController extends coreController {
         //echo "<pre>"; var_dump($formpricebands); die;
 
         $this->View('priceband/edit', array(
+            'new' => empty($pricebandgroupid),
             'form' => $form,
             'pricebandgroup' => $pricebandgroup,
             'pricebands' => $pricebands,
@@ -171,23 +172,15 @@ class PricebandController extends coreController {
     }
 
     /**
-     * Deletes a Service entity.
+     * Deletes a priceband group.
      *
      */
     public function deleteAction($pricebandgroupid)
     {
         $this->require_login('ROLE_ADMIN', 'priceband/index/' . $serviceid);
         
-        // Remove pricebands associated with this group
-        \ORM::forTable('priceband')->where('pricebandgroupid', $pricebandgroupid)->deleteMany();
-        
-        // Remove pricebandgroup
-        $pricebandgroup = \ORM::forTable('Pricebandgroup')->findOne($pricebandgroupid);
-        if (!$pricebandgroup) {
-            throw new \Exception('No price band group found for id = ' . $pricebandgroupid);
-        }
-        $serviceid = $pricebandgroup->serviceid;
-        $pricebandgroup->delete();
+        $serviceid = $this->adminlib->deletePricebandgroup($pricebandgroupid);
+
         $this->redirect('priceband/index/' . $serviceid);
     }
 }

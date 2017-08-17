@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @copyright 2017 Howard Miller - howardsmiller@gmail.com
+ */
+
 namespace thepurpleblob\railtour\controller;
 
 use thepurpleblob\core\coreController;
@@ -82,11 +86,11 @@ class JoiningController extends coreController {
             // Validate
             $this->gump->validation_rules(array(
                 'crs' => 'required',
-                'station' => 'required',
+                'name' => 'required',
             ));
             if ($data = $this->gump->run($data)) {
                 $joining->crs = $data['crs'];
-                $joining->station = $data['station'];
+                $joining->station = $data['name'];
                 $joining->pricebandgroupid = $data['pricebandgroupid'];
                 if (isset($data['meala'])) {
                     $joining->meala = $data['meala'];
@@ -109,16 +113,21 @@ class JoiningController extends coreController {
 
         // Create form
         $form = new \stdClass();
-        $form->crs = $this->form->text('crs', 'CRS', $joining->crs);
-        $form->station = $this->form->text('station', 'Station name', $joining->station);
+
+        // name='name' so CRS lookup works.
+        $form->crs = $this->form->text('crs', 'CRS', $joining->crs, true);
+        $form->station = $this->form->text('name', 'Station name', $joining->station, true);
         $pricebandgroupoptions = $this->adminlib->pricebandgroupOptions($pricebandgroups);
         $form->pricebandgroupid = $this->form->select('pricebandgroupid', 'Priceband', $joining->pricebandgroupid, $pricebandgroupoptions);
         $form->meala = $this->form->yesno('meala', $service->mealaname . ' available from this station', $joining->meala);
         $form->mealb = $this->form->yesno('mealb', $service->mealbname . ' available from this station', $joining->mealb);
         $form->mealc = $this->form->yesno('mealc', $service->mealcname . ' available from this station', $joining->mealc);
         $form->meald = $this->form->yesno('meald', $service->mealdname . ' available from this station', $joining->meald);
+        $form->ajaxpath = $this->form->hidden('ajaxpath', $this->Url('destination/ajax'));
 
         $this->View('joining/edit', array(
+            'new' => empty($joiningid),
+            'joiningid' => $joiningid,
             'joining' => $joining,
             'service' => $service,
             'serviceid' => $serviceid,
@@ -133,15 +142,7 @@ class JoiningController extends coreController {
      */
     public function deleteAction($joiningid)
     {
-        $this->require_login('ROLE_ADMIN', 'joining/index/' . $serviceid);
-
-        $joining = \ORM::forTable('joining')->findOne($joiningid);
-        if (!$joining) {
-            throw new \Exception('Unable to find joining, id = ' . $joiningid);
-        }
-
-        $serviceid = $joining->serviceid;
-        $joining->delete();
+        $serviceid = $this->adminlib->deleteJoining($joiningid);
 
         $this->redirect('joining/index/' . $serviceid);
     }

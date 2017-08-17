@@ -2,7 +2,12 @@
 
 {{> adminmenu }}
 
-    <h3 class="adminpage_title">Destination edit <i>"{{ service.name }}"</i></h3>
+    {{# new }}
+        <h3 class="adminpage_title">Add new destination <i>"{{ service.name }}"</i></h3>
+    {{/ new }}
+    {{^ new }}
+        <h3 class="adminpage_title">Destination edit <i>"{{ service.name }}"</i></h3>
+    {{/ new }}
 
     <div class="alert alert-info">
         The description will be shown to the user to select their destination.

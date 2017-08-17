@@ -254,6 +254,27 @@ class Admin {
     }
 
     /**
+     * Delete a destination
+     * Note, this will also delete associated priceband data
+     * @param int $destinationid
+     * @return $serviceid
+     */
+    public function deleteDestination($destinationid) {
+        $destination = $this->getDestination($destinationid);
+        $serviceid = $destination->serviceid;
+        if (!$this->isDestinationUsed($destination)) {
+
+            // delete pricebands associated with this
+            \ORM::for_table('Priceband')->where('destinationid', $destinationid)->delete_many();
+
+            // delete the destination
+            $destination->delete();
+        }
+
+        return $serviceid;
+    }
+
+    /**
      * Is destination used?
      * Checks if destination can be deleted
      * @param object $destination
@@ -344,6 +365,26 @@ class Admin {
         $pricebandgroup->name = '';
 
         return $pricebandgroup;
+    }
+
+
+    /**
+     * Delete priceband group
+     * @param int pricebandgroupid
+     * @return int serviceid
+     */
+    public function deletePricebandgroup($pricebandgroupid) {
+        $pricebandgroup = $this->getPricebandgroup($pricebandgroupid);
+        $serviceid = $pricebandgroup->serviceid;
+        if (!$this->isPricebandUsed($pricebandgroup)) {
+
+            // Remove pricebands associated with this group
+            \ORM::forTable('priceband')->where('pricebandgroupid', $pricebandgroupid)->deleteMany();
+
+            $pricebandgroup->delete();
+        }
+
+        return $serviceid;
     }
 
     /**
@@ -439,6 +480,19 @@ class Admin {
         $joining->pricebandgroupid = $pricebandgroup->id;
 
         return $joining;
+    }
+
+    /**
+     * Delete joining station
+     * @param int $joiningid
+     * @return serviceid
+     */
+    public function deleteJoining($joiningid) {
+        $joining = $this->getJoining($joiningid);
+        $serviceid = $joining->serviceid;
+        $joining->delete();
+
+        return $serviceid;
     }
 
     /**

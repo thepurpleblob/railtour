@@ -2,11 +2,16 @@
 
 {{> adminmenu }}
 
-<h3 class="adminpage_title">Joining station edit <i>"{{ service.name }}"</i></h3>
+    {{^ new }}
+        <h3 class="adminpage_title">Edit joining station <i>"{{ service.name }}"</i></h3>
+    {{/ new }}
+    {{# new }}
+        <h3 class="adminpage_title">Add new joining station <i>"{{ service.name }}"</i></h3>
+    {{/ new }}
 
-    {{> form_errors }}
+{{> form_errors }}
 
-    <form id="joining-edit-form" class="form-horizontal" action="{{# path }}joining/edit{{/path}}/{{ serviceid }}/{{ joining.id }}"
+    <form id="joining-edit-form" class="form-horizontal" action="{{# path }}joining/edit{{/path}}/{{ serviceid }}/{{ joiningid }}"
           method="post">
         {{{ form.crs }}}
         {{{ form.station }}}
@@ -24,6 +29,8 @@
         {{# service.mealdvisible }}
             {{{ form.meald }}}
         {{/ service.mealdvisible }}
+
+        {{{ form.ajaxpath }}}
 
         <div>
             <input type="submit" name="submit" value="Save" class="btn btn-primary" />

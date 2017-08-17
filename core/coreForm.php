@@ -44,12 +44,13 @@ class coreForm {
      */
     public function text($name, $label, $value, $required=false, $attrs=null, $type='text') {
         $id = $name . 'Text';
-        $reqstr = $required ? 'required' : '';
+        $reqstr = $required ? 'required="true"' : '';
+        $validationclass = $required ? 'has-danger' : '';
         $html = '<div class="form-group">';
         if ($label) {
             $html .= '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
         }
-        $html .= '    <div class="col-sm-8">';
+        $html .= '    <div class="col-sm-8 ' . $validationclass . '">';
         $html .= '    <input type="' . $type . '" class="form-control input-sm" name="'.$name.'" id="'.$id.'" value="'.$value.'" '.
             $this->attributes($attrs) . ' ' . $reqstr . '/>';
 
@@ -93,7 +94,7 @@ class coreForm {
      */
     public function textarea($name, $label, $value, $required=false, $attrs=null) {
         $id = $name . 'Textarea';
-        $reqstr = $required ? 'required' : '';
+        $reqstr = $required ? 'required="true"' : '';
         $html = '<div class="form-group">';
         if ($label) {
             $html .= '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';

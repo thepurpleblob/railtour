@@ -2,7 +2,12 @@
 
 {{> adminmenu }}
 
-    <h3 class="adminpage_title">Edit price bands <i>"{{ service.name }}"</i></h3>
+    {{# new }}
+        <h3 class="adminpage_title">Create new price band <i>"{{ service.name }}"</i></h3>
+    {{/ new }}
+    {{^ new }}
+        <h3 class="adminpage_title">Edit price band <i>"{{ service.name }}"</i></h3>
+    {{/ new }}
 
     {{> form_errors }}
 

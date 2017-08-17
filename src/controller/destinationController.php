@@ -78,8 +78,8 @@ class DestinationController extends coreController
 
         // Create form
         $form = new \stdClass();
-        $form->crs = $this->form->text('crs', 'CRS', $destination->crs);
-        $form->name = $this->form->text('name', 'Name', $destination->name);
+        $form->crs = $this->form->text('crs', 'CRS', $destination->crs, true);
+        $form->name = $this->form->text('name', 'Name', $destination->name, true);
         $form->description = $this->form->textarea('description', 'Description', $destination->description);
         $form->ajaxpath = $this->form->hidden('ajaxpath', $this->Url('destination/ajax'));
 
@@ -111,6 +111,7 @@ class DestinationController extends coreController
         }
 
         $this->View('destination/edit', array(
+            'new' => empty($destinationid),
             'form' => $form,
             'errors' => $errors,
             'destination' => $destination,
@@ -120,29 +121,15 @@ class DestinationController extends coreController
     }
 
     /**
-     * Deletes a Service entity.
-     *
+     * Deletes a destination.
+     * @param int $destinationid
      */
-    public function deleteAction($id)
-    {
+    public function deleteAction($destinationid) {
         $this->require_login('ROLE_ADMIN', 'destination/index/' . $serviceid);
 
-        $booking = $this->getLibrary('Booking');
+        $serviceid = $this->adminlib->deleteDestination($destinationid);
 
-        // delete pricebands associated with this
-        \ORM::for_table('Priceband')->where('destinationid', $id)->delete_many();
-
-        // delete destination
-        $destination = \ORM::forTable('destination')->find_one($id);
-        if ($destination) {
-            $serviceid = $destination->serviceid;
-            $destination->delete();
-            $this->redirect('destination/index/' . $serviceid);
-            return;
-        } else {
-            throw new \Exception('Destination record not found for id = ' . $id);
-        }
-
+        $this->redirect('destination/index/' . $serviceid);
     }
 
     /**
