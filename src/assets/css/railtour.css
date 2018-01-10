@@ -1,9 +1,7 @@
 /* main page */
 
 body {
-    font-family: Ubuntu, Helvetica, SansSerif;
     background-color: #fff;
-    font-size: 0.9em;
 }
 
 #banner {
@@ -19,10 +17,6 @@ body {
     color: #fff;
     margin-top: 12px;
     margin-left: 20px;
-}
-
-#content {
-    background-color: #fff;
 }
 
 footer {
@@ -45,14 +39,6 @@ label.error {
 }
 
 /* admin menu */
-
-#adminmenu ul {
-    list-style: none;
-}
-
-#adminmenu li {
-    padding-right: 15px;
-}
 
 .fa-circle::before {
     text-shadow: 2px 2px 2px #888;

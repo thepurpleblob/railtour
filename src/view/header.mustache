@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -7,28 +7,22 @@
     <meta name="description" content="{{ config.titleheader }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    {{! Set global params object. These are global (sorry) but RO so not so bad }}
-    <script>
-        var rtconfig = {
-            www: "{{ config.www }}"
-        };
-    </script>
+    <!-- <script data-main="{{ config.www }}/src/assets/Scripts/main" src="{{ config.www }}/src/assets/Scripts/require.js"></script> -->
 
-
-    <script data-main="{{ config.www }}/src/assets/Scripts/main" src="{{ config.www }}/src/assets/Scripts/require.js"></script>
-
-    <link rel="stylesheet" type="text/css" href="{{ config.www }}/src/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{{ config.www }}/src/assets/css/ubuntu.css">
     <link rel="stylesheet" type="text/css" href="{{ config.www }}/src/assets/css/railtour.css">
-    <link rel="stylesheet" type="text/css" href="{{ config.www }}/src/assets/font-awesome/css/font-awesome.min.css">
     <link rel="icon" type="image/x-icon" href="{{ config.www }}/favicon.ico" />
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
+    <script src="https://use.fontawesome.com/278e8584b9.js"></script>
 
 </head>
 <body>
-<div id="banner">
+<div class="container-fluid" id="banner">
     <h1><i class="fa fa-ticket" aria-hidden="true"></i> SRPS Railtours <i class="fa-small fa fa-circle" aria-hidden="true" style="font-size:0.7em;"></i> Online Booking</h1>
 </div>
+
 <div class="container">
-
-
-    <div id="content">
