@@ -1,7 +1,13 @@
 /* main page */
 
 body {
+    background-color: #aaa;
+}
+
+#maincontent {
     background-color: #fff;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 #banner {
@@ -40,6 +46,10 @@ label.error {
 
 /* admin menu */
 
+#adminmenu {
+    margin-bottom: 20px;
+}
+
 .fa-circle::before {
     text-shadow: 2px 2px 2px #888;
 }
@@ -47,6 +57,7 @@ label.error {
 .admintext {
     display: block;
     text-align: center;
+    hyphens: auto;
 }
 
 /* admin pages */

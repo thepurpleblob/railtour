@@ -2,6 +2,8 @@
 
 namespace thepurpleblob\core;
 
+use GUMP;
+
 class coreController {
 
     protected $gump;
@@ -23,18 +25,18 @@ class coreController {
     private function extendGump() {
 
         // valid time
-        \GUMP::add_validator("time", function($field, $input, $param=null) {
+        GUMP::add_validator("time", function($field, $input, $param=null) {
             return strtotime($input[$field]) !== false;
         });
 
         // valid role
-        \GUMP::add_validator('role', function($field, $input, $param=null) {
+        GUMP::add_validator('role', function($field, $input, $param=null) {
             $role = $input[$field];
             return ($role=='admin') || ($role=='organiser');
         });
 
         // valid password
-        \GUMP::add_validator('password', function($field, $input, $param=null) {
+        GUMP::add_validator('password', function($field, $input, $param=null) {
             $password = $input['password'];
             $username = $input['username'];
             $user = \ORM::for_table('user')->where(array(
@@ -61,7 +63,7 @@ class coreController {
         if (!$exception) {
             $this->form = new coreForm();
             $this->extendGump();
-            $this->gump = new \GUMP();
+            $this->gump = new GUMP();
             if (isset($_SESSION['back'])) {
                 $this->back = $_SESSION['back'];
             } else {
@@ -109,7 +111,7 @@ class coreController {
      * @param array $params array of params to pass to method
      */
     public function requirejs($name, $method, $params = null) {
-        $module = new stdClass;
+        $module = new stdClass();
         $module->name = $name;
         $module->method = $method;
         $module->params = $params;

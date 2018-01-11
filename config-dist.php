@@ -16,7 +16,8 @@ $CFG->projectname = 'railtour';
 $CFG->titleheader = 'SRPS Railtours Booking';
 
 // Routes (default if none specified)
-$CFG->defaultroute = '/admin/index';
+// NO leading slash please
+$CFG->defaultroute = 'admin/main';
 $CFG->logoutpath = 'service/index';
 
 // paths

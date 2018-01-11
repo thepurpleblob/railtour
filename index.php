@@ -34,10 +34,10 @@ if ($info) {
 // get controller and action
 $controller_name = $paths[1];
 if (!$controller_name) {
-    throw new Exception("No controller specified");
+    throw new Exception("No controller specified for '$controller_name'");
 }
 if (!$action_name = $paths[2]) {
-    throw new Exception("No action specified for controller '$controller'");
+    throw new Exception("No action specified for controller '$controller_name'");
 }
 
 // try to load controller
