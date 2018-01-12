@@ -15,6 +15,9 @@ $( function() {
         selector: 'textarea'
     });
 
+    // Tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+
     // CRS loader
     $("#crsText").change(
         function () {
