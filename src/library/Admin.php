@@ -102,6 +102,23 @@ class Admin {
     }
 
     /**
+     * Get default year
+     * @return int year
+     */
+    public function getFilteryear() {
+        $allservices = $this->getServices();
+        $maxyear = 0;
+        foreach ($allservices as $service) {
+            $year = substr($service->date, 0, 4);
+            if ($year > $maxyear) {
+                $maxyear = $year;
+            }
+        }
+
+        return $maxyear;
+    }
+
+    /**
      * Create new Service
      * @return object
      */

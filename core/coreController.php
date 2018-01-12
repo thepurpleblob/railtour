@@ -247,6 +247,7 @@ class coreController {
     		return $_SESSION[$name];
     	} else {
     		if ($default) {
+    		    $_SESSION[$name] = $default;
     			return $default;
     		} else
     			throw new \Exception("Session data for '$name' was not found");

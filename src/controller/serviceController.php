@@ -35,12 +35,12 @@ class ServiceController extends coreController
         $allservices = $this->adminlib->getServices();
 
         // submitted year
-        $thisyear = date('Y');
+        $maxyear = $this->adminlib->getFilteryear();
         $filteryear = $this->getParam('filter_year', 0);
         if ($filteryear) {
             $this->setSession('filteryear', $filteryear);
         } else {
-            $filteryear = $this->getFromSession('filteryear', $thisyear);
+            $filteryear = $this->getFromSession('filteryear', $maxyear);
         }
         
         // get possible years and filter results
