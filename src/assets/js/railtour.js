@@ -10,9 +10,9 @@ $( function() {
     // Initialise form validation
     $('.validate-form').validate();
 
-    // TinyMCE
-    tinymce.init({
-        selector: 'textarea'
+    // Summernote
+    $('textarea').summernote({
+        minHeight: 250
     });
 
     // Tooltips
