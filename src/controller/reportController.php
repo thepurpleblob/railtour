@@ -42,10 +42,9 @@ class reportController extends coreController {
         ));
     }
 
-    public function viewAction($purchaseid)
-    {
-        $this->require_login('ROLE_ORGANISER');
+    public function viewAction($purchaseid) {
 
+        $this->require_login('ROLE_ORGANISER');
 
         // Get the purchase record
         $purchase = $this->adminlib->getPurchase($purchaseid);
@@ -64,21 +63,13 @@ class reportController extends coreController {
      */
     public function exportAction($serviceid) {
 
-        $reports = $this->getLibrary('Reports');
-        $booking = $this->getLibrary('Booking');
+        $this->require_login('ROLE_ORGANISER');
         
         // Get the service object
-        $service = $booking->Service($serviceid);
+        $service = $this->adminlib->getService($serviceid);
         
         // Get the purchases
-        $purchases = \ORM::forTable('purchase')
-            ->where(array(
-                'serviceid' => $serviceid,
-                'completed' => 1,
-                'status' => 'OK',
-            ))
-            ->order_by_asc('timestamp')
-            ->findMany();
+        $purchases = $this->adminlib->getPurchases($serviceid, true);
         
         // if there are none, then nothing to do
         if (!$purchases) {
@@ -92,7 +83,7 @@ class reportController extends coreController {
         header('Content-Type: application/octet-stream');
         header("Content-Transfer-Encoding: Binary");
         header("Content-disposition: attachment; filename=\"$filename\"");
-        echo $reports->getExport($purchases);
+        echo $this->adminlib->getExport($purchases);
         die;
     }
 }

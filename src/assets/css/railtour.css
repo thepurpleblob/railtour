@@ -1,7 +1,7 @@
 /* main page */
 
 body {
-    background-color: #aaa;
+    background-color: #eee;
 }
 
 #maincontent {
@@ -28,8 +28,8 @@ body {
 footer {
     margin-top: 20px;
     padding: 5px;
-    background-color: #e1e1e1;
-    min-height: 50px;
+    background-color: #f1f1f1;
+    min-height: 100%;
 }
 
 /* errors */
