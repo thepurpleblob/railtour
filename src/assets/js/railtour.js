@@ -8,7 +8,9 @@ $( function() {
     );
 
     // Initialise form validation
-    $('.validate-form').validate();
+    $('.validate-form').validate({
+        errorClass: 'badge badge-danger'
+    });
 
     // Summernote
     $('textarea').summernote({

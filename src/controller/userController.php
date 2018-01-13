@@ -51,6 +51,11 @@ class UserController extends coreController
 
         // initial username is empty
         $username = '';
+        $rememberme = false;
+        if (isset($_COOKIE['railtouruser'])) {
+            $username = $_COOKIE['railtouruser'];
+            $rememberme = true;
+        }
 
         // anything submitted?
         if ($data = $this->getRequest()) {
@@ -64,12 +69,18 @@ class UserController extends coreController
             if ($data = $this->gump->run($data)) {
                 $username = $data['username'];
                 $password = $data['password'];
+                $rememberme = isset($data['rememberme']);
 
                 // Validate user
                 $user = $this->userlib->validate($username, $password);
 
                 if ($user) {
                     $_SESSION['user'] = $user;
+                    if ($rememberme) {
+                        setcookie('railtouruser', $username, time()+ 365 * 24 * 3600);
+                    } else {
+                        setcookie('railtouruser', '', time() - 3600);
+                    }
                     if (!empty($_SESSION['wantsurl'])) {
                         $redirect = $_SESSION['wantsurl'];
                     } else {
@@ -87,6 +98,7 @@ class UserController extends coreController
             'haserrors' => !empty($errors),
             'errors' => $errors,
             'last_username' => $username,
+            'rememberme' => $rememberme ? 'checked' : '',
         ));
     }
 
@@ -179,7 +191,11 @@ class UserController extends coreController
             'errors' => $errors,
         ));        
     }
-    
+
+    /**
+     * @param $username
+     * @throws \Exception
+     */
     public function deleteAction($username) {
 
         $this->require_login('ROLE_ADMIN', 'user/index');

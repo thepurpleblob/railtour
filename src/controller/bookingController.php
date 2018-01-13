@@ -41,7 +41,7 @@ class BookingController extends coreController
                 'service' => $service
             ));
         } else {
-             $this->View('booking/closed.html.twig', array(
+             $this->View('booking/closed', array(
                 'code' => $code,
                 'service' => $service
             ));
@@ -81,7 +81,7 @@ class BookingController extends coreController
 
         // Bail out if this service is unavailable
         if (!$booking->canProceedWithBooking($service, $count)) {
-            $this->View('booking/closed.html.twig', array(
+            $this->View('booking/closed.mustache', array(
                 'code' => $code,
                 'service' => $service
             ));

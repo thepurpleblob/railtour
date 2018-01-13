@@ -39,26 +39,6 @@ class Booking
     }
 
     /**
-     * Get the service given the service 'code'
-     * @param string $code - booking code
-     * @return mixed
-     * @throws Exception
-     */
-    public function serviceFromCode($code) {
-        $services = \ORM::forTable('service')->where('code', $code)->findMany();
-
-        if (!$services) {
-            throw new Exception('Unable to find Service record for code = ' . $code);
-        }
-
-        if (count($services) > 1) {
-            throw new Exception('More than one service defined with code = ' . $code);
-        }
-
-        return reset($services);
-    }
-
-    /**
      * Get services available to book
      */
     public function availableServices() {
@@ -144,21 +124,7 @@ class Booking
         return $limits;
     }
 
-    /**
-     * Get the maximum party size in theory.
-     * We have to use this before we know the first/standard choice
-     * (even though they can, effectively, have different limits)
-     * @param $limits limits object
-     * @return int
-     */
-    public function getMaxparty($limits) {
-        $maxparty = $limits->maxparty;
-        if ($limits->maxpartyfirst and ($limits->maxpartyfirst > $maxparty)) {
-            $maxparty = $limits->maxpartyfirst;
-        }
 
-        return $maxparty;
-    }
 
     /**
      * Basic checks to ensure booking can procede

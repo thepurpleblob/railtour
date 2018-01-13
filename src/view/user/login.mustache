@@ -6,37 +6,26 @@
 
             {{> formerrors }}
 
-            <form id="loginform" action="{{ action }}" method="post">
+            <form id="loginform" class="validate_form" action="{{ action }}" method="post">
                 <div class="form-group">
                     <label for="username">Username</label>
-                    <input type="text" class="form-control form-control-lg" id="username" name="username" value="{{ last_username }}" />
+                    <input type="text" class="form-control form-control-lg" id="username" name="username" value="{{ last_username }}" required="true" />
                 </div>
 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" class="form-control form-control-lg" id="password" name="password" />
+                    <input type="password" class="form-control form-control-lg" id="password" name="password" required="true"/>
+                </div>
+
+                <div class="form-group">
+                    <input type="checkbox" class="form-check-input form-control-lg" name="rememberme" id="rememberme" {{ rememberme }}>
+                    <label class="form-check-label" for="rememberme">Remember me</label>
                 </div>
 
                 <button type="submit" id="loginbtn" class="btn btn-primary">Login</button>
             </form>
         </div>
     </div>
-
-
-    <script>
-        $("#loginform").validate({
-            rules: {
-                username: {
-                    required: true
-                },
-                password: {
-                    required: true
-                }
-            },
-            errorClass: "validateerror",
-        }
-        )
-    </script>
 
 
 {{> footer }}

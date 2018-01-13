@@ -1,12 +1,14 @@
 
 </div>
 <footer>
-    {{^ system.loggedin }}
-        <a href="{{# path }}user/login{{/path}}"> admin login</a>
-    {{/ system.loggedin }}
-    {{# system.loggedin }}
-        Logged in as {{ system.fullname }}. <a href="{{# path }}user/logout{{/path}}">logout</a>
-    {{/ system.loggedin }}
+    {{# showlogin }}
+        {{^ system.loggedin }}
+            <a href="{{# path }}user/login{{/path}}"> admin login</a>
+        {{/ system.loggedin }}
+        {{# system.loggedin }}
+            Logged in as {{ system.fullname }}. <a href="{{# path }}user/logout{{/path}}">logout</a>
+        {{/ system.loggedin }}
+    {{/ showlogin }}
 </footer>
 
 <script src="{{ config.www }}/src/assets/js/railtour.js"></script>

@@ -6,6 +6,7 @@ use GUMP;
 
 class coreController {
 
+    /** @var GUMP  */
     protected $gump;
 
     protected $form;
@@ -158,6 +159,7 @@ class coreController {
         }
         $variables['system'] = $system;
         $variables['config'] = $CFG;
+        $variables['showlogin'] = $viewname != 'user/login';
 
         // Get template
         $template = $mustache->loadTemplate($viewname . '.mustache');
