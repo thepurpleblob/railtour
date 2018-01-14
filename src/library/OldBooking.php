@@ -288,149 +288,16 @@ class Booking
                 unset($_SESSION['purchaseid']);
 
                 // Redirect out of here
-                $this->controller->View('booking/timeout.html.twig');
+                $this->controller->View('booking/timeout.mustache');
             }
         }
     }
 
 
-    /**
-     * Duplicates a db record
-     */
-    private function duplicateRecord($from, $to) {
-        $fields = $from->as_array();
-        unset($fields['id']);
-        foreach ($fields as $name => $value) {
-            $to->$name = $value;
-        }
 
-        return $to;
-    }
 
-    /**
-     * duplicate a complete service and return new service
-     */
-    public function duplicate($service) {
 
-        $serviceid = $service->id;
 
-        // duplicate service
-        $newservice = \ORM::forTable('service')->create();
-        $this->duplicateRecord($service, $newservice);
-        $newservice->code = "CHANGE";
-        $newservice->date = date("Y-m-d");
-        $newservice->visible = 0;
-        $newservice->save();
-        $newserviceid = $newservice->id();
-
-        // duplicate destinations
-        // create a map of old to new ids
-        $destmap = array();
-        $destinations = \ORM::forTable('destination')->where('serviceid', $serviceid)->findMany();
-        if ($destinations) {
-            foreach ($destinations as $destination) {
-                $newdestination = \ORM::forTable('destination')->create();
-                $this->duplicateRecord($destination, $newdestination);
-                $newdestination->serviceid = $newserviceid;
-                $newdestination->save();
-                $destmap[$destination->id] = $newdestination->id();
-            }
-        }
-
-        // duplicate pricebandgroup
-        // create a map of old to new ids
-        $pbmap = array();
-        $pricebandgroups = \ORM::forTable('pricebandgroup')->where('serviceid', $serviceid)->findMany();
-        if ($pricebandgroups) {
-            foreach ($pricebandgroups as $pricebandgroup) {
-                $newpricebandgroup = \ORM::forTable('pricebandgroup')->create();
-                $newpricebandgroup->serviceid = $newserviceid;
-                $newpricebandgroup->name = $pricebandgroup->name;
-                $newpricebandgroup->save();
-                $pbmap[$pricebandgroup->id] = $newpricebandgroup->id();
-            }
-        }
-
-        // duplicate joining
-        $joinings = \ORM::forTable('joining')->where('serviceid', $serviceid)->findMany();
-        if ($joinings) {
-            foreach ($joinings as $joining) {
-                $newjoining = \ORM::forTable('joining')->create();
-                $this->duplicateRecord($joining, $newjoining);
-                $newjoining->serviceid = $newserviceid;
-                if (empty($pbmap[$joining->pricebandgroupid])) {
-                    throw new Exception('No pricebandgroup mapping exists for id = ' . $joining->pricebandgroupid);
-                }
-                $newjoining->pricebandgroupid = $pbmap[$joining->pricebandgroupid];
-                $newjoining->save();
-            }
-        }
-
-        // duplicate pricebands
-        $pricebands = \ORM::forTable('priceband')->where('serviceid', $serviceid)->findMany();
-        if ($pricebands) {
-            foreach ($pricebands as $priceband) {
-                if (empty($pbmap[$priceband->pricebandgroupid])) {
-                    throw new Exception('No pricebandgroup mapping exists for id = ' . $priceband->pricebandgroupid);
-                }
-                $newpriceband = \ORM::forTable('priceband')->create();
-                $this->duplicateRecord($priceband, $newpriceband);
-                $newpriceband->serviceid = $newserviceid;
-                if (empty($destmap[$priceband->destinationid])) {
-                    throw new Exception('No destination mapping exists for id = ' . $priceband->destinationid);
-                }
-                $newpriceband->destinationid = $destmap[$priceband->destinationid];
-                if (empty($pbmap[$priceband->pricebandgroupid])) {
-                    throw new Exception('No pricebandgroup mapping exists for id = ' . $priceband->pricebandgroupid);
-                }
-                $newpriceband->pricebandgroupid = $pbmap[$priceband->pricebandgroupid];
-                $newpriceband->save();
-            }
-        }
-
-        // duplicate limits
-        $limits = \ORM::forTable('limits')->where('serviceid', $serviceid)->findOne();
-        if ($limits) {
-            $newlimits = \ORM::forTable('limits')->create();
-            $this->duplicateRecord($limits, $newlimits);
-            $newlimits->serviceid = $newserviceid;
-            $newlimits->save();
-        }
-
-        return $newservice;
-    }
-
-    /**
-     * Delete complete service
-     */
-    public function deleteService($service) {
-
-        // Check there are no purchases. We should not have got here if there
-        // are, but we'll check anyway
-        if (\ORM::forTable('purchase')->where('serviceid', $service->id)->count()) {
-            throw new Exception('Trying to delete service with purchases. id = ' . $service->id);
-        }
-
-        $serviceid = $service->id;
-
-        // Delete limits
-        \ORM::forTable('limits')->where('serviceid', $serviceid)->delete_many();
-
-        // Delete pricebands
-        \ORM::forTable('priceband')->where('serviceid', $serviceid)->delete_many();
-
-        // Delete joining stations
-        \ORM::forTable('joining')->where('serviceid', $serviceid)->delete_many();
-
-        // Delete pricebandgroups
-        \ORM::forTable('pricebandgroup')->where('serviceid', $serviceid)->delete_many();
-
-        // Delete destinations
-        \ORM::forTable('destination')->where('serviceid', $serviceid)->delete_many();
-
-        // Finally, delete the service
-        $service->delete();
-    }
 
     /**
      * Get the purchase record from database, or create a new one
@@ -541,7 +408,7 @@ class Booking
         // if no code or serviceid was supplied then we are not allowed a new one
         // ...so display expired message
         if (!$serviceid) {
-            $this->controller->View('booking/timeout.html.twig');
+            $this->controller->View('booking/timeout.mustache');
         }
 
         // Get the service

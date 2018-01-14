@@ -20,6 +20,13 @@ $( function() {
     // Tooltips
     $('[data-toggle="tooltip"]').tooltip();
 
+    // Datepicker (Gijgo.com)
+    $('.datepicker').datepicker({
+        format: 'dd/mm/yyyy',
+        uiLibrary: 'bootstrap4',
+        iconsLibrary: 'fontawesome'
+    });
+
     // CRS loader
     $("#crsText").change(
         function () {

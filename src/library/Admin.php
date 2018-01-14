@@ -6,6 +6,7 @@ namespace thepurpleblob\railtour\library;
 define('PURCHASE_LIFETIME', 3600);
 
 use Exception;
+use ORM;
 
 
 /**
@@ -17,6 +18,7 @@ class Admin {
 
     private $stations = null;
 
+    public $controller;
 
     /**
      * Set up the stations json data
@@ -38,7 +40,7 @@ class Admin {
     /**
      * Find station/location from crs
      * @param string $crs
-     * @return location object
+     * @return object
      */
     public function getCRSLocation($crs) {
         if (isset($this->stations[$crs])) {
@@ -96,7 +98,7 @@ class Admin {
      * @return array
      */
     public function getServices() {
-        $allservices = \ORM::forTable('service')->order_by_asc('date')->findMany();
+        $allservices = ORM::forTable('service')->order_by_asc('date')->findMany();
 
         return $allservices;
     }
@@ -123,7 +125,7 @@ class Admin {
      * @return object
      */
     public function createService() {
-        $service = \ORM::for_table('service')->create();
+        $service = ORM::for_table('service')->create();
         $service->code = '';
         $service->name = '';
         $service->description = '';
@@ -154,9 +156,10 @@ class Admin {
      * Get a single service
      * @param int serviceid (0 = new one)
      * @return object
+     * @throws Exception
      */
     public function getService($id = 0) {
-        $service = \ORM::forTable('service')->findOne($id);
+        $service = ORM::forTable('service')->findOne($id);
 
         if ($service === 0) {
             $service = $this->createService();
@@ -176,20 +179,21 @@ class Admin {
      * @param int $pricebandgroupid
      * @param boolean $save
      * @return array
+     * @throws Exception
      */
     public function getPricebands($serviceid, $pricebandgroupid, $save=true) {
-        $destinations = \ORM::forTable('destination')->where('serviceid', $serviceid)->order_by_asc('destination.name')->findMany();
+        $destinations = ORM::forTable('destination')->where('serviceid', $serviceid)->order_by_asc('destination.name')->findMany();
         if (!$destinations) {
             throw new Exception('No destinations found for serviceid = ' . $serviceid);
         }
         $pricebands = array();
         foreach ($destinations as $destination) {
-            $priceband = \ORM::forTable('priceband')->where(array(
+            $priceband = ORM::forTable('priceband')->where(array(
                 'pricebandgroupid' => $pricebandgroupid,
                 'destinationid' => $destination->id,
             ))->findOne();
             if (!$priceband) {
-                $priceband = \ORM::forTable('priceband')->create();
+                $priceband = ORM::forTable('priceband')->create();
                 $priceband->serviceid = $serviceid;
                 $priceband->pricebandgroupid = $pricebandgroupid;
                 $priceband->destinationid = $destination->id;
@@ -215,11 +219,12 @@ class Admin {
      * Is the priceband group assigned
      * in any joining station
      * @param object $pricebandgroup
+     * @return bool
      */
     public function isPricebandUsed($pricebandgroup) {
 
         // find joining stations that specify this group
-        $joinings = \ORM::forTable('joining')->where('pricebandgroupid', $pricebandgroup->id)->findMany();
+        $joinings = ORM::forTable('joining')->where('pricebandgroupid', $pricebandgroup->id)->findMany();
 
         // if there are any then it is used
         if ($joinings) {
@@ -235,7 +240,7 @@ class Admin {
      * @return array
      */
     public function getDestinations($serviceid) {
-        $destinations = \ORM::forTable('destination')->where('serviceid', $serviceid)->findMany();
+        $destinations = ORM::forTable('destination')->where('serviceid', $serviceid)->findMany();
 
         return $destinations;
     }
@@ -244,9 +249,10 @@ class Admin {
      * Get single destination
      * @param int $destinationid
      * @return object
+     * @throws Exception
      */
     public function getDestination($destinationid) {
-        $destination = \ORM::forTable('destination')->findOne($destinationid);
+        $destination = ORM::forTable('destination')->findOne($destinationid);
         if (!$destination) {
             throw new Exception('Destination was not found id=' . $destinationid);
         }
@@ -260,7 +266,7 @@ class Admin {
      * @return object
      */
     public function createDestination($serviceid) {
-        $destination = \ORM::forTable('destination')->create();
+        $destination = ORM::forTable('destination')->create();
         $destination->serviceid = $serviceid;
         $destination->name = '';
         $destination->crs = '';
@@ -274,7 +280,8 @@ class Admin {
      * Delete a destination
      * Note, this will also delete associated priceband data
      * @param int $destinationid
-     * @return $serviceid
+     * @return int
+     * @throws Exception
      */
     public function deleteDestination($destinationid) {
         $destination = $this->getDestination($destinationid);
@@ -282,7 +289,7 @@ class Admin {
         if (!$this->isDestinationUsed($destination)) {
 
             // delete pricebands associated with this
-            \ORM::for_table('Priceband')->where('destinationid', $destinationid)->delete_many();
+            ORM::for_table('Priceband')->where('destinationid', $destinationid)->delete_many();
 
             // delete the destination
             $destination->delete();
@@ -300,7 +307,7 @@ class Admin {
     public function isDestinationUsed($destination) {
 
         // find pricebands that specify this destination
-        $pricebands = \ORM::forTable('priceband')->where('destinationid', $destination->id)->findMany();
+        $pricebands = ORM::forTable('priceband')->where('destinationid', $destination->id)->findMany();
 
         // if there are non then not used
         if (!$pricebands) {
@@ -321,6 +328,7 @@ class Admin {
      * munge priceband group
      * @param object $pricebandgroup
      * @return object
+     * @throws Exception
      */
     private function mungePricebandgroup($pricebandgroup) {
         $pricebandgroupid = $pricebandgroup->id;
@@ -333,7 +341,8 @@ class Admin {
 
     /**
      * @param array $pricebandgroups
-     * @param return array
+     * @return array
+     * @throws Exception
      */
     public function mungePricebandgroups($pricebandgroups) {
         foreach ($pricebandgroups as $pricebandgroup) {
@@ -349,7 +358,7 @@ class Admin {
      * @return array
      */
     public function getPricebandgroups($serviceid) {
-        $pricebandgroups = \ORM::forTable('pricebandgroup')->where('serviceid', $serviceid)->findMany();
+        $pricebandgroups = ORM::forTable('pricebandgroup')->where('serviceid', $serviceid)->findMany();
 
         return $pricebandgroups;
     }
@@ -358,9 +367,10 @@ class Admin {
      * Get priceband group
      * @param int $pricebandgroupid
      * @return object
+     * @throws Exception
      */
     public function getPricebandgroup($pricebandgroupid) {
-        $pricebandgroup = \ORM::forTable('pricebandgroup')->findOne($pricebandgroupid);
+        $pricebandgroup = ORM::forTable('pricebandgroup')->findOne($pricebandgroupid);
 
         if (!$pricebandgroup) {
             throw new Exception('Unable to find Pricebandgroup record for id = ' . $pricebandgroupid);
@@ -377,7 +387,7 @@ class Admin {
      * @return object pricebandgroup
      */
     public function createPricebandgroup($serviceid) {
-        $pricebandgroup = \ORM::forTable('pricebandgroup')->create();
+        $pricebandgroup = ORM::forTable('pricebandgroup')->create();
         $pricebandgroup->serviceid = $serviceid;
         $pricebandgroup->name = '';
 
@@ -389,6 +399,7 @@ class Admin {
      * Delete priceband group
      * @param int pricebandgroupid
      * @return int serviceid
+     * @throws Exception
      */
     public function deletePricebandgroup($pricebandgroupid) {
         $pricebandgroup = $this->getPricebandgroup($pricebandgroupid);
@@ -396,7 +407,7 @@ class Admin {
         if (!$this->isPricebandUsed($pricebandgroup)) {
 
             // Remove pricebands associated with this group
-            \ORM::forTable('priceband')->where('pricebandgroupid', $pricebandgroupid)->deleteMany();
+            ORM::forTable('priceband')->where('pricebandgroupid', $pricebandgroupid)->deleteMany();
 
             $pricebandgroup->delete();
         }
@@ -407,7 +418,7 @@ class Admin {
     /**
      * Create options list for pricebandgroup select dropdown(s)
      * @param array $pricebandgroups
-     * @return associative array
+     * @return array
      */
     public function pricebandgroupOptions($pricebandgroups) {
         $options = array();
@@ -419,13 +430,10 @@ class Admin {
     }
 
     /**
-     * Get
-     */
-
-    /**
      * Munge joining
      * @param object $joining
      * @return object
+     * @throws Exception
      */
     private function mungeJoining($joining) {
         $pricebandgroup = $this->getPricebandgroup($joining->pricebandgroupid);
@@ -438,6 +446,7 @@ class Admin {
      * Munge joinings
      * @param array $joinings
      * @return array
+     * @throws Exception
      */
     public function mungeJoinings($joinings) {
         foreach ($joinings as $joining) {
@@ -451,9 +460,10 @@ class Admin {
      * Get joining stations
      * @param int $serviceid
      * @return array
+     * @throws Exception
      */
     public function getJoinings($serviceid) {
-        $joinings = \ORM::forTable('joining')->where('serviceid', $serviceid)->findMany();
+        $joinings = ORM::forTable('joining')->where('serviceid', $serviceid)->findMany();
 
         foreach ($joinings as $joining) {
             $this->mungeJoining($joining);
@@ -464,11 +474,12 @@ class Admin {
 
     /**
      * Get joining station
-     * $param int $joiningid
+     * @param int $joiningid
      * @return object
+     * @throws Exception
      */
     public function getJoining($joiningid) {
-        $joining = \ORM::forTable('joining')->findOne($joiningid);
+        $joining = ORM::forTable('joining')->findOne($joiningid);
         if (!$joining) {
             throw new \Exception('Unable to find joining, id = ' . $joiningid);
         }
@@ -483,7 +494,7 @@ class Admin {
      * @return object new (empty) joining object
      */
     public function createJoining($serviceid, $pricebandgroups) {
-        $joining = \ORM::forTable('joining')->create();
+        $joining = ORM::forTable('joining')->create();
         $joining->serviceid = $serviceid;
         $joining->station = '';
         $joining->crs = '';
@@ -502,7 +513,8 @@ class Admin {
     /**
      * Delete joining station
      * @param int $joiningid
-     * @return serviceid
+     * @return int
+     * @throws Exception
      */
     public function deleteJoining($joiningid) {
         $joining = $this->getJoining($joiningid);
@@ -518,7 +530,7 @@ class Admin {
      * @return array
      */
     public function getLimits($serviceid) {
-        $limits = \ORM::forTable('limits')->where('serviceid', $serviceid)->findOne();
+        $limits = ORM::forTable('limits')->where('serviceid', $serviceid)->findOne();
 
         return $limits;
     }
@@ -528,7 +540,7 @@ class Admin {
      */
     public function deleteOldPurchases() {
         $oldtime = time() - PURCHASE_LIFETIME;
-        \ORM::forTable('purchase')
+        ORM::forTable('purchase')
             ->where('completed', 0)
             ->where_lt('timestamp', $oldtime)
             ->delete_many();
@@ -539,13 +551,13 @@ class Admin {
         // See if the current purchase still exists
         if (isset($_SESSION['purchaseid'])) {
             $purchaseid = $_SESSION['purchaseid'];
-            $purchase = \ORM::forTable('purchase')->findOne($purchaseid);
+            $purchase = ORM::forTable('purchase')->findOne($purchaseid);
             if (!$purchase) {
                 unset($_SESSION['key']);
                 unset($_SESSION['purchaseid']);
 
                 // Redirect out of here
-                $this->controller->View('booking/timeout.html.twig');
+                $this->controller->View('booking/timeout');
             }
         }
     }
@@ -600,14 +612,14 @@ class Admin {
 
     /**
      * Get purchases for service
-     * @param int service id
-     * @parm bool $complete, only complete purchases
+     * @param int serviceid
+     * @param bool $completed
      * @return array
      */
     public function getPurchases($serviceid, $completed = true) {
         $dbcompleted = $completed ? 1 : 0;
 
-        $purchases = \ORM::forTable('purchase')
+        $purchases = ORM::forTable('purchase')
             ->where(array(
                 'serviceid' => $serviceid,
                 'completed' => $dbcompleted,
@@ -622,9 +634,10 @@ class Admin {
      * Get single purchase
      * @param int $purchaseid
      * @return object
+     * @throws Exception
      */
     public function getPurchase($purchaseid) {
-        $purchase = \ORM::forTable('purchase')->findOne($purchaseid);
+        $purchase = ORM::forTable('purchase')->findOne($purchaseid);
 
         if (!$purchase) {
             throw new \Exception('Purchase record not found, id=' . $purchaseid);
@@ -641,13 +654,13 @@ class Admin {
     public function isPricebandsConfigured($serviceid) {
 
         // presumably we need at least one pricebandgroup
-        $pricebandgroup_count = \ORM::forTable('pricebandgroup')->where('serviceid', $serviceid)->count();
+        $pricebandgroup_count = ORM::forTable('pricebandgroup')->where('serviceid', $serviceid)->count();
         if (!$pricebandgroup_count) {
             return false;
         }
 
         // ...and there must be some pricebands too
-        $priceband_count = \ORM::forTable('priceband')->where('serviceid', $serviceid)->count();
+        $priceband_count = ORM::forTable('priceband')->where('serviceid', $serviceid)->count();
         if (!$priceband_count) {
             return false;
         }
@@ -787,6 +800,161 @@ class Admin {
 
         // combine lines
         return implode("\n", $lines);
+    }
+
+    /**
+     * Duplicates a db record (used by service duplicate)
+     * @param object $from
+     * @param object $to
+     * @return mixed
+     */
+    private function duplicateRecord($from, $to) {
+        $fields = $from->as_array();
+        unset($fields['id']);
+        foreach ($fields as $name => $value) {
+            $to->$name = $value;
+        }
+
+        return $to;
+    }
+
+    /**
+     * Duplicate a complete service and return new service
+     * @param object $service
+     * @return object
+     * @throws Exception
+     */
+    public function duplicate($service) {
+
+        $serviceid = $service->id;
+
+        // duplicate service
+        $newservice = ORM::forTable('service')->create();
+        $this->duplicateRecord($service, $newservice);
+        $newservice->code = "CHANGE";
+        $newservice->date = date("Y-m-d");
+        $newservice->visible = 0;
+        $newservice->save();
+        $newserviceid = $newservice->id();
+
+        // duplicate destinations
+        // create a map of old to new ids
+        $destmap = array();
+        $destinations = ORM::forTable('destination')->where('serviceid', $serviceid)->findMany();
+        if ($destinations) {
+            foreach ($destinations as $destination) {
+                $newdestination = ORM::forTable('destination')->create();
+                $this->duplicateRecord($destination, $newdestination);
+                $newdestination->serviceid = $newserviceid;
+                $newdestination->save();
+                $destmap[$destination->id] = $newdestination->id();
+            }
+        }
+
+        // duplicate pricebandgroup
+        // create a map of old to new ids
+        $pbmap = array();
+        $pricebandgroups = ORM::forTable('pricebandgroup')->where('serviceid', $serviceid)->findMany();
+        if ($pricebandgroups) {
+            foreach ($pricebandgroups as $pricebandgroup) {
+                $newpricebandgroup = ORM::forTable('pricebandgroup')->create();
+                $newpricebandgroup->serviceid = $newserviceid;
+                $newpricebandgroup->name = $pricebandgroup->name;
+                $newpricebandgroup->save();
+                $pbmap[$pricebandgroup->id] = $newpricebandgroup->id();
+            }
+        }
+
+        // duplicate joining
+        $joinings = ORM::forTable('joining')->where('serviceid', $serviceid)->findMany();
+        if ($joinings) {
+            foreach ($joinings as $joining) {
+                $newjoining = ORM::forTable('joining')->create();
+                $this->duplicateRecord($joining, $newjoining);
+                $newjoining->serviceid = $newserviceid;
+                if (empty($pbmap[$joining->pricebandgroupid])) {
+                    throw new Exception('No pricebandgroup mapping exists for id = ' . $joining->pricebandgroupid);
+                }
+                $newjoining->pricebandgroupid = $pbmap[$joining->pricebandgroupid];
+                $newjoining->save();
+            }
+        }
+
+        // duplicate pricebands
+        $pricebands = ORM::forTable('priceband')->where('serviceid', $serviceid)->findMany();
+        if ($pricebands) {
+            foreach ($pricebands as $priceband) {
+                if (empty($pbmap[$priceband->pricebandgroupid])) {
+                    throw new Exception('No pricebandgroup mapping exists for id = ' . $priceband->pricebandgroupid);
+                }
+                $newpriceband = ORM::forTable('priceband')->create();
+                $this->duplicateRecord($priceband, $newpriceband);
+                $newpriceband->serviceid = $newserviceid;
+                if (empty($destmap[$priceband->destinationid])) {
+                    throw new Exception('No destination mapping exists for id = ' . $priceband->destinationid);
+                }
+                $newpriceband->destinationid = $destmap[$priceband->destinationid];
+                if (empty($pbmap[$priceband->pricebandgroupid])) {
+                    throw new Exception('No pricebandgroup mapping exists for id = ' . $priceband->pricebandgroupid);
+                }
+                $newpriceband->pricebandgroupid = $pbmap[$priceband->pricebandgroupid];
+                $newpriceband->save();
+            }
+        }
+
+        // duplicate limits
+        $limits = ORM::forTable('limits')->where('serviceid', $serviceid)->findOne();
+        if ($limits) {
+            $newlimits = ORM::forTable('limits')->create();
+            $this->duplicateRecord($limits, $newlimits);
+            $newlimits->serviceid = $newserviceid;
+            $newlimits->save();
+        }
+
+        return $newservice;
+    }
+
+    /**
+     * Are there any purchases for service
+     * @param int $serviceid
+     * @return boolean
+     */
+    public function is_purchases($serviceid) {
+        return ORM::forTable('purchase')->where('serviceid', $serviceid)->count() > 0;
+    }
+
+    /**
+     * Delete complete service
+     * @param object $service
+     * @throws Exception
+     */
+    public function deleteService($service) {
+
+        // Check there are no purchases. We should not have got here if there
+        // are, but we'll check anyway
+        if ($this->is_purchases($service->id)) {
+            throw new Exception('Trying to delete service with purchases. id = ' . $service->id);
+        }
+
+        $serviceid = $service->id;
+
+        // Delete limits
+        ORM::forTable('limits')->where('serviceid', $serviceid)->delete_many();
+
+        // Delete pricebands
+        ORM::forTable('priceband')->where('serviceid', $serviceid)->delete_many();
+
+        // Delete joining stations
+        ORM::forTable('joining')->where('serviceid', $serviceid)->delete_many();
+
+        // Delete pricebandgroups
+        ORM::forTable('pricebandgroup')->where('serviceid', $serviceid)->delete_many();
+
+        // Delete destinations
+        ORM::forTable('destination')->where('serviceid', $serviceid)->delete_many();
+
+        // Finally, delete the service
+        $service->delete();
     }
 
 }

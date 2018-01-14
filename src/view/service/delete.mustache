@@ -1,0 +1,29 @@
+{{> header }}
+
+{{> adminmenu }}
+
+    <h3>{{service.name}} ({{ service.code }})</h3>
+
+    {{# haspurchases }}
+        <div class="alert alert-warning">
+            There are purchases recorded for this service. It cannot be deleted.
+        </div>
+    {{/ haspurchases }}
+    {{^ haspurchases }}
+        <div class="alert alert-danger">
+            Are you sure? All the details for this service will be deleted and cannot be recovered.
+            Press 'Back' if you're not sure.
+        </div>
+    {{/ haspurchases }}
+
+    <form id="service-delete-form" class="form-horizontal" action="{{ path('service/delete', service.id) }}" method="post" >
+
+        <div>
+            <input type="submit" name="back" value="Back" class="btn btn-success" />
+            {{^ haspurchases }}
+                <input type="submit" name="delete" value="Delete" class="btn btn-danger" />
+            {{/ haspurchases }}
+        </div>
+    </form>
+
+{{> footer }}

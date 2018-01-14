@@ -51,11 +51,19 @@ class coreController {
     /**
      * Instantiate class in library
      * @param string $name
+     * @return mixed
      */
     public function getLib($name) {
         $namespace = 'lib';
         $classname = $namespace . '\\' . $name;
-        return new $classname;
+        $lib = new $classname;
+
+        // If this has a 'controller' property, set it
+        if (property_exists($lib, 'controller')) {
+            $lib->controller = $this;
+        }
+
+        return $lib;
     }
 
     public function __construct($exception=false) {

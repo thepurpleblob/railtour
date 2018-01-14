@@ -280,10 +280,9 @@ class ServiceController extends coreController
     public function duplicateAction($serviceid) {
         $this->require_login('ROLE_ADMIN', 'service/show/' . $serviceid);
 
-        $booking = $this->getLibrary('Booking');
-        $service = $booking->Service($serviceid);
+        $service = $this->adminlib->getService($serviceid);
 
-        $newservice = $booking->duplicate($service);
+        $newservice = $this->adminlib->duplicate($service);
 
         $this->redirect('service/edit/' . $newservice->id);
     }
@@ -294,11 +293,10 @@ class ServiceController extends coreController
     public function deleteAction($serviceid) {
         $this->require_login('ROLE_ADMIN', 'service/show/' . $serviceid);
 
-        $booking = $this->getLibrary('Booking');
-        $service = $booking->Service($serviceid);
+        $service = $this->adminlib->getService($serviceid);
 
         // If there are purchases, we're out of here
-        if (\ORM::forTable('purchase')->where('serviceid', $serviceid)->count()) {
+        if ($this->adminlib->is_purchases($serviceid)) {
             $haspurchases = true;
         } else {
             $haspurchases = false;
@@ -308,13 +306,13 @@ class ServiceController extends coreController
 
                 // Delete?
                 if (!empty($data['delete'])) {
-                    $booking->deleteService($service);
+                    $this->adminlib->deleteService($service);
                 }
                 $this->redirect('service/index');
             }
         }
 
-        $this->View('service/delete.html.twig', array(
+        $this->View('service/delete', array(
             'service' => $service,
             'haspurchases' => $haspurchases,
         ));
