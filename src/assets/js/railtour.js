@@ -17,7 +17,7 @@ $( function() {
         minHeight: 250
     });
 
-    // Tooltips
+    // (Bootstrap) Tooltips
     $('[data-toggle="tooltip"]').tooltip();
 
     // Datepicker (Gijgo.com)

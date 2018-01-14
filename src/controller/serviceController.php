@@ -8,12 +8,13 @@ use thepurpleblob\core\coreController;
  * Service controller.
  *
  */
-class ServiceController extends coreController
-{
+class ServiceController extends coreController {
+
     protected $adminlib;
 
     /**
      * Constructor
+     * @param bool $exception
      */
     public function __construct($exception = false)
     {
@@ -26,6 +27,7 @@ class ServiceController extends coreController
     /**
      * Lists all Service entities.
      *
+     * @throws \Exception
      */
     public function indexAction() {
         global $CFG;
@@ -83,7 +85,9 @@ class ServiceController extends coreController
 
     /**
      * flip service visibility
-     * @param $id service id
+     * @param int $id service id
+     * @param bool $visible
+     * @throws \Exception
      */
     public function visibleAction($id, $visible) {
 
@@ -107,8 +111,7 @@ class ServiceController extends coreController
     /**
      * Finds and displays a Service entity.
      *
-     * @Route("/{id}/show", name="admin_service_show")
-     * @Template()
+     * @param int $id
      */
     public function showAction($id)
     {
@@ -138,6 +141,7 @@ class ServiceController extends coreController
     /**
      * Displays a form to edit an existing Service entity or create a new one
      * @param int $id service id
+     * @throws \Exception
      */
     public function editAction($id=null)
     {
@@ -276,6 +280,7 @@ class ServiceController extends coreController
 
     /**
      * Duplicate a complete service
+     * @param int $serviceid
      */
     public function duplicateAction($serviceid) {
         $this->require_login('ROLE_ADMIN', 'service/show/' . $serviceid);
@@ -289,6 +294,7 @@ class ServiceController extends coreController
 
     /**
      * Delete a service provided that there are no purchases
+     * @param int $serviceid
      */
     public function deleteAction($serviceid) {
         $this->require_login('ROLE_ADMIN', 'service/show/' . $serviceid);
@@ -318,15 +324,4 @@ class ServiceController extends coreController
         ));
     }
 
-    /**
-     * Calls routines to set the system up
-     * (hidden)
-     */
-    public function installAction() {
-
-        // Install the list of crs codes and stations
-        $stations = $this->getLibrary('Stations');
-
-
-    }
 }

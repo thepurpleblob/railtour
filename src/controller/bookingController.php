@@ -4,38 +4,50 @@ namespace thepurpleblob\railtour\controller;
 
 use thepurpleblob\core\coreController;
 
-class BookingController extends coreController
-{
+class BookingController extends coreController {
+
+    public $controller;
+
+    private $bookinglib;
+
+    /**
+     * Constructor
+     * @param bool
+     */
+    public function __construct($exception = false) {
+        parent::__construct($exception);
+
+        // Library
+        $this->bookinglib = $this->getLibrary('Booking');
+    }
+
     /**
      * Opening page for booking.
-     * @param $code unique (hopefully) tour code
+     * @param $code string unique (hopefully) tour code
      */
-    public function indexAction($code)
-    {
-        // Basics
-        $booking = $this->getLibrary('Booking');
+    public function indexAction($code) {
 
         // Log
         $this->log('Booking started ' . $code);
 
         // Clear session and delete expired purchases
-        $booking->cleanPurchases();
+        $this->bookinglib->cleanPurchases();
 
         // Get the service object
-        $service = $booking->serviceFromCode($code);
+        $service = $this->bookinglib->serviceFromCode($code);
         $serviceid = $service->id;
 
         // count the seats left
-        $count = $booking->countStuff($serviceid);
+        $count = $this->bookinglib->countStuff($serviceid);
 
         // Get the limits for this service
-        $limits = $booking->getLimits($serviceid);
+        $limits = $this->bookinglib->getLimits($serviceid);
 
         // get acting maxparty (best estimate to display to punter)
-        $maxparty = $booking->getMaxparty($limits);
+        $maxparty = $this->bookinglib->getMaxparty($limits);
 
-        if ($booking->canProceedWithBooking($service, $count)) {
-            $this->View('booking/index.html.twig', array(
+        if ($this->bookinglib->canProceedWithBooking($service, $count)) {
+            $this->View('booking/index', array(
                 'code' => $code,
                 'maxparty' => $maxparty,
                 'service' => $service
@@ -50,7 +62,8 @@ class BookingController extends coreController
 
     /**
      * Opening page for *telephone* bookings.
-     * @param $code unique (hopefully) tour code
+     * @param $code string unique (hopefully) tour code
+     * @throws \Exception
      */
     public function telephoneAction($code)
     {
@@ -145,29 +158,29 @@ class BookingController extends coreController
      * First 'proper' booking page.
      * Ask for numbers of travellers. Also sets up purchase record
      * and session data.
-     * @param $serviceid
+     * @param int $serviceid
+     * @throws \Exception
      */
     public function numbersAction($serviceid)
     {
         // Basics
-        $booking = $this->getLibrary('Booking');
-        $service = $booking->Service($serviceid);
+        $service = $this->bookinglib->getService($serviceid);
 
         // Get the limits for this service:
-        $limits = $booking->getLimits($serviceid);
+        $limits = $this->bookinglib->getLimits($serviceid);
 
         // Grab current purchase
-        $purchase = $booking->getPurchase($serviceid);
+        $purchase = $this->bookinglib->getSessionPurchase($serviceid);
         if ($purchase->bookedby) {
             $this->require_login('ROLE_ORGANISER', 'booking/numbers/' . $serviceid);
         }
 
         // get acting maxparty
-        $maxparty = $booking->getMaxparty($limits);
+        $maxparty = $this->bookinglib->getMaxparty($limits);
 
         // Choices
-        $choices_adult = $booking->choices($maxparty, false);
-        $choices_children = $booking->choices($maxparty, true);
+        $choices_adult = $this->bookinglib->choices($maxparty, false);
+        $choices_children = $this->bookinglib->choices($maxparty, true);
 
         // hopefully no errors
         $errors = null;
@@ -212,7 +225,7 @@ class BookingController extends coreController
         }
 
         // display form
-        $this->View('booking/numbers.html.twig', array(
+        $this->View('booking/numbers', array(
             'purchase' => $purchase,
             'service' => $service,
             'limits' => $limits,

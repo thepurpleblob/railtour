@@ -299,139 +299,9 @@ class Booking
 
 
 
-    /**
-     * Get the purchase record from database, or create a new one
-     * @param int $purchaseid 0 to create new one
-     * @param object
-     * @return object purchase - existing or new
-     */
-    public function getPurchaseRecord($purchaseid, $service = null) {
-        if (!$purchaseid) {
-            if (!$service) {
-                throw new Exception('A service object must be supplied to create new purchase');
-            }
-            $purchase = \ORM::forTable('purchase')->create();
-            $purchase->created = time();
-            $purchase->seskey = '';
-            $purchase->timestamp = time();
-            $purchase->serviceid = $service->id;
-            $purchase->type = 0;
-            $purchase->code = $service->code;
-            $purchase->bookingref = '';
-            $purchase->completed = 0;
-            $purchase->manual = 0;
-            $purchase->title = '';
-            $purchase->firstname = '';
-            $purchase->surname = '';
-            $purchase->address1 = '';
-            $purchase->address2 = '';
-            $purchase->city = '';
-            $purchase->county = '';
-            $purchase->postcode = '';
-            $purchase->phone = '';
-            $purchase->email = '';
-            $purchase->joining = '';
-            $purchase->destination = '';
-            $purchase->class = '';
-            $purchase->adults = 0;
-            $purchase->children = 0;
-            $purchase->meala = 0;
-            $purchase->mealb = 0;
-            $purchase->mealc = 0;
-            $purchase->meald = 0;
-            $purchase->payment = 0;
-            $purchase->seatsupplement = 0;
-            $purchase->comment = '';
-            $purchase->date = date('Y-m-d');
-            $purchase->status = '';
-            $purchase->statusdetail = '';
-            $purchase->cardtype = '';
-            $purchase->last4digits = 0;
-            $purchase->bankauthcode = 0;
-            $purchase->declinecode = 0;
-            $purchase->emailsent = 0;
-            $purchase->eticket = 0;
-            $purchase->einfo = 0;
-            $purchase->securitykey = '';
-            $purchase->regstatus = '';
-            $purchase->VPSTxId = '';
-            $purchase->bookedby = '';
-            $purchase->save();
-        } else if (!$purchase = \ORM::forTable('purchase')->findOne($purchaseid)) {
-            throw new Exception('Cannot find purchase record for id=' . $purchaseid);
-        }
 
-        return $purchase;
-    }
 
-    /**
-     * Find the current purchase record and/or create a new one if
-     * needed
-     */
-    public function getPurchase($serviceid=0) {
-        global $CFG;
 
-        if (isset($_SESSION['key'])) {
-            $key = $_SESSION['key'];
-
-            // then we should have the record id and they should match
-            if (isset($_SESSION['purchaseid'])) {
-                $purchaseid = $_SESSION['purchaseid'];
-                $purchase = $this->getPurchaseRecord($purchaseid);
-
-                // if it exists then the key must match (security I think)
-                if ($purchase->seskey != $key) {
-                    throw new Exception('Purchase key (' . $purchase->seskey .') does not match session (' . $key . ')');
-                } else {
-
-                    // if it has a Sagepay status then something is wrong
-                    if ($purchase->status) {
-                        throw new Exception('This booking has already been submitted for payment, purchaseid = ' . $purchase->id);
-                    }
-
-                    // All is well. Return the record
-                    $purchase->timestamp = time();
-                    return $purchase;
-                }
-            } else {
-
-                 // if record id isn't there then this is an exception
-                throw new Exception('Purchase id is missing in session');
-            }
-        } else {
-            $key = '';
-        }
-
-        // If we get here, there is no session set up, so
-        // there won't be a purchase record either
-
-        // if no code or serviceid was supplied then we are not allowed a new one
-        // ...so display expired message
-        if (!$serviceid) {
-            $this->controller->View('booking/timeout.mustache');
-        }
-
-        // Get the service
-        $service = $this->Service($serviceid);
-
-        // create a random new key
-        $key = sha1(microtime(true).mt_rand(10000,90000));
-
-        // create the new purchase object
-        $purchase = $this->getPurchaseRecord(0, $service);
-
-        // id should be set automagically
-        $id = $purchase->id();
-        $_SESSION['key'] = $key;
-        $_SESSION['purchaseid'] = $id;
-
-        // we can add the booking ref (generated from id) and key
-        $purchase->seskey = $key;
-        $purchase->bookingref = $CFG->sage_prefix . $id;
-        $purchase->save();
-
-        return $purchase;
-    }
 
     /**
      * Find the purchase from the VendorTxCode
@@ -805,24 +675,7 @@ class Booking
         return $meals;
     }
 
-    /**
-     * Create array of choices for numeric drop-down
-     * @param $max maximum value of numeric choices
-     * @param $none if true add 'None' in 0th place
-     * @return array
-     */
-    public function choices($max, $none) {
-        if ($none) {
-            $choices = array(0 => 'None');
-        } else {
-            $choices = array();
-        }
-        for ($i=1; $i <= $max; $i++) {
-            $choices[$i] = "$i";
-        }
 
-        return $choices;
-    }
 
     /**
      * Update purchase with data returned from SagePay

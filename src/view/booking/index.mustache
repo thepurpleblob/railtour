@@ -1,6 +1,5 @@
-{% extends 'booking/booking.html.twig' %}
+{{> header }}
 
-{% block content %}
     <h2 class="attention_heading"><span><i class="fa fa-warning"></i> Please read first...</span></h2>
 
             <p>
@@ -29,7 +28,7 @@
 
 
     <div>
-        <a class="btn btn-primary" href="{{ path('booking/numbers', service.id) }}">
+        <a class="btn btn-primary" href="{{# path }}booking/numbers{{/ path }}/{{ service.id }}">
             Book tour '{{ service.name }}'
         </a>
         <a class="btn btn-warning" href="http://www.srps.org.uk/railtours">
@@ -37,4 +36,4 @@
         </a>
     </div>
 
-{% endblock content %}
+{{> footer }}
