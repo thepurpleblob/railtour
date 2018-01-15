@@ -224,14 +224,19 @@ class BookingController extends coreController {
             }
         }
 
+        // Create form
+        $form = new \stdClass();
+        $form->adults = $this->form->select('adults', 'Number of adults', $purchase->adults, $choices_adult);
+        $form->children = $this->form->select('children', 'Number of children', $purchase->children, $choices_children);
+
+
         // display form
         $this->View('booking/numbers', array(
             'purchase' => $purchase,
             'service' => $service,
+            'form' => $form,
             'limits' => $limits,
             'maxparty' => $maxparty,
-            'choices_adult' => $choices_adult,
-            'choices_children' => $choices_children,
             'errors' => $errors,
         ));
     }
