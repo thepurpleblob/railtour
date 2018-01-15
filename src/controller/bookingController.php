@@ -244,20 +244,19 @@ class BookingController extends coreController {
     /**
      * Joining station
      */
-    public function joiningAction()
-    {
+    public function joiningAction() {
+
         // Basics
-        $booking = $this->getLibrary('Booking');
-        $purchase = $booking->getPurchase();
+        $purchase = $this->bookinglib->getSessionPurchase();
         $serviceid = $purchase->serviceid;
-        $service = $booking->Service($serviceid);
+        $service = $this->bookinglib->getService($serviceid);
 
         if ($purchase->bookedby) {
             $this->require_login('ROLE_ORGANISER', 'booking/joining');
         }
 
         // get the joining stations
-        $stations = $booking->getJoiningStations($serviceid);
+        $stations = $this->bookinglib->getJoiningStations($serviceid);
 
         // If there is only one then there is nothing to do
         if (count($stations)==1) {
@@ -299,10 +298,14 @@ class BookingController extends coreController {
             }
         }
 
+        // Create form
+        $form = new \stdClass();
+        $form->joining = $this->form->radio('joining', '', $purchase->joining, $stations);
+
         // display form
-        $this->View('booking/joining.html.twig', array(
+        $this->View('booking/joining', array(
             'purchase' => $purchase,
-            'stations' => $stations,
+            'form' => $form,
             'code' => $purchase->code,
             'service' => $service,
             'errors' => $errors,

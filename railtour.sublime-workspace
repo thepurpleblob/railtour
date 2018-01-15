@@ -16,27 +16,49 @@
 	"buffers":
 	[
 		{
-			"file": "core/coreForm.php",
-			"settings":
-			{
-				"buffer_size": 7499,
-				"line_ending": "Unix"
-			}
-		},
-		{
 			"file": "src/controller/bookingController.php",
 			"settings":
 			{
-				"buffer_size": 35167,
+				"buffer_size": 35282,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "src/controller/serviceController.php",
+			"file": "core/coreForm.php",
 			"settings":
 			{
-				"buffer_size": 11626,
+				"buffer_size": 7401,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "<?php\n\nnamespace thepurpleblob\\railtour\\library;\n\n// Lifetime of incomplete purchases in seconds\nuse Exception;\n\n/**\n * Class Booking\n * @package thepurpleblob\\railtour\\library\n */\nclass Booking\n{\n\n    protected $controller;\n\n    /**\n     * Booking constructor.\n     * @param $controller\n     */\n    public function __construct($controller) {\n        $this->controller = $controller;\n    }\n\n    /**\n     * Get/check the service\n     * @param $id\n     * @return mixed\n     * @throws Exception\n     */\n    public function Service($id) {\n        $service = \\ORM::forTable('service')->findOne($id);\n\n        if (!$service) {\n            throw new Exception('Unable to find Service record for id = ' . $id);\n        }\n\n        return $service;\n    }\n\n    /**\n     * Get services available to book\n     */\n    public function availableServices() {\n\n        // Get 'likely' candidates\n        $potentialservices = \\ORM::for_table('service')->where('visible', true)->findMany();\n\n        // We need to do more checks to see if it is really available\n        $services = array();\n        foreach ($potentialservices as $service) {\n            $count = $this->countStuff($service->id);\n            if ($this->canProceedWithBooking($service, $count)) {\n                $services[$service->id] = $service;\n            }\n        }\n\n        return $services;\n    }\n\n\n    /**\n     * Create new pricebandgroup\n     */\n    public function createPricebandgroup($serviceid) {\n        $pricebandgroup = \\ORM::forTable('pricebandgroup')->create();\n        $pricebandgroup->serviceid = $serviceid;\n        $pricebandgroup->name = '';\n\n        return $pricebandgroup;\n    }\n\n\n\n\n    /**\n     * Create new pricebands (as required)\n     */\n    public function createPricebands($serviceid) {\n        $pricebands = array();\n        $destinations = \\ORM::forTable('destination')->where('serviceid', $serviceid)->order_by_asc('destination.name')->findMany();\n        if (!$destinations) {\n            throw new Exception('No destinations found for serviceid = ' . $serviceid);\n        }\n\n        foreach ($destinations as $destination) {\n            $priceband = \\ORM::forTable('priceband')->create();\n            $priceband->name = $destination->name;\n            $priceband->serviceid = $serviceid;\n            $priceband->destinationid = $destination->id;\n            $priceband->first = 0;\n            $priceband->standard = 0;\n            $priceband->child = 0;\n            $pricebands[] = $priceband;\n        }\n\n        return $pricebands;\n    }\n\n    /**\n     * Get limits\n     * (may need to create a new record)\n     * @param $serviceid\n     */\n    public function getLimits($serviceid) {\n        $limits = \\ORM::forTable('limits')->where('serviceid', $serviceid)->findOne();\n\n        // Its's possible that the limits for this service don't exist (yet)\n        if (!$limits) {\n            $limits = \\ORM::forTable('limits')->create();\n            $limits->serviceid = $serviceid;\n            $limits->first = 0;\n            $limits->standard = 0;\n            $limits->firstsingles = 0;\n            $limits->meala = 0;\n            $limits->mealb = 0;\n            $limits->mealc = 0;\n            $limits->meald = 0;\n            $limits->maxparty = 0;\n            $limits->maxpartyfirst = 0;\n            $limits->save();\n        }\n\n        return $limits;\n    }\n\n\n\n    /**\n     * Basic checks to ensure booking can procede\n     * TODO: Fix the date shit so it works!\n     */\n    public function canProceedWithBooking($service, $count) {\n        $today = date('Y-m-d');\n        $seatsavailable =\n            (($count->remainingfirst > 0) or ($count->remainingstandard > 0));\n        $isvisible = ($service->visible);\n        $isindate = ($service->date > $today);\n\n        return ($seatsavailable and $isvisible and $isindate);\n    }\n\n    public function getDestination($serviceid, $crs) {\n        $destination = \\ORM::forTable('destination')->where(array(\n            'serviceid' => $serviceid,\n            'crs' => $crs,\n        ))->findOne();\n        if (!$destination) {\n            throw new Exception('No destination station for for service id = ' . $serviceid . ' and CRS = ' . $crs);\n        }\n\n        return $destination;\n    }\n\n\n\n    /**\n     * Get single joining record\n     * @param $serviceid\n     * @param $crs\n     * @return object\n     * @throws Exception\n     */\n    public function getJoining($serviceid, $crs) {\n        $joining = \\ORM::forTable('joining')->where(array(\n            'serviceid' => $serviceid,\n            'crs' => $crs,\n        ))->findOne();\n        if (!$joining) {\n            throw new Exception('No joining station found for service id = ' . $serviceid . ' and CRS = ' . $crs);\n        }\n\n        return $joining;\n    }\n\n    /**\n     * Get a list of destination stations indexed by CRS\n     * @param $serviceid\n     * @return array stations\n     * @throws Exception\n     */\n    public function getDestinationStations($serviceid) {\n        $destinations = \\ORM::forTable('destination')->where('serviceid', $serviceid)->findMany();\n        if (!$destinations) {\n            throw new Exception('No destination stations found for service id = ' . $serviceid);\n        }\n        $stations = array();\n        foreach ($destinations as $destination) {\n            $stations[$destination->crs] = $destination->name;\n        }\n\n        return $stations;\n    }\n\n\n    /**\n     * Creates an array of destinations with extra stuff to enhance the\n     * user form.\n     * @param $purchase purchase object\n     * @return array complicated destination objects\n     * @throws Exception\n     */\n    public function getDestinationsExtra($purchase, $service) {\n\n        // Get counts info\n        $numbers = $this->countStuff($service->id, $purchase);\n        $destinationcounts = $numbers->destinations;\n        $passengercount = $purchase->adults + $purchase->children;\n\n        // get Destinations\n        $destinations = \\ORM::forTable('destination')->where('serviceid', $service->id)->findMany();\n        if (!$destinations) {\n            throw new Exception('No destinations found for service id = ' . $service->id);\n        }\n\n        // Get joining information\n        $joining = \\ORM::forTable('joining')->where(array(\n            'serviceid' => $service->id,\n            'crs' => $purchase->joining,\n        ))->findOne();\n        if (!$joining) {\n            throw new Exception('Missing joining record for service id = ' . $service->id . ', crs = ' . $purchase->joining);\n        }\n\n        $pricebandgroupid = $joining->pricebandgroupid;\n        foreach ($destinations as $destination) {\n            $destinationcount = $destinationcounts[$destination->crs];\n            $priceband = \\ORM::forTable('priceband')->where(array(\n                'pricebandgroupid' => $pricebandgroupid,\n                'destinationid' => $destination->id,\n            ))->findOne();\n            if (!$priceband) {\n                throw new Exception(\"No priceband for pricebandgroup id = $pricebandgroupid destination id = \" . $destination->id . \" service = \" . $service->id);\n            }\n            $destination->first = $priceband->first;\n            $destination->standard = $priceband->standard;\n            $destination->child = $priceband->child;\n\n            // a limit of 0 means ignore the limit\n            if (($destinationcount->limit==0) or ($destinationcount->remaining>=$passengercount)) {\n                $destination->available = true;\n            } else {\n                $destination->available = false;\n            }\n        }\n\n        return $destinations;\n    }\n\n\n\n    /**\n     * Clear incomplete purchases that are time expired\n     */\n    public function deleteOldPurchases() {\n        $oldtime = time() - PURCHASE_LIFETIME;\n        \\ORM::forTable('purchase')\n            ->where('completed', 0)\n            ->where_lt('timestamp', $oldtime)\n            ->delete_many();\n\n        // IF we've deleted the current purchase then we have\n        // an interesting problem!\n\n        // See if the current purchase still exists\n        if (isset($_SESSION['purchaseid'])) {\n            $purchaseid = $_SESSION['purchaseid'];\n            $purchase = \\ORM::forTable('purchase')->findOne($purchaseid);\n            if (!$purchase) {\n                unset($_SESSION['key']);\n                unset($_SESSION['purchaseid']);\n\n                // Redirect out of here\n                $this->controller->View('booking/timeout.mustache');\n            }\n        }\n    }\n\n\n\n\n\n\n\n\n\n\n\n    /**\n     * Find the purchase from the VendorTxCode\n     * (Same as our bookingref)\n     * @param string $VendorTxCode\n     * @return mixed Purchase record of false if not found\n     */\n    public function getPurchaseFromVendorTxCode($VendorTxCode) {\n        $purchase = \\ORM::forTable('purchase')->where('bookingref', $VendorTxCode)->findOne();\n\n        return $purchase;\n    }\n\n    /**\n     * Convert a null to a zero\n     * (done a lot in countStuff)\n     */\n    private function zero($value) {\n        $result = ($value) ? $value : 0;\n        return $result;\n    }\n\n    /**\n     * Count the purchases and work out what's left. Major PITA this\n     */\n    public function countStuff($serviceid, $currentpurchase=null) {\n\n        // get incomplete purchases\n        $this->deleteOldPurchases();\n\n        // Always a chance the limits don't exist yet\n        $limits = $this->getLimits($serviceid);\n\n        // Create counts entity\n        $count = new \\stdClass();\n\n        // get first class booked\n        $fbtotal = \\ORM::forTable('purchase')\n            ->select_expr('SUM(adults + children)', 'fb')\n            ->where(array(\n                'completed' => 1,\n                'class' => 'F',\n                'status' => 'OK',\n                'serviceid' => $serviceid,\n            ))\n            ->findOne();\n        $count->bookedfirst = $this->zero($fbtotal->fb);\n\n        // get first class in progress\n        $fptotal = \\ORM::forTable('purchase')\n            ->select_expr('SUM(adults + children)', 'fp')\n            ->where(array(\n                'completed' => 0,\n                'class' => 'F',\n                'status' => 'OK',\n                'serviceid' => $serviceid,\n            ))\n            ->findOne();\n        $count->pendingfirst = $this->zero($fptotal->fp);\n\n        // if we have a purchase in progress, adjust current pending count\n        if ($currentpurchase) {\n            if ($currentpurchase->class == 'F') {\n                $pf = $count->pendingfirst;\n                $pf = $pf - $currentpurchase->adults - $currentpurchase->children;\n                $pf = $pf < 0 ? 0 : $pf;\n                $count->pendingfirst = $pf;\n            }\n        }\n\n        // firct class remainder is simply...\n        $count->remainingfirst = $limits->first - $count->bookedfirst - $count->pendingfirst;\n\n        // get standard class booked\n        $sbtotal = \\ORM::forTable('purchase')\n            ->select_expr('SUM(adults + children)', 'sb')\n            ->where(array(\n                'completed' => 1,\n                'class' => 'S',\n                'status' => 'OK',\n                'serviceid' => $serviceid,\n            ))\n            ->findOne();\n        $count->bookedstandard = $this->zero($sbtotal->sb);\n\n        // get standard class in progress\n        $sptotal = \\ORM::forTable('purchase')\n            ->select_expr('SUM(adults + children)', 'sp')\n            ->where(array(\n                'completed' => 0,\n                'class' => 'S',\n                'status' => 'OK',\n                'serviceid' => $serviceid,\n            ))\n            ->findOne();\n        $count->pendingstandard = $this->zero($sptotal->sp);\n\n        // if we have a purchase object then remove any current count from pending\n        if ($currentpurchase) {\n            if ($currentpurchase->class == 'S') {\n                $ps = $count->pendingstandard;\n                $ps = $ps - $currentpurchase->adults - $currentpurchase->children;\n                $ps = $ps < 0 ? 0 : $ps;\n                $count->pendingstandard = $ps;\n            }\n        }\n\n        // standard class remainder is simply\n        $count->remainingstandard = $limits->standard - $count->bookedstandard - $count->pendingstandard;\n\n        // get first supplements booked. Note field is a boolean and applies to\n        // all persons in booking (which is only asked for parties of one or two)\n        $suptotal = \\ORM::forTable('purchase')\n            ->select_expr('SUM(adults + children)', 'sup')\n            ->where(array(\n                'completed' => 1,\n                'class' => 'F',\n                'status' => 'OK',\n                'serviceid' => $serviceid,\n            ))\n            ->where_gt('seatsupplement', 0)\n            ->findOne();\n        $count->bookedfirstsingles = $this->zero($suptotal->sup);\n\n        // get first supplements in progress. Note field is a boolean and applies to\n        // all persons in booking (which is only asked for parties of one or two)\n        $supptotal = \\ORM::forTable('purchase')\n            ->select_expr('SUM(adults + children)', 'supp')\n            ->where(array(\n                'completed' => 0,\n                'class' => 'F',\n                'status' => 'OK',\n                'serviceid' => $serviceid,\n            ))\n            ->where_gt('seatsupplement', 0)\n            ->findOne();\n        $count->pendingfirstsingles = $this->zero($supptotal->supp);\n\n        // First suppliements remainder\n        $count->remainingfirstsingles = $limits->firstsingles - $count->bookedfirstsingles - $count->pendingfirstsingles;\n\n        // Get booked meals\n        $bmeals = \\ORM::forTable('purchase')\n            ->select_expr('SUM(meala)', 'suma')\n            ->select_expr('SUM(mealb)', 'sumb')\n            ->select_expr('SUM(mealc)', 'sumc')\n            ->select_expr('SUM(meald)', 'sumd')\n            ->where(array(\n                'completed' => 1,\n                'status' => 'OK',\n                'serviceid' => $serviceid,\n            ))\n            ->findOne();\n        $count->bookedmeala = $this->zero($bmeals->suma);\n        $count->bookedmealb = $this->zero($bmeals->sumb);\n        $count->bookedmealc = $this->zero($bmeals->sumc);\n        $count->bookedmeald = $this->zero($bmeals->sumd);\n\n        // Get pending meals\n        $pmeals = \\ORM::forTable('purchase')\n            ->select_expr('SUM(meala)', 'suma')\n            ->select_expr('SUM(mealb)', 'sumb')\n            ->select_expr('SUM(mealc)', 'sumc')\n            ->select_expr('SUM(meald)', 'sumd')\n            ->where(array(\n                'completed' => 0,\n                'status' => 'OK',\n                'serviceid' => $serviceid,\n            ))\n            ->findOne();\n        $count->pendingmeala = $this->zero($pmeals->suma);\n        $count->pendingmealb = $this->zero($pmeals->sumb);\n        $count->pendingmealc = $this->zero($pmeals->sumc);\n        $count->pendingmeald = $this->zero($pmeals->sumd);\n\n        // Get remaining meals\n        $count->remainingmeala = $limits->meala - $count->bookedmeala - $count->pendingmeala;\n        $count->remainingmealb = $limits->mealb - $count->bookedmealb - $count->pendingmealb;\n        $count->remainingmealc = $limits->mealc - $count->bookedmealc - $count->pendingmealc;\n        $count->remainingmeald = $limits->meald - $count->bookedmeald - $count->pendingmeald;\n\n        // Get counts for destination limits\n        $destinations = \\ORM::forTable('destination')->where('serviceid', $serviceid)->findMany();\n        $destinationcounts = array();\n        foreach ($destinations as $destination) {\n            $name = $destination->name;\n            $crs = $destination->crs;\n            $destinationcount = new \\stdClass();\n            $destinationcount->name = $name;\n\n            // bookings for this destination\n            $dtotal = \\ORM::forTable('purchase')\n                ->select_expr('SUM(adults + children)', 'dt')\n                ->where(array(\n                    'completed' => 1,\n                    'destination' => $crs,\n                    'status' => 'OK',\n                    'serviceid' => $serviceid,\n                ))\n                ->findOne();\n            $destinationcount->booked = $this->zero($dtotal->dt);\n\n            // pending bookings for this destination\n            $ptotal = \\ORM::forTable('purchase')\n                ->select_expr('SUM(adults + children)', 'pt')\n                ->where(array(\n                    'completed' => 0,\n                    'destination' => $crs,\n                    'status' => 'OK',\n                    'serviceid' => $serviceid,\n                ))\n                ->findOne();\n            $dpcount = $this->zero($ptotal->pt);\n\n            // if we have a purchase object then remove any current count from pending\n            if ($currentpurchase) {\n                if ($currentpurchase->destination == $crs) {\n                    $dpcount = $dpcount - $currentpurchase->adults - $currentpurchase->children;\n                    $dpcount = $dpcount < 0 ? 0 : $dpcount;\n                }\n            }\n            $destinationcount->pending = $dpcount;\n\n            // limit=0 means the limit is not being used\n            $dlimit = $destination->bookinglimit;\n            $destinationcount->limit = $dlimit;\n            if ($dlimit==0) {\n                $destinationcount->remaining = '-';\n            } else {\n                $destinationcount->remaining = $dlimit - $destinationcount->booked - $dpcount;\n            }\n\n            $destinationcounts[$crs] = $destinationcount;\n        }\n        $count->destinations = $destinationcounts;\n\n        return $count;\n    }\n\n    /**\n     * Work out the price of the tour\n     * This will work (optionally) for first or standard travel\n     * @param object $service\n     * @param object $purchase\n     * @param string $class (F or S)\n     */\n    public function calculateFare($service, $purchase, $class) {\n\n        // Need to drag everything out of the database\n        $serviceid = $service->id;\n\n        // Get basic numbers from purchase\n        $adults = $purchase->adults;\n        $children = $purchase->children;\n        $meala = $purchase->meala;\n        $mealb = $purchase->mealb;\n        $mealc = $purchase->mealc;\n        $meald = $purchase->meald;\n\n        // get basic start/destination info\n        $join = $purchase->joining;\n        $dest= $purchase->destination;\n\n        // get the db records for above\n        $joining = $this->getJoining($serviceid, $join);\n        $destination = $this->getDestination($serviceid, $dest);\n        $pricebandgroupid = $joining->pricebandgroupid;\n        $destinationid = $destination->id;\n        $priceband = \\ORM::forTable('priceband')->where(array(\n            'pricebandgroupid' => $pricebandgroupid,\n            'destinationid' => $destinationid,\n        ))->findOne();\n        if (!$priceband) {\n            throw new Exception('No priceband found for pricebandgroup id = ' . $pricebandgroupid . ' destinationid = ' . $destinationid);\n        }\n\n        // we return an object with various info\n        $result = new \\stdClass();\n        if ($class==\"F\") {\n            $result->adultunit = $priceband->first;\n            $result->childunit = $priceband->first;\n            $result->adultfare = $adults * $result->adultunit;\n            $result->childfare = $children * $result->childunit;\n        } else {\n            $result->adultunit = $priceband->standard;\n            $result->childunit = $priceband->child;\n            $result->adultfare = $adults * $result->adultunit;\n            $result->childfare = $children * $result->childunit;\n        }\n\n        // Calculate meals\n        $result->meals = $meala * $service->mealaprice +\n            $mealb * $service->mealbprice +\n            $mealc * $service->mealcprice +\n            $meald * $service->mealdprice;\n\n        // Calculate seat supplement\n        $passengers = $adults + $children;\n        $suppallowed = (($passengers==1) or ($passengers==2));\n        if (($purchase->class == 'F') && $purchase->seatsupplement && $suppallowed) {\n            $result->seatsupplement = $passengers * $service->singlesupplement;\n        } else {\n            $result->seatsupplement = 0;\n        }\n\n        // Grand total\n        $result->total = $result->adultfare + $result->childfare + $result->meals + $result->seatsupplement;\n\n        return $result;\n    }\n\n    /**\n     * detect if any meals are available\n     * @return boolean\n     */\n    public function mealsAvailable($service) {\n        return\n            $service->mealavisible ||\n            $service->mealbvisible ||\n            $service->mealcvisible ||\n            $service->mealdvisible\n            ;\n    }\n\n    /**\n     * Create an array of available meals\n     * along with names, price and array of choices\n     * @param $service\n     * @param $purchase\n     * @return array\n     */\n    public function mealsForm($service, $purchase) {\n\n        // we need to know about the number\n        $numbers = $this->countStuff($service->id);\n\n        // Get the passenger count\n        $maxpassengers = $purchase->adults + $purchase->children;\n\n        // get the joining station (to see what meals available)\n        $station = $this->getJoining($service->id, $purchase->joining);\n\n        $letters = array('a', 'b', 'c', 'd');\n        $meals = array();\n        foreach ($letters as $letter) {\n            $prefix = 'meal' . $letter;\n            $mealname = $prefix . 'name';\n            $mealvisible = $prefix . 'visible';\n            $mealprice = $prefix . 'price';\n            $remaining = 'remainingmeal' . $letter;\n\n            // NB maxmeals=0 if they are sold out\n            if ($service->$mealvisible) {\n                $meal = new \\stdClass();\n                $meal->letter = $letter;\n                $meal->formname = $prefix;\n                $meal->price = $service->$mealprice;\n                $meal->label = $service->$mealname . \"  <span class=\\\"labelinfo\\\">(&pound;$meal->price each)</span>\";\n                $meal->name = $service->$mealname;\n                $meal->available = $station->$prefix;\n                $meal->purchase = $purchase->$prefix;\n                $meal->maxmeals = $numbers->$remaining > $maxpassengers ? $maxpassengers : $numbers->$remaining;\n\n                // precaution\n                $meal->maxmeals = $meal->maxmeals < 0 ? 0 : $meal->maxmeals;\n                $meal->choices = $this->choices($meal->maxmeals, true);\n                $meals[$letter] = $meal;\n            }\n        }\n\n        return $meals;\n    }\n\n\n\n    /**\n     * Update purchase with data returned from SagePay\n     * @param object $purchase\n     * @param array $data\n     */\n    public function updatePurchase($purchase, $data) {\n        $purchase->status = $data['Status'];\n        $purchase->statusdetail = $data['StatusDetail'];\n        $purchase->cardtype = $data['CardType'];\n        $purchase->last4digits = $data['Last4Digits'];\n        $purchase->bankauthcode = $data['BankAuthCode'];\n        $purchase->declinecode = $data['DeclineCode'];\n        $purchase->completed = 1;\n        $purchase->save();\n    }\n\n}\n",
+			"file": "src/library/OldBooking.php",
+			"file_size": 23652,
+			"file_write_time": 131604392858410932,
+			"settings":
+			{
+				"buffer_size": 23059,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/view/booking/joining.mustache",
+			"settings":
+			{
+				"buffer_size": 580,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/library/Booking.php",
+			"settings":
+			{
+				"buffer_size": 17400,
+				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
@@ -44,16 +66,8 @@
 			"file": "src/view/booking/numbers.mustache",
 			"settings":
 			{
-				"buffer_size": 994,
+				"buffer_size": 840,
 				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/view/service/edit.mustache",
-			"settings":
-			{
-				"buffer_size": 2258,
 				"line_ending": "Unix"
 			}
 		}
@@ -98,6 +112,7 @@
 		"/var/www/html/railtour/core",
 		"/var/www/html/railtour/src",
 		"/var/www/html/railtour/src/controller",
+		"/var/www/html/railtour/src/library",
 		"/var/www/html/railtour/src/schema",
 		"/var/www/html/railtour/src/view",
 		"/var/www/html/railtour/src/view/booking",
@@ -106,12 +121,18 @@
 	],
 	"file_history":
 	[
+		"/var/www/html/railtour/src/view/service/edit.mustache",
+		"/var/www/html/railtour/src/view/header.mustache",
+		"/var/www/html/railtour/src/view/formerrors.mustache",
+		"/var/www/html/railtour/src/controller/serviceController.php",
+		"/var/www/html/railtour/core/coreController.php",
+		"/var/www/html/railtour/core/coreForm.php",
 		"/home/howard/.config/sublime-text-3/Packages/Package Control/Package Control.sublime-settings",
 		"/home/howard/.config/sublime-text-3/Packages/User/Package Control.sublime-settings"
 	],
 	"find":
 	{
-		"height": 0.0
+		"height": 40.0
 	},
 	"find_in_files":
 	{
@@ -125,6 +146,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"getPurchase"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -147,49 +169,19 @@
 			[
 				{
 					"buffer": 0,
-					"file": "core/coreForm.php",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 7499,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								4003,
-								4003
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/PHP/PHP.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1580.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
 					"file": "src/controller/bookingController.php",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 35167,
+						"buffer_size": 35282,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								7377,
-								7377
+								9475,
+								9475
 							]
 						],
 						"settings":
@@ -199,7 +191,37 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2995.0,
+						"translation.y": 4822.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "core/coreForm.php",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7401,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5895,
+								5895
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/PHP/PHP.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2325.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -207,19 +229,19 @@
 				},
 				{
 					"buffer": 2,
-					"file": "src/controller/serviceController.php",
+					"file": "src/library/OldBooking.php",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 11626,
+						"buffer_size": 23059,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								4214,
+								4214
 							]
 						],
 						"settings":
@@ -229,7 +251,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 480.0,
+						"translation.y": 2537.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
@@ -237,19 +259,19 @@
 				},
 				{
 					"buffer": 3,
-					"file": "src/view/booking/numbers.mustache",
+					"file": "src/view/booking/joining.mustache",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 994,
+						"buffer_size": 580,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								742,
-								742
+								334,
+								334
 							]
 						],
 						"settings":
@@ -267,19 +289,49 @@
 				},
 				{
 					"buffer": 4,
-					"file": "src/view/service/edit.mustache",
+					"file": "src/library/Booking.php",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2258,
+						"buffer_size": 17400,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								290,
-								273
+								16809,
+								16809
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/PHP/PHP.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 8262.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/view/booking/numbers.mustache",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 840,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								299,
+								299
 							]
 						],
 						"settings":
@@ -292,7 +344,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 5,
 					"type": "text"
 				}
 			]
@@ -300,11 +352,11 @@
 	],
 	"incremental_find":
 	{
-		"height": 0.0
+		"height": 26.0
 	},
 	"input":
 	{
-		"height": 37.0
+		"height": 39.0
 	},
 	"layout":
 	{
@@ -337,7 +389,7 @@
 	"project": "railtour.sublime-project",
 	"replace":
 	{
-		"height": 0.0
+		"height": 48.0
 	},
 	"save_all_on_build": true,
 	"select_file":

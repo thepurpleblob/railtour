@@ -1,0 +1,21 @@
+{{> header }}
+
+    <h3 class="text-error">Joining station...</h3>
+
+    <p>
+        Tell us which station you will be joining the train at.
+    </p>
+
+    {{> form_errors }}
+
+    <form id="joining-form" class="form-horizontal" action="{{# path }}booking/joining{{/ path }}" method="post">
+        
+        {{{  form.joining }}}
+        
+        <div>
+            <input type="submit" name="next" value="Next step" class="btn btn-primary" />
+            <input type="submit" name="back" value="Back" class="btn btn-warning" formnovalidate />
+        </div>
+    </form>
+
+{{> footer }}

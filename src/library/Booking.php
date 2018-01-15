@@ -469,4 +469,23 @@ class Booking extends Admin {
 
         return $choices;
     }
+
+    /**
+     * Get a list of joining stations indexed by CRS
+     * @param $serviceid
+     * @return array stations
+     * @throws Exception
+     */
+    public function getJoiningStations($serviceid) {
+        $joinings = \ORM::forTable('joining')->where('serviceid', $serviceid)->findMany();
+        if (!$joinings) {
+            throw new Exception('No joining stations found for service id = ' . $serviceid);
+        }
+        $stations = array();
+        foreach ($joinings as $joining) {
+            $stations[$joining->crs] = $joining->station;
+        }
+
+        return $stations;
+    }
 }

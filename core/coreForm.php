@@ -151,29 +151,27 @@ class coreForm {
         return $html;
     }
 
+    /**
+     * NOTE: Label currently doesn't do anything (it used to)
+     */
     public function radio($name, $label, $selected, $options, $labelcol=4) {
         $id = $name . 'Radio';
         $inputcol = 12 - $labelcol;
-        $html = '<div class="form-group">';
-        if ($label) {
-            $html .= '    <label for="' . $id . '" class="col-sm-' . $labelcol . ' control-label">' . $label . '</label>';
-        }
-        $html .= '    <div class="col-sm-' . $inputcol .'">';
+        $html = '';
         foreach ($options as $value => $option) {
+            $id = 'radio_' . $name . '_' . $value;
             if ($value == $selected) {
                 $checked = 'checked';
             } else {
                 $checked = '';
             }
-            $html .= '<div class="radio">';
-            $html .= '<label>';
-            $html .= '<input type="radio" name="' . $name .'" id="optionsRadios1" value="' . $value . '" ' . $checked . '>';
+            $html .= '<div class="form-check">';
+            $html .= '<input class="form-check-input" type="radio" name="' . $name .'"  value="' . $value . '" id="' . $id . '" ' . $checked . '>';
+            $html .= '<label class="form-check-label" for="' . $id . '" >';
             $html .= $option;
             $html .= '</label>';
             $html .= '</div>';
         }
-        $html .= '    </div>';
-        $html .= "</div>";
 
         return $html;
     }

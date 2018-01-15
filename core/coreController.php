@@ -168,6 +168,7 @@ class coreController {
         $variables['system'] = $system;
         $variables['config'] = $CFG;
         $variables['showlogin'] = $viewname != 'user/login';
+        $variables['haserrors'] = !empty($variables['errors']);
 
         // Get template
         $template = $mustache->loadTemplate($viewname . '.mustache');
