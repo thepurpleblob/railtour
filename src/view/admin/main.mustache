@@ -1,6 +1,6 @@
 {{> header }}
 
-<h3>Railtour Services</h3>
+<h3>Railtours available for booking now</h3>
 
 {{^ anyservices }}
     <div class="alert alert-warning">
@@ -9,15 +9,17 @@
 {{/anyservices}}
 
 {{# services }}
-    <div class="panel panel-primary">
-        <div class="panel-heading">{{ date }} : {{ name }}</div>
-        <div class="panel-body">
-            {{ description }}
-            <br /><br />
-            <a class="btn btn-primary" href="{{ path('booking/index', service.code) }}">Book now</a>
-            {% if system.loggedin %}
-                <a class="btn btn-warning" href="{{ path('booking/telephone', service.code) }}">Telephone booking</a>
-            {% endif %}
+    <div class="card">
+        <div class="card-header">{{ name }} on {{ date }}</div>
+        <div class="card-body">
+            <div class="card-text">
+                {{{ description }}}
+                <br /><br />
+                <a class="btn btn-primary" href="{{# path }}booking/index{{/ path }}/{{ code }}">Book now</a>
+                {{# system.loggedin }}
+                    <a class="btn btn-warning" href="{{# path }}booking/telephone{{/ path }}/{{ service.code }}">Telephone booking</a>
+                {{/ system.loggedin }}
+            </div>
         </div>
     </div>
 {{/ services }}

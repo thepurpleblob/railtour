@@ -10,18 +10,7 @@ use Exception;
  * Class Booking
  * @package thepurpleblob\railtour\library
  */
-class User
-{
-
-    protected $controller;
-
-    /**
-     * Booking constructor.
-     * @param $controller
-     */
-    public function __construct($controller) {
-        $this->controller = $controller;
-    }
+class User {
 
     /**
      * Validate user

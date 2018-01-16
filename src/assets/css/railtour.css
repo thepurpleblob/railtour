@@ -101,3 +101,8 @@ tr.purchase_not_ok {
     border-color: #ebcccc;
     color: #a94442;
 }
+
+/* booking odds and ends */
+.destination-card {
+    margin-bottom: 15px;
+}

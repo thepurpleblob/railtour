@@ -1,44 +1,43 @@
 {{> header}}
 
-    <div class="srpsnavbar">
-        SRPS Railtours Online Booking &nbsp;<span class="navdot glyphicon glyphicon-record"></span>&nbsp; {{ service.name }}
-    </div>
-
-    <h3 class="text-error">Destination...</h3>
+    <h3 class="text-error">Destinations / Options</h3>
 
     <p>
         There is more than one destination or option for this tour. Please choose
         the one you would like.
     </p>
 
-    {% for destination in destinations %}
-        {% if destination.available %}
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title">{{ destination.name }}</h3>
+    {{# destinations }}
+        {{# available }}
+            <div class="card destination-card">
+                <div class="card-header">
+                    <h3>{{ name }}</h3>
                 </div>
-                <div class="panel-body">
-                    {{ destination.description | raw }}
-                    <ul>
-                        <li><b>First adult/child</b> (each) &pound;{{ destination.first }}</li>
-                        <li><b>Standard adult</b> (each) &pound;{{ destination.standard }}</li>
-                        <li><b>Standard child</b> (each) &pound;{{ destination.child }}</li>
-                    </ul>
-                    <a class="btn btn-primary" href="{{ path( 'booking/destination', destination.crs ) }}">Choose <b>{{ destination.name }}</b></a>
+                <div class="card-body">
+                    <div class="card-text">
+                        {{{ description }}}
+                        <ul>
+                            <li><b>First adult/child</b> (each) &pound;{{ first }}</li>
+                            <li><b>Standard adult</b> (each) &pound;{{ standard }}</li>
+                            <li><b>Standard child</b> (each) &pound;{{ child }}</li>
+                        </ul>
+                        <a class="btn btn-primary" href="{{# path }}booking/destination{{/ path }}/{{ crs }}">Choose <b>{{ name }}</b></a>
+                    </div>
                 </div>
             </div>
-        {% else %}
+        {{/ available }}
+        {{^ available }}
             <div class="panel panel-default">
-                <p class="muted">{{ destination.description | raw }}</p>
+                <p class="muted">{{{ description }}}</p>
                 <p><b>Sorry, this destination is fully booked.</b></p>
             </div>
-        {% endif %}
-    {% endfor %}
+        {{/ available }}
+    {{/ destinations }}
 
     <div>
-        <form action="{{ path( 'booking/destination' ) }}" method="post">
+        <form action="{{# path }}booking/destination{{/ path }}" method="post">
             <input type="submit" name="back" value="Back" class="btn btn-warning" formnovalidate />
         </form>
     </div>
 
-{% endblock content %}
+{{> footer }}
