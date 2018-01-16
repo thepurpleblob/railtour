@@ -281,7 +281,12 @@ class coreController {
         global $CFG;
 
         $classname = '\\thepurpleblob\\' . $CFG->projectname . '\\library\\' . $name;
-        return new $classname($this);
+        $lib = new $classname;
+
+        // So class can reference the controller
+        $lib->controller = $this;
+
+        return $lib;
     }
 
     /**

@@ -360,7 +360,7 @@ class Booking extends Admin {
         // if no code or serviceid was supplied then we are not allowed a new one
         // ...so display expired message
         if (!$serviceid) {
-            $this->controller->View('booking/timeout.mustache');
+            $this->controller->View('booking/timeout');
         }
 
         // Get the service

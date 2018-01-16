@@ -319,17 +319,16 @@ class BookingController extends coreController {
     public function destinationAction($crs = '')
     {
         // Basics
-        $booking = $this->getLibrary('Booking');
-        $purchase = $booking->getPurchase();
+        $purchase = $this->bookinglib->getSessionPurchase();
         $serviceid = $purchase->serviceid;
-        $service = $booking->Service($serviceid);
+        $service = $this->bookinglib->getService($serviceid);
 
         if ($purchase->bookedby) {
             $this->require_login('ROLE_ORGANISER', 'booking/destination');
         }
 
         // get the destinations
-        $stations = $booking->getDestinationStations($serviceid);
+        $stations = $this->bookinglib->getDestinationStations($serviceid);
 
         // If there is only one then there is nothing to do
         if (count($stations)==1) {
@@ -341,7 +340,7 @@ class BookingController extends coreController {
         }
 
         // Get destinations with extra pricing information
-        $destinations = $booking->getDestinationsExtra($purchase, $service);
+        $destinations = $this->bookinglib->getDestinationsExtra($purchase, $service);
 
         // anything submitted?
         // Will only apply to back in this case
@@ -366,7 +365,7 @@ class BookingController extends coreController {
         }
 
         // display form
-        $this->View('booking/destination.html.twig', array(
+        $this->View('booking/destination', array(
             'purchase' => $purchase,
             'destinations' => $destinations,
             'service' => $service,

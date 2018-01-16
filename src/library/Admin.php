@@ -18,8 +18,6 @@ class Admin {
 
     private $stations = null;
 
-    public $controller;
-
     /**
      * Set up the stations json data
      * Need to call this first, if you want to use this data

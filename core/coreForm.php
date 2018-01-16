@@ -157,7 +157,7 @@ class coreForm {
     public function radio($name, $label, $selected, $options, $labelcol=4) {
         $id = $name . 'Radio';
         $inputcol = 12 - $labelcol;
-        $html = '';
+        $html = '<div class="form-group">';
         foreach ($options as $value => $option) {
             $id = 'radio_' . $name . '_' . $value;
             if ($value == $selected) {
@@ -172,6 +172,7 @@ class coreForm {
             $html .= '</label>';
             $html .= '</div>';
         }
+        $html .= '</div>';
 
         return $html;
     }
