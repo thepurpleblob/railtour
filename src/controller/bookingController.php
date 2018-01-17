@@ -443,23 +443,25 @@ class BookingController extends coreController {
         ));
     }
 
-   public function classAction($class = '')
-    {
+   /**
+    * Book class (first/standard)
+    */
+   public function classAction($class = '') {
+
         // Basics
-        $booking = $this->getLibrary('Booking');
-        $purchase = $booking->getPurchase();
+        $purchase = $this->bookinglib->getSessionPurchase();
         $serviceid = $purchase->serviceid;
-        $service = $booking->Service($serviceid);
+        $service = $this->bookinglib->getService($serviceid);
 
         if ($purchase->bookedby) {
             $this->require_login('ROLE_ORGANISER', 'booking/class');
         }
 
         // Get the limits for this service:
-        $limits = $booking->getLimits($serviceid);
+        $limits = $this->bookinglib->getLimits($serviceid);
 
         // get acting maxparty
-        $maxpartystandard = $booking->getMaxparty($limits);
+        $maxpartystandard = $this->bookinglib->getMaxparty($limits);
 
         // get first and standard maximum parties
         $maxpartyfirst = $limits->maxpartyfirst ? $limits->maxpartyfirst : $maxpartystandard;
@@ -468,12 +470,12 @@ class BookingController extends coreController {
         $passengercount = $purchase->adults + $purchase->children;
 
         // get first and standard fares
-        $farestandard = $booking->calculateFare($service, $purchase, 'S');
-        $farefirst = $booking->calculateFare($service, $purchase, 'F');
+        $farestandard = $this->bookinglib->calculateFare($service, $purchase, 'S');
+        $farefirst = $this->bookinglib->calculateFare($service, $purchase, 'F');
 
         // we need to know about the number
         // it's a bodge - but if the choice is made then skip this check
-        $numbers = $booking->countStuff($serviceid, $purchase);
+        $numbers = $this->bookinglib->countStuff($serviceid, $purchase);
         $availablefirst = $numbers->remainingfirst >= $passengercount;
         $availablestandard = $numbers->remainingstandard >= $passengercount;
 
@@ -505,30 +507,31 @@ class BookingController extends coreController {
         }
 
         // display form
-        $this->View('booking/class.html.twig', array(
+        $this->View('booking/class', array(
             'purchase' => $purchase,
             'service' => $service,
             'farefirst' => $farefirst,
             'farestandard' => $farestandard,
             'availablefirst' => $availablefirst,
             'availablestandard' => $availablestandard,
+            'childname' => $purchase->children == 1 ? 'child' : 'children',
+            'adultname' => $purchase->adults == 1 ? 'adult' : 'adults',
         ));
     }
 
     public function additionalAction() {
 
         // Basics
-        $booking = $this->getLibrary('Booking');
-        $purchase = $booking->getPurchase();
+        $purchase = $this->bookinglib->getPurchase();
         $serviceid = $purchase->serviceid;
-        $service = $booking->Service($serviceid);
+        $service = $this->bookinglib->getService($serviceid);
 
         if ($purchase->bookedby) {
             $this->require_login('ROLE_ORGANISER', 'booking/additional');
         }
 
         // current counts
-        $numbers = $booking->countStuff($serviceid, $purchase);
+        $numbers = $this->bookinglib->countStuff($serviceid, $purchase);
 
         // Get the passenger count
         $passengercount = $purchase->adults + $purchase->children;
@@ -566,7 +569,7 @@ class BookingController extends coreController {
         }
 
         // display form
-        $this->View('booking/additional.html.twig', array(
+        $this->View('booking/additional', array(
             'purchase' => $purchase,
             'service' => $service,
             'iscomments' => $iscomments,

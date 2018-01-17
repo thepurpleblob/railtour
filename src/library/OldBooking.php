@@ -140,129 +140,15 @@ class Booking
         return ($seatsavailable and $isvisible and $isindate);
     }
 
-    public function getDestination($serviceid, $crs) {
-        $destination = \ORM::forTable('destination')->where(array(
-            'serviceid' => $serviceid,
-            'crs' => $crs,
-        ))->findOne();
-        if (!$destination) {
-            throw new Exception('No destination station for for service id = ' . $serviceid . ' and CRS = ' . $crs);
-        }
-
-        return $destination;
-    }
-
-    /**
-     * Get a list of joining stations indexed by CRS
-     * @param $serviceid
-     * @return array stations
-     * @throws Exception
-     */
-    public function getJoiningStations($serviceid) {
-        $joinings = \ORM::forTable('joining')->where('serviceid', $serviceid)->findMany();
-        if (!$joinings) {
-            throw new Exception('No joining stations found for service id = ' . $serviceid);
-        }
-        $stations = array();
-        foreach ($joinings as $joining) {
-            $stations[$joining->crs] = $joining->station;
-        }
-
-        return $stations;
-    }
-
-    /**
-     * Get single joining record
-     * @param $serviceid
-     * @param $crs
-     * @return object
-     * @throws Exception
-     */
-    public function getJoining($serviceid, $crs) {
-        $joining = \ORM::forTable('joining')->where(array(
-            'serviceid' => $serviceid,
-            'crs' => $crs,
-        ))->findOne();
-        if (!$joining) {
-            throw new Exception('No joining station found for service id = ' . $serviceid . ' and CRS = ' . $crs);
-        }
-
-        return $joining;
-    }
-
-    /**
-     * Get a list of destination stations indexed by CRS
-     * @param $serviceid
-     * @return array stations
-     * @throws Exception
-     */
-    public function getDestinationStations($serviceid) {
-        $destinations = \ORM::forTable('destination')->where('serviceid', $serviceid)->findMany();
-        if (!$destinations) {
-            throw new Exception('No destination stations found for service id = ' . $serviceid);
-        }
-        $stations = array();
-        foreach ($destinations as $destination) {
-            $stations[$destination->crs] = $destination->name;
-        }
-
-        return $stations;
-    }
 
 
-    /**
-     * Creates an array of destinations with extra stuff to enhance the
-     * user form.
-     * @param $purchase purchase object
-     * @return array complicated destination objects
-     * @throws Exception
-     */
-    public function getDestinationsExtra($purchase, $service) {
 
-        // Get counts info
-        $numbers = $this->countStuff($service->id, $purchase);
-        $destinationcounts = $numbers->destinations;
-        $passengercount = $purchase->adults + $purchase->children;
 
-        // get Destinations
-        $destinations = \ORM::forTable('destination')->where('serviceid', $service->id)->findMany();
-        if (!$destinations) {
-            throw new Exception('No destinations found for service id = ' . $service->id);
-        }
 
-        // Get joining information
-        $joining = \ORM::forTable('joining')->where(array(
-            'serviceid' => $service->id,
-            'crs' => $purchase->joining,
-        ))->findOne();
-        if (!$joining) {
-            throw new Exception('Missing joining record for service id = ' . $service->id . ', crs = ' . $purchase->joining);
-        }
 
-        $pricebandgroupid = $joining->pricebandgroupid;
-        foreach ($destinations as $destination) {
-            $destinationcount = $destinationcounts[$destination->crs];
-            $priceband = \ORM::forTable('priceband')->where(array(
-                'pricebandgroupid' => $pricebandgroupid,
-                'destinationid' => $destination->id,
-            ))->findOne();
-            if (!$priceband) {
-                throw new Exception("No priceband for pricebandgroup id = $pricebandgroupid destination id = " . $destination->id . " service = " . $service->id);
-            }
-            $destination->first = $priceband->first;
-            $destination->standard = $priceband->standard;
-            $destination->child = $priceband->child;
 
-            // a limit of 0 means ignore the limit
-            if (($destinationcount->limit==0) or ($destinationcount->remaining>=$passengercount)) {
-                $destination->available = true;
-            } else {
-                $destination->available = false;
-            }
-        }
 
-        return $destinations;
-    }
+
 
 
 
@@ -541,139 +427,11 @@ class Booking
         return $count;
     }
 
-    /**
-     * Work out the price of the tour
-     * This will work (optionally) for first or standard travel
-     * @param object $service
-     * @param object $purchase
-     * @param string $class (F or S)
-     */
-    public function calculateFare($service, $purchase, $class) {
 
-        // Need to drag everything out of the database
-        $serviceid = $service->id;
 
-        // Get basic numbers from purchase
-        $adults = $purchase->adults;
-        $children = $purchase->children;
-        $meala = $purchase->meala;
-        $mealb = $purchase->mealb;
-        $mealc = $purchase->mealc;
-        $meald = $purchase->meald;
 
-        // get basic start/destination info
-        $join = $purchase->joining;
-        $dest= $purchase->destination;
 
-        // get the db records for above
-        $joining = $this->getJoining($serviceid, $join);
-        $destination = $this->getDestination($serviceid, $dest);
-        $pricebandgroupid = $joining->pricebandgroupid;
-        $destinationid = $destination->id;
-        $priceband = \ORM::forTable('priceband')->where(array(
-            'pricebandgroupid' => $pricebandgroupid,
-            'destinationid' => $destinationid,
-        ))->findOne();
-        if (!$priceband) {
-            throw new Exception('No priceband found for pricebandgroup id = ' . $pricebandgroupid . ' destinationid = ' . $destinationid);
-        }
 
-        // we return an object with various info
-        $result = new \stdClass();
-        if ($class=="F") {
-            $result->adultunit = $priceband->first;
-            $result->childunit = $priceband->first;
-            $result->adultfare = $adults * $result->adultunit;
-            $result->childfare = $children * $result->childunit;
-        } else {
-            $result->adultunit = $priceband->standard;
-            $result->childunit = $priceband->child;
-            $result->adultfare = $adults * $result->adultunit;
-            $result->childfare = $children * $result->childunit;
-        }
-
-        // Calculate meals
-        $result->meals = $meala * $service->mealaprice +
-            $mealb * $service->mealbprice +
-            $mealc * $service->mealcprice +
-            $meald * $service->mealdprice;
-
-        // Calculate seat supplement
-        $passengers = $adults + $children;
-        $suppallowed = (($passengers==1) or ($passengers==2));
-        if (($purchase->class == 'F') && $purchase->seatsupplement && $suppallowed) {
-            $result->seatsupplement = $passengers * $service->singlesupplement;
-        } else {
-            $result->seatsupplement = 0;
-        }
-
-        // Grand total
-        $result->total = $result->adultfare + $result->childfare + $result->meals + $result->seatsupplement;
-
-        return $result;
-    }
-
-    /**
-     * detect if any meals are available
-     * @return boolean
-     */
-    public function mealsAvailable($service) {
-        return
-            $service->mealavisible ||
-            $service->mealbvisible ||
-            $service->mealcvisible ||
-            $service->mealdvisible
-            ;
-    }
-
-    /**
-     * Create an array of available meals
-     * along with names, price and array of choices
-     * @param $service
-     * @param $purchase
-     * @return array
-     */
-    public function mealsForm($service, $purchase) {
-
-        // we need to know about the number
-        $numbers = $this->countStuff($service->id);
-
-        // Get the passenger count
-        $maxpassengers = $purchase->adults + $purchase->children;
-
-        // get the joining station (to see what meals available)
-        $station = $this->getJoining($service->id, $purchase->joining);
-
-        $letters = array('a', 'b', 'c', 'd');
-        $meals = array();
-        foreach ($letters as $letter) {
-            $prefix = 'meal' . $letter;
-            $mealname = $prefix . 'name';
-            $mealvisible = $prefix . 'visible';
-            $mealprice = $prefix . 'price';
-            $remaining = 'remainingmeal' . $letter;
-
-            // NB maxmeals=0 if they are sold out
-            if ($service->$mealvisible) {
-                $meal = new \stdClass();
-                $meal->letter = $letter;
-                $meal->formname = $prefix;
-                $meal->price = $service->$mealprice;
-                $meal->label = $service->$mealname . "  <span class=\"labelinfo\">(&pound;$meal->price each)</span>";
-                $meal->name = $service->$mealname;
-                $meal->available = $station->$prefix;
-                $meal->purchase = $purchase->$prefix;
-                $meal->maxmeals = $numbers->$remaining > $maxpassengers ? $maxpassengers : $numbers->$remaining;
-
-                // precaution
-                $meal->maxmeals = $meal->maxmeals < 0 ? 0 : $meal->maxmeals;
-                $meal->choices = $this->choices($meal->maxmeals, true);
-                $meals[$letter] = $meal;
-            }
-        }
-
-        return $meals;
-    }
 
 
 

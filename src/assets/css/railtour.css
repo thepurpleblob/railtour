@@ -103,6 +103,6 @@ tr.purchase_not_ok {
 }
 
 /* booking odds and ends */
-.destination-card {
+.destination-card, .class-card {
     margin-bottom: 15px;
 }

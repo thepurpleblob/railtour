@@ -1,10 +1,4 @@
-{% extends 'booking/booking.html.twig' %}
-
-{% block content %}
-
-    <div class="srpsnavbar">
-        SRPS Railtours Online Booking &nbsp;<span class="navdot glyphicon glyphicon-record"></span>&nbsp; {{ service.name }}
-    </div>
+{{> header }}
 
     <h3 class="text-error">Additional options {% if iscomments %}and comments...{% endif %}</h3>
 
@@ -35,4 +29,4 @@
         </div>
     </form>
 
-{% endblock content %}
+{{> footer }}

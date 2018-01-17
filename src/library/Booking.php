@@ -625,4 +625,116 @@ class Booking extends Admin {
 
         return array_values($meals);
     }
+
+    /**
+     * Work out the price of the tour
+     * This will work (optionally) for first or standard travel
+     * @param object $service
+     * @param object $purchase
+     * @param string $class (F or S)
+     * @throws Exception
+     */
+    public function calculateFare($service, $purchase, $class) {
+
+        // Need to drag everything out of the database
+        $serviceid = $service->id;
+
+        // Get basic numbers from purchase
+        $adults = $purchase->adults;
+        $children = $purchase->children;
+        $meala = $purchase->meala;
+        $mealb = $purchase->mealb;
+        $mealc = $purchase->mealc;
+        $meald = $purchase->meald;
+
+        // get basic start/destination info
+        $joincrs = $purchase->joining;
+        $destcrs = $purchase->destination;
+
+        // get the db records for above
+        $joining = $this->getJoiningCRS($serviceid, $joincrs);
+        $destination = $this->getDestinationCRS($serviceid, $destcrs);
+        $pricebandgroupid = $joining->pricebandgroupid;
+        $destinationid = $destination->id;
+        $priceband = \ORM::forTable('priceband')->where(array(
+            'pricebandgroupid' => $pricebandgroupid,
+            'destinationid' => $destinationid,
+        ))->findOne();
+        if (!$priceband) {
+            throw new Exception('No priceband found for pricebandgroup id = ' . $pricebandgroupid . ' destinationid = ' . $destinationid);
+        }
+
+        // we return an object with various info
+        $result = new \stdClass();
+        if ($class=="F") {
+            $result->adultunit = $priceband->first;
+            $result->childunit = $priceband->first;
+            $result->adultfare = $adults * $result->adultunit;
+            $result->childfare = $children * $result->childunit;
+        } else {
+            $result->adultunit = $priceband->standard;
+            $result->childunit = $priceband->child;
+            $result->adultfare = $adults * $result->adultunit;
+            $result->childfare = $children * $result->childunit;
+        }
+
+        // Calculate meals
+        $result->meals = $meala * $service->mealaprice +
+            $mealb * $service->mealbprice +
+            $mealc * $service->mealcprice +
+            $meald * $service->mealdprice;
+
+        // Calculate seat supplement
+        $passengers = $adults + $children;
+        $suppallowed = (($passengers==1) or ($passengers==2));
+        if (($purchase->class == 'F') && $purchase->seatsupplement && $suppallowed) {
+            $result->seatsupplement = $passengers * $service->singlesupplement;
+        } else {
+            $result->seatsupplement = 0;
+        }
+
+        // Grand total
+        $result->total = $result->adultfare + $result->childfare + $result->meals + $result->seatsupplement;
+
+        return $result;
+    }
+
+    /**
+     * Get single joining record from CRS code
+     * @param $serviceid
+     * @param $crs
+     * @return object
+     * @throws Exception
+     */
+    public function getJoiningCRS($serviceid, $crs) {
+        $joining = \ORM::forTable('joining')->where(array(
+            'serviceid' => $serviceid,
+            'crs' => $crs,
+        ))->findOne();
+        if (!$joining) {
+            throw new Exception('No joining station found for service id = ' . $serviceid . ' and CRS = ' . $crs);
+        }
+
+        return $joining;
+    }
+
+    /**
+     * Get destination from CRS code
+     * @param int $serviceid
+     * @param string $crs
+     * @return object
+     * @throws Exception
+     */
+    public function getDestinationCRS($serviceid, $crs) {
+        $destination = \ORM::forTable('destination')->where(array(
+            'serviceid' => $serviceid,
+            'crs' => $crs,
+        ))->findOne();
+        if (!$destination) {
+            throw new Exception('No destination station for for service id = ' . $serviceid . ' and CRS = ' . $crs);
+        }
+
+        return $destination;
+    }
+
 }
