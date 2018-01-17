@@ -378,33 +378,30 @@ class BookingController extends coreController {
    public function mealsAction()
     {
         // Basics
-        $booking = $this->getLibrary('Booking');
-        $purchase = $booking->getPurchase();
+        $purchase = $this->bookinglib->getSessionPurchase();
         $serviceid = $purchase->serviceid;
-        $service = $booking->Service($serviceid);
+        $service = $this->bookinglib->getService($serviceid);
 
         if ($purchase->bookedby) {
             $this->require_login('ROLE_ORGANISER', 'booking/meals');
         }
 
         // If there are no meals on this service just bail
-        if (!$booking->mealsAvailable($service)) {
+        if (!$this->bookinglib->mealsAvailable($service)) {
             $this->redirect('booking/class');
         }
 
         // Array of meal options for forms
-        $meals = $booking->mealsForm($service, $purchase);
+        $meals = $this->bookinglib->mealsForm($service, $purchase);
 
         // Create validation
         $gumprules = array();
         $fieldnames = array();
-        $jqvrules = array();
         foreach ($meals as $meal) {
             $gumprules[$meal->formname] = 'required|integer|min_numeric,0|max_numeric,' . $meal->maxmeals;
             $fieldnames[$meal->formname] = $meal->name;
-            $jqvrules[] = $meal->formname . '{required: true, range: [0, ' . $meal->maxmeals . ']}';
+            $meal->formselect = $this->form->select($meal->formname, $meal->label, $meal->purchase, $meal->choices);
         }
-        $jqv = implode(',', $jqvrules);
 
         // hopefully no errors
         $errors = null;
@@ -416,7 +413,7 @@ class BookingController extends coreController {
             if (!empty($data['back'])) {
 
                 // We need to know if Destinations would have been displayed
-                $stations = $booking->getDestinationStations($serviceid);
+                $stations = $this->bookinglib->getDestinationStations($serviceid);
                 if (count($stations) > 1) {
                     $this->redirect('booking/destination', true);
                 } else {
@@ -438,11 +435,10 @@ class BookingController extends coreController {
         }
 
         // display form
-        $this->View('booking/meals.html.twig', array(
+        $this->View('booking/meals', array(
             'purchase' => $purchase,
             'service' => $service,
             'meals' => $meals,
-            'jqv' => $jqv,
             'errors' => $errors,
         ));
     }

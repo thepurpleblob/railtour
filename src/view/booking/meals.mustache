@@ -1,0 +1,23 @@
+{{> header }}
+
+    <h3 class="text-error">Meals...</h3>
+
+    <p>
+        Tell us which meals you would like. Please select the number of each available
+        meal that you require.
+    </p>
+
+    {{> form_errors }}
+
+    <form id="meals-form" class="form-horizontal" action="{{# path }}booking/meals{{/ path }}" method="post" >
+        {{# meals }}
+            {{{ formselect }}}
+        {{/ meals }}
+
+        <div>
+            <input type="submit" name="next" value="Next step" class="btn btn-primary" />
+            <input type="submit" name="back" value="Back" class="btn btn-warning" formnovalidate />
+        </div>
+    </form>
+
+{{> footer }}

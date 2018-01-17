@@ -58,10 +58,7 @@ class coreController {
         $classname = $namespace . '\\' . $name;
         $lib = new $classname;
 
-        // If this has a 'controller' property, set it
-        if (property_exists($lib, 'controller')) {
-            $lib->controller = $this;
-        }
+        $lib->controller = $this;
 
         return $lib;
     }
