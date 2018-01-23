@@ -227,7 +227,7 @@ class BookingController extends coreController {
         // Create form
         $form = new \stdClass();
         $form->adults = $this->form->select('adults', 'Number of adults', $purchase->adults, $choices_adult);
-        $form->children = $this->form->select('children', 'Number of children', $purchase->children, $choices_children);
+        $form->children = $this->form->select('children', 'Number of children (14 and under)', $purchase->children, $choices_children);
 
 
         // display form
@@ -522,7 +522,7 @@ class BookingController extends coreController {
     public function additionalAction() {
 
         // Basics
-        $purchase = $this->bookinglib->getPurchase();
+        $purchase = $this->bookinglib->getSessionPurchase();
         $serviceid = $purchase->serviceid;
         $service = $this->bookinglib->getService($serviceid);
 
@@ -568,22 +568,26 @@ class BookingController extends coreController {
             $this->redirect('booking/personal');
         }
 
+        // Create form
+        $form = new \stdClass;
+        $form->comment = $this->form->text('comment', '', $purchase->comment);
+        $form->seatsupplement = $this->form->yesno('seatsupplement', 'Window seats in first class', $purchase->seatsupplement);
+
         // display form
         $this->View('booking/additional', array(
             'purchase' => $purchase,
             'service' => $service,
+            'form' => $form,
             'iscomments' => $iscomments,
             'issupplement' => $issupplement,
         ));
     }
 
-    public function personalAction()
-    {
+    public function personalAction() {
         // Basics
-        $booking = $this->getLibrary('Booking');
-        $purchase = $booking->getPurchase();
+        $purchase = $this->bookinglib->getSessionPurchase();
         $serviceid = $purchase->serviceid;
-        $service = $booking->Service($serviceid);
+        $service = $this->bookinglib->getService($serviceid);
 
         if ($purchase->bookedby) {
             $this->require_login('ROLE_ORGANISER', 'booking/personal');
@@ -643,9 +647,23 @@ class BookingController extends coreController {
             }
         }
 
+        // Create form
+        $form = new stdClass;
+        $form->title = $this->form->text('title', 'Title', $purchase->title, FORM_REQUIRED);
+        $form->firstname = $this->form->text('firstname', 'First name', $purchase->firstname, FORM_REQUIRED);
+        $form->surname = $this->form->text('surname', 'Surname', $purchase->surname);
+        $form->address1 = $this->form->text('address1', 'Address line 1', $purchase->address1, FORM_REQUIRED);
+        $form->address2 = $this->form->text('address2', 'Address line 2', $purchase->address2);
+        $form->city = $this->form->text('city', 'Post town / city', $purchase->city, FORM_REQUIRED);
+        $form->county = $this->form->text('county', 'County', $purchase->county, FORM_REQUIRED);
+        $form->postcode = $this->form->text('postcode', 'Post code', $purchase->postcode, FORM_REQUIRED);
+        $form->phone = $this->form->text('phone', 'Telephone', $purchase->phone);
+        $form->email = $this->form->text('email', 'Email', $purchase->email, FORM_REQUIRED);
+
         // display form
-        $this->View('booking/personal.html.twig', array(
+        $this->View('booking/personal', array(
             'purchase' => $purchase,
+            'form' => $form,
             'service' => $service,
         ));
     }

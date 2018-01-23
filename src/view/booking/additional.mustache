@@ -1,18 +1,18 @@
 {{> header }}
 
-    <h3 class="text-error">Additional options {% if iscomments %}and comments...{% endif %}</h3>
+    <h3 class="text-error">Additional options {{# iscomments }}and comments...{{/ iscomments }}</h3>
 
-    <form id="additional-form" class="form-horizontal" action="{{ path('booking/additional') }}" method="post">
-        {% if iscomments %}
+    <form id="additional-form" class="form-horizontal" action="{{# path }}booking/additional{{/ path }}" method="post">
+        {{# iscomments }}
             <div class="alert alert-block">
                 You may add a short comment or request here and we will do our best
                 to accommodate you. Please <b>DO NOT</b> use this to ask a question
                 or request special meals - please call us. 
             </div>  
-            {{ form_text('comment', '', purchase.comment) }}
-        {% endif %}
+            {{{ form.comment }}}
+        {{/ iscomments }}
                     
-        {% if issupplement %}
+        {{# issupplement }}
             <div class="alert alert-block">
                 You may specially request the single seats by the window in our
                 'First Open' coaches. These are available in limited numbers to
@@ -20,8 +20,8 @@
                 a charge of &pound;{{ service.singlesupplement | number_format(2) }}
                 per person<br />
             </div>  
-            {{ form_yesno('seatsupplement', 'Window seats in First Class', purchase.seatsupplement) }}
-        {% endif %}
+            {{{ form.seatsupplement }}}
+        {{/ issupplement }}
 
         <div>
             <input type="submit" name="next" value="Next step" class="btn btn-primary" />
