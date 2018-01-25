@@ -11,16 +11,16 @@
     {{> form_errors }}
 
     <form id="personal-form" class="form-horizontal" action="{{# path }}booking/personal{{/ path }}" method="post">
-        {{ form_text('title', 'Title', purchase.title) }}
-        {{ form_text('firstname', 'First name', purchase.firstname) }}
-        {{ form_text('surname', 'Surname', purchase.surname) }}
-        {{ form_text('address1', 'Address line 1', purchase.address1) }}
-        {{ form_text('address2', 'Address line 2', purchase.address2) }}
-        {{ form_text('city', 'Post town / city', purchase.city) }}
-        {{ form_text('county', 'County', purchase.county) }}
-        {{ form_text('postcode', 'Post code', purchase.postcode) }}
-        {{ form_text('phone', 'Telephone', purchase.phone) }}
-        {{ form_text('email', 'Email', purchase.email) }}
+        {{{ form.title }}}
+        {{{ form.firstname }}}
+        {{{ form.surname }}}
+        {{{ form.address1 }}}
+        {{{ form.address2 }}}
+        {{{ form.city }}}
+        {{{ form.county }}}
+        {{{ form.postcode }}}
+        {{{ form.phone }}}
+        {{{ form.email }}}
 
         {{# service.eticketenabled }}
             {{# service.eticketoptional }}

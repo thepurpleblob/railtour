@@ -45,15 +45,14 @@ class coreForm {
     public function text($name, $label, $value, $required=false, $attrs=null, $type='text') {
         $id = $name . 'Text';
         $reqstr = $required ? 'required="true"' : '';
-        $validationclass = $required ? 'has-danger' : '';
+        $validation = $required && !$value ? '&nbsp;<small class="rt-required">(required)</small>' : '';
         $html = '<div class="form-group">';
         if ($label) {
-            $html .= '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
+            $html .= '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . ' ' . $validation . '</label>';
         }
-        $html .= '    <div class="col-sm-8 ' . $validationclass . '">';
+        $html .= '    <div class="col-sm-8">';
         $html .= '    <input type="' . $type . '" class="form-control input-sm" name="'.$name.'" id="'.$id.'" value="'.$value.'" '.
-            $this->attributes($attrs) . ' ' . $reqstr . '/>';
-
+            $this->attributes($attrs) . ' ' . $reqstr . '/>';  
         $html .= '</div></div>';
 
         return $html;

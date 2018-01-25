@@ -106,3 +106,7 @@ tr.purchase_not_ok {
 .destination-card, .class-card {
     margin-bottom: 15px;
 }
+
+.rt-required {
+    color: #dc3545;
+}

@@ -1,0 +1,88 @@
+{{> header }}
+
+    <h3 class="text-error">Review and pay</h3>
+
+    <p>
+        Review your booking information. When you are happy, go to our secure
+        payment partner to complete your booking.
+    </p>
+
+    <dl class="row">
+        <dt class="col-3">Booking ref</dt>
+        <dd class="col-9">{{ purchase.bookingref }}</dd>
+
+        <dt class="col-3">Tour name</dt>
+        <dd class="col-9">{{ service.name }}</dd>
+
+        <dt class="col-3">Tour date</dt>
+        <dd class="col-9">{{ service.date | date('d/m/Y') }}</dd>
+
+        <dt class="col-3">Destination</dt>
+        <dd class="col-9">{{ destination.name }}</dd>
+
+        <dt class="col-3">Joining station</dt>
+        <dd class="col-9">{{ joining.station }}</dd>
+
+        <dt class="col-3">Number of adults</dt>
+        <dd class="col-9">{{ purchase.adults }}</dd>
+
+        <dt class="col-3">Number of children</dt>
+        <dd class="col-9">{{ purchase.children }}</dd>
+        
+        <dt class="col-3">Travel class</dt>
+        <dd class="col-9">{{ class }}</dd>
+        
+        {{# purchase.seatsupplement }}
+            <dt class="col-3">Window supplement</dt>
+            <dd class="col-9">Yes (&pound;{{ fare.seatsupplement }})</dd>
+        {{/ purchase.seatsupplement }}
+
+        <dt class="col-3">Name</dt>
+        <dd class="col-9">{{ purchase.title }} {{ purchase.firstname }} {{ purchase.surname }}</dd>
+
+        <dt class="col-3">Address line 1</dt>
+        <dd class="col-9">{{ purchase.address1 }}</dd>
+
+        {{# purchase.address2 }}
+            <dt class="col-3">Address line 2</dt>
+            <dd class="col-9">{{ purchase.address2 }}</dd>
+        {{/ purchase.address2 }}
+
+        <dt class="col-3">Post town/city</dt>
+        <dd class="col-9">{{ purchase.city }}</dd>
+
+        {{# purchase.county }}
+            <dt class="col-3">County</dt>
+            <dd class="col-9">{{ purchase.county }}</dd>
+        {{/ purchase.county }}
+
+        <dt class="col-3">Postcode</dt>
+        <dd class="col-9">{{ purchase.postcode }}</dd>
+        
+        {{# purchase.phone }}
+            <dt class="col-3">Telephone</dt>
+            <dd class="col-9">{{ purchase.phone }}</dd>
+        {{/ purchase.phone }}
+            
+        <dt class="col-3">Email</dt>
+        <dd class="col-9">{{ purchase.email }}</dd>
+
+        <dt class="col-3">Total price</dt>
+        <dd class="col-9">&pound;{{ purchase.payment }}</dd>
+        
+    </dl>
+
+    <div class="alert alert-error">
+        By placing this booking you agree that you have read, understood and agree
+        to our <a href="http://www.srps.org.uk/railtours/conditions.htm" target="_terms">
+        Terms and Conditions</a>
+    </div>
+
+    <form id="review-form" class="form-horizontal" action="{{# path }}booking/payment{{/ path }}" method="post">
+        <div>
+            <input type="submit" name="next" value="Go to our secure payment site" class="btn btn-primary" />
+            <input type="submit" name="back" value="Back" class="btn btn-warning" formnovalidate />
+        </div>
+    </form>
+
+{{> footer }}

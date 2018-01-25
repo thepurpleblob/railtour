@@ -648,14 +648,14 @@ class BookingController extends coreController {
         }
 
         // Create form
-        $form = new stdClass;
-        $form->title = $this->form->text('title', 'Title', $purchase->title, FORM_REQUIRED);
+        $form = new \stdClass;
+        $form->title = $this->form->text('title', 'Title', $purchase->title);
         $form->firstname = $this->form->text('firstname', 'First name', $purchase->firstname, FORM_REQUIRED);
-        $form->surname = $this->form->text('surname', 'Surname', $purchase->surname);
+        $form->surname = $this->form->text('surname', 'Surname', $purchase->surname, FORM_REQUIRED);
         $form->address1 = $this->form->text('address1', 'Address line 1', $purchase->address1, FORM_REQUIRED);
         $form->address2 = $this->form->text('address2', 'Address line 2', $purchase->address2);
         $form->city = $this->form->text('city', 'Post town / city', $purchase->city, FORM_REQUIRED);
-        $form->county = $this->form->text('county', 'County', $purchase->county, FORM_REQUIRED);
+        $form->county = $this->form->text('county', 'County', $purchase->county);
         $form->postcode = $this->form->text('postcode', 'Post code', $purchase->postcode, FORM_REQUIRED);
         $form->phone = $this->form->text('phone', 'Telephone', $purchase->phone);
         $form->email = $this->form->text('email', 'Email', $purchase->email, FORM_REQUIRED);
@@ -668,35 +668,38 @@ class BookingController extends coreController {
         ));
     }
 
-   public function reviewAction() {
+    /**
+     * Last chance to check details
+     */
+    public function reviewAction() {
 
         // Basics
-        $booking = $this->getLibrary('Booking');
-        $purchase = $booking->getPurchase();
+        $purchase = $this->bookinglib->getSessionPurchase();
         $serviceid = $purchase->serviceid;
-        $service = $booking->Service($serviceid);
+        $service = $this->bookinglib->getService($serviceid);
 
        if ($purchase->bookedby) {
            $this->require_login('ROLE_ORGANISER', 'booking/review');
        }
 
         // work out final fare
-        $fare = $booking->calculateFare($service, $purchase, $purchase->class);
+        $fare = $this->bookinglib->calculateFare($service, $purchase, $purchase->class);
         $purchase->payment = $fare->total;
         $purchase->save();
 
         // get the destination
-        $destination = $booking->getDestination($serviceid, $purchase->destination);
+        $destination = $this->bookinglib->getDestination($serviceid, $purchase->destination);
 
         // get the joining station
-        $joining = $booking->getJoining($serviceid, $purchase->joining);
+        $joining = $this->bookinglib->getJoining($serviceid, $purchase->joining);
 
         // display form
-        $this->View('booking/review.html.twig', array(
+        $this->View('booking/review', array(
             'purchase' => $purchase,
             'service' => $service,
             'destination' => $destination,
             'joining' => $joining,
+            'class' => $purchase->class == 'F' ? 'First' : 'Standard',
             'fare' => $fare,
         ));
     }
