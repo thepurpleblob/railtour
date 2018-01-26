@@ -737,4 +737,16 @@ class Booking extends Admin {
         return $destination;
     }
 
+    /**
+     * Find the purchase from the VendorTxCode
+     * (Same as our bookingref)
+     * @param string $VendorTxCode
+     * @return mixed Purchase record of false if not found
+     */
+    public function getPurchaseFromVendorTxCode($VendorTxCode) {
+        $purchase = \ORM::forTable('purchase')->where('bookingref', $VendorTxCode)->findOne();
+
+        return $purchase;
+    }
+
 }

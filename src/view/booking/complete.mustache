@@ -1,33 +1,29 @@
-{% extends 'booking/booking.html.twig' %}
-
-{% block content %}
-
-    <div class="srpsnavbar">
-        SRPS Railtours Online Booking &nbsp;<span class="navdot glyphicon glyphicon-record"></span>&nbsp; {{ service.name }}
-    </div>
+{{> header }}
 
     <h3 class="text-error">Booking completed successfuly</h3>
 
     <p>Thank you for booking with SRPS Railtours.</p>
 
     <p>
-        {% if not purchase.emailsent %}
+        {{# purchase.emailsent }}
             Please find the details of your transaction. You should receive an
             email shortly.
-        {% else %}
+        {{/ purchase.emailsent }}
+        {{^ purchase.emailsent }}
             Please find the details of your transaction. An email has already
             been sent to you.
-        {% endif %}    
+        {{/ purchase.emailsent }}
     </p>
 
     <p>
-        {% if purchase.eticket %}
+        {{# purchase.eticket }}
             Final timings and your electronic ticket will be emailed to you approximately <b>ONE WEEK</b> before the
             tour date. Please make sure you check your "spam" or junk mail folders before contacting us if you do not
             receive this.
-        {% else %}
+        {{/ purchase.eticket }}
+        {{^ purchase.eticket }}
             Final timings and tickets will be sent <b>ONE WEEK</b> before the tour.
-        {% endif %}
+        {{/ purchase.eticket }}
     </p>
 
     <dl class="dl-horizontal">
@@ -38,13 +34,13 @@
         <dd>{{ service.name }}</dd>
 
         <dt>Tour date</dt>
-        <dd>{{ service.date | date('d/m/Y') }}</dd>
+        <dd>{{ service.date }}</dd>
 
         <dt>Payment status</dt>
         <dd>{{ sage.StatusDetail }}</dd>
 
         <dt>Total price</dt>
-        <dd>&pound;{{ purchase.payment | number_format(2) }}</dd>
+        <dd>&pound;{{ purchase.payment }}</dd>
     </dl>
 
     <div>
@@ -53,4 +49,4 @@
         </a>
     </div>
 
-{% endblock content %}
+{{> footer }}

@@ -748,7 +748,7 @@ class BookingController extends coreController {
 
             // If false is returned then it went wrong
             if ($sr === false) {
-                $this->View('booking/fail.html.twig', array(
+                $this->View('booking/fail', array(
                     'status' => 'N/A',
                     'diagnostic' => $sagepay->error,
                 ));
@@ -757,7 +757,7 @@ class BookingController extends coreController {
             // check status of registration from SagePay
             $status = $sr['Status'];
             if (($status != 'OK') && ($status != 'OK REPEATED')) {
-                $this->View('booking/fail.html.twig', array(
+                $this->View('booking/fail', array(
                     'status' => $status,
                     'diagnostic' => $sr['StatusDetail'],
                 ));
@@ -786,7 +786,6 @@ class BookingController extends coreController {
     public function notificationAction() {
 
         // Library stuff
-        $booking = $this->getLibrary('Booking');
         $sagepay = $this->getLibrary('SagepayServer');
 
         // POST data from SagePay
@@ -797,13 +796,13 @@ class BookingController extends coreController {
 
         // Get the VendorTxCode and use it to look up the purchase
         $VendorTxCode = $data['VendorTxCode'];
-        if (!$purchase = $booking->getPurchaseFromVendorTxCode($VendorTxCode)) {
+        if (!$purchase = $this->bookinglib->getPurchaseFromVendorTxCode($VendorTxCode)) {
             $url = $this->Url('booking/fail') . '/' . $VendorTxCode . '/' . urlencode('Purchase record not found');
             $sagepay->notificationreceipt('INVALID', $url, 'Purchase record not found');
         }
         
         // Now that we have the purchase object, we can save whatever we got back in it
-        $booking->updatePurchase($purchase, $data);
+        $this->bookinglib->updatePurchase($purchase, $data);
 
         // Check VPSSignature for validity
         if (!$sagepay->checkVPSSignature($purchase, $data)) {
@@ -839,16 +838,15 @@ class BookingController extends coreController {
      */
     public function failAction($VendorTxCode, $message) {
         $message = urldecode($message);
-        $booking = $this->getLibrary('Booking');
-        if (!$purchase = $booking->getPurchaseFromVendorTxCode($VendorTxCode)) {
-            $this->View('booking/fail.html.twig', array(
+        if (!$purchase = $this->bookinglib->getPurchaseFromVendorTxCode($VendorTxCode)) {
+            $this->View('booking/fail', array(
                 'status' => 'N/A',
                 'diagnostic' => 'Purchase record could not be found for ' . $VendorTxCode . ' Plus ' . $message,
                 'servicename' => '',
             ));
         } else {
-            $service = $booking->Service($purchase->serviceid);
-            $this->View('booking/fail.html.twig', array(
+            $service = $this->bookinglib->getService($purchase->serviceid);
+            $this->View('booking/fail', array(
                 'status' => 'N/A',
                 'diagnostic' => $message,
                 'servicename' => $service->name,
@@ -862,16 +860,15 @@ class BookingController extends coreController {
      * @param string $VendorTxCode
      */
     public function completeAction($VendorTxCode) {
-        $booking = $this->getLibrary('Booking');
-        if (!$purchase = $booking->getPurchaseFromVendorTxCode($VendorTxCode)) {
-            $this->View('booking/fail.html.twig', array(
+        if (!$purchase = $this->bookinglib->getPurchaseFromVendorTxCode($VendorTxCode)) {
+            $this->View('booking/fail', array(
                 'status' => 'N/A',
                 'diagnostic' => 'Purchase record could not be found for ' . $VendorTxCode,
                 'servicename' => '',
             ));
         } else {
-            $service = $booking->Service($purchase->serviceid);
-            $this->View('booking/complete.html.twig', array(
+            $service = $this->bookinglib->getService($purchase->serviceid);
+            $this->View('booking/complete', array(
                 'purchase' => $purchase,
                 'service' => $service,
             ));
