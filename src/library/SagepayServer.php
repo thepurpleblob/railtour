@@ -23,14 +23,11 @@ class SagepayServer {
 
     protected $error;
 
-    protected $controller;
-
     /**
      * Booking constructor.
      * @param $controller
      */
-    public function __construct($controller) {
-        $this->controller = $controller;
+    public function __construct() {
         $this->error = '';
     }
 

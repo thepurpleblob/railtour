@@ -519,6 +519,10 @@ class BookingController extends coreController {
         ));
     }
 
+    /**
+     * Ask, if appropriate/enabled, for comments
+     * and/or first class supplements
+     */
     public function additionalAction() {
 
         // Basics
@@ -557,12 +561,13 @@ class BookingController extends coreController {
         // anything submitted?
         if ($data = $this->getRequest()) {
 
-            if (!empty($data['comment'])) {
-                $purchase->comment = $data['comment'];
+            // Cancel?
+            if (!empty($data['back'])) {
+                $this->redirect('booking/class', true);
             }
-            if (!empty($data['seatsupplement'])) {
-                $purchase->seatsupplement = $data['seatsupplement'];
-            }
+
+            $purchase->comment = empty($data['comment']) ? '' : $data['comment'];
+            $purchase->seatsupplement = empty($data['seatsupplement']) ? 0 : 1;
             $purchase->save();
 
             $this->redirect('booking/personal');
@@ -583,6 +588,9 @@ class BookingController extends coreController {
         ));
     }
 
+    /**
+     * Get contact and ticket deliver details
+    */
     public function personalAction() {
         // Basics
         $purchase = $this->bookinglib->getSessionPurchase();
@@ -701,6 +709,7 @@ class BookingController extends coreController {
             'joining' => $joining,
             'class' => $purchase->class == 'F' ? 'First' : 'Standard',
             'fare' => $fare,
+            'formatteddate'=> date('d/m/Y', strtotime($service->date)),
         ));
     }
 
@@ -712,13 +721,12 @@ class BookingController extends coreController {
     public function paymentAction() {
 
         // Basics
-        $booking = $this->getLibrary('Booking');
-        $purchase = $booking->getPurchase();
+        $purchase = $this->bookinglib->getSessionPurchase();
         $serviceid = $purchase->serviceid;
-        $service = $booking->Service($serviceid);
+        $service = $this->bookinglib->getService($serviceid);
 
         // work out final fare
-        $fare = $booking->calculateFare($service, $purchase, $purchase->class);
+        $fare = $this->bookinglib->calculateFare($service, $purchase, $purchase->class);
 
         // Line up Sagepay class
         $sagepay = $this->getLibrary('SagepayServer');

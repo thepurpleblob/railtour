@@ -50,9 +50,11 @@ ORM::configure('logging', true);
 set_exception_handler('exception_handler');
 
 // Start the session
-ini_set('session.gc_maxlifetime', 7200);
-ini_set('session.cookie_lifetime', 7200);
-session_set_cookie_params(7200);
+//ini_set('session.gc_maxlifetime', 7200);
+//ini_set('session.cookie_lifetime', 7200);
+$sessionlife = 3600;
+session_set_cookie_params($sessionlife);
 session_name('SRPS_Railtour');
 session_start();
+setcookie(session_name(), session_id(), time() + $sessionlife);
 

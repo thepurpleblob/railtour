@@ -133,6 +133,9 @@ class coreController {
     {
         global $CFG;
 
+        // No spaces
+        $viewname = trim($viewname);
+
         // get/setup Mustache.
         $mustache = new \Mustache_Engine(array(
             'loader' => new \Mustache_Loader_FilesystemLoader($CFG->dirroot . '/src/view'),
@@ -164,7 +167,8 @@ class coreController {
         }
         $variables['system'] = $system;
         $variables['config'] = $CFG;
-        $variables['showlogin'] = $viewname != 'user/login';
+        $variables['showlogin'] = (($viewname != 'user/login') && (strpos($viewname, 'booking') !== 0))
+            || ($viewname == 'booking/index');
         $variables['haserrors'] = !empty($variables['errors']);
 
         // Get template
