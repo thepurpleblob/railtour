@@ -49,6 +49,17 @@ if ($dbversion < 2016041901) {
         ADD eticketenabled tinyint(1),
         ADD eticketforce tinyint(1)');
 }
+if ($dbversion < 2018012900) {
+    $db->exec("
+        CREATE TABLE IF NOT EXISTS `session` (
+            `id` varchar(32) NOT NULL,
+            `access` int(10) unsigned DEFAULT NULL,
+            `data` text,
+            `ip` varchar(32) DEFAULT NULL,
+            PRIMARY KEY (`id`)
+        )"
+    );
+}
 
 // Make config version up to date
 $config->name = 'version';

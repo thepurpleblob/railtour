@@ -162,3 +162,11 @@ $schema[] = 'CREATE TABLE `station` (
   `name` varchar(150) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci';
+
+$schema[] = 'CREATE TABLE `session` (
+  `id` varchar(32) NOT NULL,
+  `access` int(10) unsigned DEFAULT NULL,
+  `data` text,
+  `ip` varchar(32) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4'';
