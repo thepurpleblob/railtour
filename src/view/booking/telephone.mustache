@@ -1,0 +1,27 @@
+{{> headers }}
+
+    <h3 class="text-error">Telephone booking (customer not present)</h3>
+
+    <div class="alert alert-warning">
+        Please ensure that all members of the customer's party are all taking the same
+        trip in the same class.
+    </div>
+
+    <p>
+        Please request the customer's name.
+    </p>
+
+    <form id="telephone-form" class="form-horizontal" action="{{# path }}booking/telephone{{/ path }}/{{ code }}" method="post">
+        {{ form_text('title', 'Title', purchase.title) }}
+        {{ form_text('firstname', 'First name', purchase.firstname) }}
+        {{ form_text('surname', 'Surname', purchase.surname) }}
+
+        {{ form_errors(errors) }}
+
+        <div>
+            <input type="submit" name="next" value="Next" class="btn btn-primary" />
+            <input type="submit" name="cancel" value="Cancel" class="btn btn-warning" formnovalidate />
+        </div>
+    </form>
+
+{{> footer }}    

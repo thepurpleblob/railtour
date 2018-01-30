@@ -2,14 +2,28 @@
 </div>
 <footer>
 	<div id="footer-container" class="container-fluid">
-	    {{# showlogin }}
-	        {{^ system.loggedin }}
-	            <a class ="btn btn-info" href="{{# path }}user/login{{/path}}"> staff login</a>
-	        {{/ system.loggedin }}
-	        {{# system.loggedin }}
-	            Logged in as {{ system.fullname }}. <a href="{{# path }}user/logout{{/path}}">logout</a>
-	        {{/ system.loggedin }}
-	    {{/ showlogin }}
+		<div class="row">
+	        <div id="footer-notes" class="col">
+	        	<ul class="list-unstyled">
+                    <li><a href="{{# path }}booking/terms{{/ path }}">Terms and conditions</a></li>
+                    <li>SRPS Railtours Ltd is a trading subsidiary of the Scottish Railway Preservation Society.</li>
+                    <li>The Scottish Railway Preservation Society is a Full Member of the Heritage Railway Association and a Charitable Company limited by guarantee. Scottish Charity No.SCO02375</li>
+                    <li>SRPS Railtours Ltd, Registered in Scotland. Reg. No. : 158474</li>
+                    <li>Reg. Office : 17-19 North Street, Bo'ness, West Lothian</li>
+                    <li>Hosting kindly donated by <a href="http://www.e-learndesign.co.uk">E-Learn Design Limited</a></li> 
+                </ul>
+	        </div>
+	        {{# showlogin }}
+				<div class="col logincol">
+			        {{^ system.loggedin }}
+			            <a class ="btn btn-info" href="{{# path }}user/login{{/path}}"> staff login</a>
+			        {{/ system.loggedin }}
+			        {{# system.loggedin }}
+			            Logged in as {{ system.fullname }}. <a href="{{# path }}user/logout{{/path}}">logout</a>
+			        {{/ system.loggedin }}
+		        </div>
+	        {{/ showlogin }}
+	    </div>
     </div>
 </footer>
 

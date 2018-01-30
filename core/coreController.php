@@ -245,7 +245,13 @@ class coreController {
      */
     public function getUser() {
         if (!empty($_SESSION['user'])) {
-            return $_SESSION['user'];
+            $userid = $_SESSION['user'];
+            $user = \ORM::forTable('srps_users')->findOne($userid);
+            if ($user) {
+                return $user;
+            } else {
+                throw new \Exception("User not found id=" . $userid);
+            }    
         } else {
             return false;
         }

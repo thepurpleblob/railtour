@@ -22,6 +22,13 @@ class BookingController extends coreController {
     }
 
     /**
+     * Show terms and conditions page
+     */
+    public function termsAction() {
+        $this->view('booking/terms');
+    }
+
+    /**
      * Opening page for booking.
      * @param $code string unique (hopefully) tour code
      */
@@ -70,38 +77,35 @@ class BookingController extends coreController {
         // Security
         $this->require_login('ROLE_ORGANISER', 'booking/telephone/' . $code);
 
-        // Basics
-        $booking = $this->getLibrary('Booking');
-
         // Log
         $this->log('Booking started ' . $code);
 
         // Clear session and delete expired purchases
-        $booking->cleanPurchases();
+        $this->bookinglib->cleanPurchases();
 
         // Get the service object
-        $service = $booking->serviceFromCode($code);
+        $service = $this->bookinglib->serviceFromCode($code);
         $serviceid = $service->id;
 
         // count the seats left
-        $count = $booking->countStuff($serviceid);
+        $count = $this->bookinglib->countStuff($serviceid);
 
         // Get the limits for this service
-        $limits = $booking->getLimits($serviceid);
+        $limits = $this->bookinglib->getLimits($serviceid);
 
         // get acting maxparty (best estimate to display to punter)
-        $maxparty = $booking->getMaxparty($limits);
+        $maxparty = $this->bookinglib->getMaxparty($limits);
 
         // Bail out if this service is unavailable
-        if (!$booking->canProceedWithBooking($service, $count)) {
-            $this->View('booking/closed.mustache', array(
+        if (!$this->bookinglib->canProceedWithBooking($service, $count)) {
+            $this->View('booking/closed', array(
                 'code' => $code,
                 'service' => $service
             ));
         }
 
         // Grab current purchase
-        $purchase = $booking->getPurchase($serviceid);
+        $purchase = $this->bookinglib->getSessionPurchase($serviceid);
 
         // hopefully no errors
         $errors = null;
@@ -139,13 +143,13 @@ class BookingController extends coreController {
 
                 // This means it's a telephone booking
                 $purchase->bookedby = $username;
-
                 $purchase->save();
+
                 $this->redirect('booking/numbers/' . $serviceid);
             }
         }
 
-        $this->View('booking/telephone.html.twig', array(
+        $this->View('booking/telephone', array(
             'code' => $code,
             'maxparty' => $maxparty,
             'service' => $service,

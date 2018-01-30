@@ -44,6 +44,13 @@ class coreSession {
     public function _read($id) {
     	$session = \ORM::forTable('session')->where('id', $id)->findOne();
     	if ($session) {
+
+    		// Check if IP matches
+    		if ($session->ip != $_SERVER['REMOTE_ADDR']) {
+    			$this->_destroy($id);
+    			return false;
+    		}
+
     		return $session->data;
     	} else {
     		return '';
@@ -61,7 +68,14 @@ class coreSession {
     	if (!$session) {
     	    $session = \ORM::forTable('session')->create();
     	    $session->id = $id;
-    	}    
+    	} else {
+
+    		// Check if IP matches
+    		if ($session->ip != $_SERVER['REMOTE_ADDR']) {
+    			$this->_destroy($id);
+    			return false;
+    		}
+    	}  
     	$session->access = time();
     	$session->data = $data;
     	$session->ip = $_SERVER['REMOTE_ADDR'];
