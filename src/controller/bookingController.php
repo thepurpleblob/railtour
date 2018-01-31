@@ -120,19 +120,21 @@ class BookingController extends coreController {
 
             // Validate
             $this->gump->validation_rules(array(
-                'surname' => 'required',
                 'firstname' => 'required',
+                'surname' => 'required',
+                'postcode' => 'required',
             ));
             $this->gump->set_field_names(array(
-                'surname' => 'Surname',
                 'firstname' => 'First name',
+                'surname' => 'Last name',
+                'postcode' => 'Post code',
             ));
             if ($data = $this->gump->run($data)) {
 
                 // Now need to 'normalise' some of the fields
-                $purchase->title = ucwords($data['title']);
                 $purchase->surname = ucwords($data['surname']);
                 $purchase->firstname = ucwords($data['firstname']);
+                $purchase->postcode = strtoupper($data['postcode']);
 
                 // Get the booker's username and mark the purchase
                 // as a "customer not present" transaction.
@@ -145,17 +147,45 @@ class BookingController extends coreController {
                 $purchase->bookedby = $username;
                 $purchase->save();
 
-                $this->redirect('booking/numbers/' . $serviceid);
+                $this->redirect('booking/telephone2/' . $serviceid);
             }
         }
+
+        // Create form
+        $form = new \stdClass;
+        $form->firstname = $this->form->text('firstname', 'First name', $purchase->firstname, FORM_REQUIRED);
+        $form->surname = $this->form->text('surname', 'Surname', $purchase->surname, FORM_REQUIRED);
+        $form->postcode = $this->form->text('postcode', 'Post code', $purchase->postcode, FORM_REQUIRED);
 
         $this->View('booking/telephone', array(
             'code' => $code,
             'maxparty' => $maxparty,
             'service' => $service,
             'purchase' => $purchase,
+            'form' => $form,
             'errors' => $errors,
         ));
+    }
+
+    /**
+     * Check if old purchase exists for telephone bookings
+     */
+    public function telephone2Action() {
+
+        // Basics
+        $purchase = $this->bookinglib->getSessionPurchase();
+        $serviceid = $purchase->serviceid;
+        $service = $this->bookinglib->getService($serviceid);
+        $this->require_login('ROLE_ORGANISER', 'booking/joining');
+
+        // Should have a postcode
+        if ($oldpurchases = $this->bookinglib->findOldPurchase($purchase)) {
+            $this->View('booking/telephone2', array(
+                'purchases' => $oldpurchases,
+                'service' => $service,
+            ));
+        }
+
     }
 
     /**
@@ -165,8 +195,7 @@ class BookingController extends coreController {
      * @param int $serviceid
      * @throws \Exception
      */
-    public function numbersAction($serviceid)
-    {
+    public function numbersAction($serviceid) {
         // Basics
         $service = $this->bookinglib->getService($serviceid);
 

@@ -218,13 +218,29 @@ class coreController {
     }
 
     /**
+     * Get the user from the session if it exists
+     * @return mixed user object or false
+     */
+    public static function getSessionUser() {
+        if (empty($_SESSION['user'])) {
+            return false;
+        }
+        $userid = $_SESSION['user'];
+        $user = \ORM::forTable('srps_users')->findOne($userid);
+        if (!$user) {
+            throw new \Exception("User id $userid not found in db");
+        }
+
+        return $user;
+    }
+
+    /**
      * Check for login/security
      * Current role posibilities are ROLE_ADMIN and ROLE_ORGANISER
      *
      */
     public function require_login($role, $wantsurl = '') {
-        if (!empty($_SESSION['user'])) {
-            $user = $_SESSION['user'];
+        if ($user = $this->getSessionUser()) {
             if ($role =='ROLE_ADMIN') {
                 if ($user->role == 'ROLE_ADMIN') {
                     return true;
@@ -244,17 +260,9 @@ class coreController {
      * Get logged in user
      */
     public function getUser() {
-        if (!empty($_SESSION['user'])) {
-            $userid = $_SESSION['user'];
-            $user = \ORM::forTable('srps_users')->findOne($userid);
-            if ($user) {
-                return $user;
-            } else {
-                throw new \Exception("User not found id=" . $userid);
-            }    
-        } else {
-            return false;
-        }
+        $user = $this->getSessionUser();
+
+        return $user;
     }
 
     /**

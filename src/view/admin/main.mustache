@@ -1,5 +1,13 @@
 {{> header }}
 
+{{# system.loggedin }}
+    <a href="{{# path }}service/index{{/ path }}">
+        <div class="alert alert-primary">
+            Click here for admin/organiser portal.
+        </div>    
+    </a>    
+{{/ system.loggedin}}
+
 <h3>Railtours available for booking now</h3>
 
 {{^ anyservices }}
@@ -17,7 +25,7 @@
                 <br /><br />
                 <a class="btn btn-primary" href="{{# path }}booking/index{{/ path }}/{{ code }}">Book now</a>
                 {{# system.loggedin }}
-                    <a class="btn btn-warning" href="{{# path }}booking/telephone{{/ path }}/{{ service.code }}">Telephone booking</a>
+                    <a class="btn btn-warning" href="{{# path }}booking/telephone{{/ path }}/{{ code }}">Telephone booking</a>
                 {{/ system.loggedin }}
             </div>
         </div>

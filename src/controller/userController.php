@@ -75,7 +75,7 @@ class UserController extends coreController
                 $user = $this->userlib->validate($username, $password);
 
                 if ($user) {
-                    $_SESSION['user'] = $user;
+                    $_SESSION['user'] = $user->id;
                     if ($rememberme) {
                         setcookie('railtouruser', $username, time() + 365 * 24 * 3600);
                     } else {

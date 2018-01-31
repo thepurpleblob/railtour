@@ -749,4 +749,25 @@ class Booking extends Admin {
         return $purchase;
     }
 
+    /**
+     * Try to find existing booking from user details
+     * @param object $purchase
+     * @return array of purchases
+     */
+    public function findOldPurchase($purchase) {
+        if (!$postcode) {
+            return false;
+        }
+        $criteria = array(
+            'firstname' => $purchase->firstname,
+            'surname' => $purchase->surname,
+            'postcode' => $purchase->postcode,
+            'status' => 'OK',
+        );
+        $purchases = \ORM::forTable('purchase')->where($criteria)->order_by_desc('timestamp')->
+            limit(5)->findMany();
+
+        return $purchases;    
+    }
+
 }
