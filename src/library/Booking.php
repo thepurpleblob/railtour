@@ -755,7 +755,7 @@ class Booking extends Admin {
      * @return array of purchases
      */
     public function findOldPurchase($purchase) {
-        if (!$postcode) {
+        if (!$purchase) {
             return false;
         }
         $criteria = array(
@@ -767,7 +767,29 @@ class Booking extends Admin {
         $purchases = \ORM::forTable('purchase')->where($criteria)->order_by_desc('timestamp')->
             limit(5)->findMany();
 
+        // Fix up date
+        foreach ($purchases as $purchase) {
+            $purchase->formatteddate = date('d/m/Y', strtotime($purchase->date));
+        }    
+
         return $purchases;    
+    }
+
+    /**
+     * Check purchase id valid in list of purchases
+     * @param int $purchaseid
+     * @param array $purchases
+     * @return mixed selected purchase
+     * @throws \Exception
+     */
+    public function checkPurchaseID($purchaseid, $purchases) {
+        foreach ($purchases as $purchase) {
+            if ($purchase->id == $purchaseid) {
+                return $purchase;
+            }
+        }
+
+        throw new \Exception("Matching purchaseid not found - " . $purchaseid);
     }
 
 }

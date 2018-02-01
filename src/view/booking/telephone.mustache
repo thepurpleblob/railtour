@@ -8,14 +8,16 @@
     </div>
 
     <p>
-        Please request the customer's postcode. We'll try to match this with old purchases. 
+        Please request the customer's name and postcode. We'll try to match this with old purchases. 
+        Please confirm name spelling if unsure.  
     </p>
 
     {{> form_errors }}
 
     <form id="telephone-form" class="form-horizontal" action="{{# path }}booking/telephone{{/ path }}/{{ code }}" method="post">
+        {{{ form.title }}}
         {{{ form.firstname }}}
-        {{{ form.lastname }}}
+        {{{ form.surname }}}
         {{{ form.postcode }}}
 
         <div>

@@ -3,11 +3,30 @@
     <h3 class="text-error">Telephone booking (customer not present)</h3>
 
     <div class="alert alert-warning">
-        The following purchases have the same details.
+        The following purchases have matching details. Check if any match the customer. 
     </div>
 
     {{# purchases }}
+        <div class="card purchase-card">
+            <div class="card-header">Booking completed on {{ formatteddate }}</div>
+            <div class="card-body">
+                <div class="card-text">
+                    <strong>Customer Name: </strong> {{ firstname }} {{ surname }}<br />
+                    <strong>Address: </strong>
+                    {{ address1 }}
+                    {{ address2 }}
+                    {{ county }}
+                    {{ postcode }}
+                    <br /><br />
+                    <a class="btn btn-primary" href="{{# path }}booking/telephone2{{/ path }}/{{ id }}">Matching customer</a>
+                </div>
+            </div>
+        </div>
+    {{/ purchases }}
 
-    {{/ purchase }}
+    <div class="rt-buttons">
+        <a class="btn btn-primary" href="{{# path }}booking/numbers{{/ path }}/{{ service.id }}">No matches</a>
+    </div>
+
 
 {{> footer }}    

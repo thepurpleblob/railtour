@@ -132,6 +132,7 @@ class BookingController extends coreController {
             if ($data = $this->gump->run($data)) {
 
                 // Now need to 'normalise' some of the fields
+                $purchase->title = ucwords($data['title']);
                 $purchase->surname = ucwords($data['surname']);
                 $purchase->firstname = ucwords($data['firstname']);
                 $purchase->postcode = strtoupper($data['postcode']);
@@ -147,12 +148,13 @@ class BookingController extends coreController {
                 $purchase->bookedby = $username;
                 $purchase->save();
 
-                $this->redirect('booking/telephone2/' . $serviceid);
+                $this->redirect('booking/telephone2');
             }
         }
 
         // Create form
         $form = new \stdClass;
+        $form->title = $this->form->text('title', 'Title', $purchase->title);
         $form->firstname = $this->form->text('firstname', 'First name', $purchase->firstname, FORM_REQUIRED);
         $form->surname = $this->form->text('surname', 'Surname', $purchase->surname, FORM_REQUIRED);
         $form->postcode = $this->form->text('postcode', 'Post code', $purchase->postcode, FORM_REQUIRED);
@@ -169,8 +171,9 @@ class BookingController extends coreController {
 
     /**
      * Check if old purchase exists for telephone bookings
+     * @param int $id of old purchase
      */
-    public function telephone2Action() {
+    public function telephone2Action($purchaseid = 0) {
 
         // Basics
         $purchase = $this->bookinglib->getSessionPurchase();
@@ -178,12 +181,35 @@ class BookingController extends coreController {
         $service = $this->bookinglib->getService($serviceid);
         $this->require_login('ROLE_ORGANISER', 'booking/joining');
 
+        // Search for old purchases
+        $oldpurchases = $this->bookinglib->findOldPurchase($purchase);
+
+        // If purchase id provided, make sure it is valid
+        if ($purchaseid) {
+            $oldpurchase = $this->bookinglib->checkPurchaseID($purchaseid, $oldpurchases);
+
+            // Copy address data
+            if (empty($purchase->title)) {
+                $purchase->title = $oldpurchase->title;
+            }
+            $purchase->address1 = $oldpurchase->address1;
+            $purchase->address2 = $oldpurchase->address2;
+            $purchase->city = $oldpurchase->city;
+            $purchase->county = $oldpurchase->county;
+            $purchase->phone = $oldpurchase->phone;
+            $purchase->email = $oldpurchase->email;
+            $purchase->save();
+            $this->redirect('booking/numbers/' . $serviceid);
+        }
+
         // Should have a postcode
         if ($oldpurchases = $this->bookinglib->findOldPurchase($purchase)) {
             $this->View('booking/telephone2', array(
                 'purchases' => $oldpurchases,
                 'service' => $service,
             ));
+        } else {
+            $this->redirect('booking/numbers/' . $serviceid);
         }
 
     }
@@ -695,7 +721,7 @@ class BookingController extends coreController {
         $form->surname = $this->form->text('surname', 'Surname', $purchase->surname, FORM_REQUIRED);
         $form->address1 = $this->form->text('address1', 'Address line 1', $purchase->address1, FORM_REQUIRED);
         $form->address2 = $this->form->text('address2', 'Address line 2', $purchase->address2);
-        $form->city = $this->form->text('city', 'Post town / city', $purchase->city, FORM_REQUIRED);
+        $form->city = $this->form->text('city', 'Town / city', $purchase->city, FORM_REQUIRED);
         $form->county = $this->form->text('county', 'County', $purchase->county);
         $form->postcode = $this->form->text('postcode', 'Post code', $purchase->postcode, FORM_REQUIRED);
         $form->phone = $this->form->text('phone', 'Telephone', $purchase->phone);

@@ -125,3 +125,8 @@ tr.purchase_not_ok {
 .rt-required {
     color: #dc3545;
 }
+
+.purchase-card {
+    margin-bottom: 15px;
+}
+
