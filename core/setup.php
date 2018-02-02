@@ -40,12 +40,16 @@ function pdo_execute($db, $sql) {
 }
 
 // MAIN SETUP STUFF
+// (order matters)
 
 // Configure Idiorm
 ORM::configure($CFG->dsn);
 ORM::configure('username', $CFG->dbuser);
 ORM::configure('password', $CFG->dbpass);
 ORM::configure('logging', true);
+
+// Make a check for any schema updates and such
+require_once(dirname(__FILE__) . '/update.php');
 
 // Set exception handler
 set_exception_handler('exception_handler');

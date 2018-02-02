@@ -6,7 +6,6 @@
  * Time: 21:35
  */
 
-
 // check if config table needs creating
 $db = ORM::get_db();
 $db->exec("

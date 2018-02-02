@@ -4,13 +4,15 @@
 
     <h2 class="adminpage_title">{{ service.name }} ({{ service.code }})</h2>
 
+    </h2>
+
+    <h3>Summary
     {{# system.admin }}
-        <a class="btn btn-info btn-sm pull-right" href="{{# path }}service/edit{{/path}}/{{ service.id }}">
-            Edit service
+        <a  href="{{# path }}service/edit{{/path}}/{{ service.id }}" data-toggle="tooltip" title="Edit service">
+            <i class="fas fa-cog"></i>
         </a>
     {{/ system.admin }}
-
-    <h3>Summary</h3>
+    </h3>
 
     {{^ service.visible }}
     <div class="alert alert-danger">
@@ -97,18 +99,21 @@
             </table>
         </div>
 
+
+        <h3>Destinations
         {{# system.admin }}
-            <a class="btn btn-info btn-sm pull-right" href="{{# path }}destination/index{{/ path }}/{{ service.id }}">
                 {{# isdestinations }}
-                    Edit destinations
+                    <a  href="{{# path }}destination/index{{/ path }}/{{ service.id }}" data-toggle="tooltip" title="Edit destinations">
+                    <i class="fas fa-cog"></i>
                 {{/ isdestinations }}
                 {{^ isdestinations }}
-                    New destination
+                    <a  href="{{# path }}destination/index{{/ path }}/{{ service.id }}" data-toggle="tooltip" title="New destination">
+                    <i class="fas fa-plus"></i>
                 {{/ isdestinations }}
             </a>
         {{/ system.admin }}
-
-        <h3>Destinations</h3>
+        </h3>
+        
 
         <div>
             {{^ isdestinations }}
@@ -136,14 +141,20 @@
             {{/ isdestinations }}
         </div>
 
+
+        <h3>Price bands
         {{# system.admin }}
-            <a class="btn btn-info btn-sm pull-right" href="{{# path }}priceband/index{{/ path }}/{{ service.id }}">
-                {{# ispricebandgroups }}Edit price bands{{/ ispricebandgroups }}
-                {{^ ispricebandgroups }}New price band{{/ ispricebandgroups }}
+            {{# ispricebandgroups }}
+                <a href="{{# path }}priceband/index{{/ path }}/{{ service.id }}" data-toggle="tooltip" title="Edit price bands">
+                <i class="fas fa-cog"></i>
+            {{/ ispricebandgroups }}
+            {{^ ispricebandgroups }}
+                <a href="{{# path }}priceband/index{{/ path }}/{{ service.id }}" data-toggle="tooltip" title="New price band">
+                <i class="fas fa-plus"></i>
+            {{/ ispricebandgroups }}
             </a>
         {{/ system.admin }}
-
-        <h3>Price bands</h3>
+        </h3>
 
         {{^ ispricebandgroups }}
             <div class="alert alert-block alert-error">
@@ -192,18 +203,19 @@
             </table>
         {{/ ispricebandgroups }}
 
+        <h3>Joining stations
         {{# system.admin }}
-            <a class="btn btn-info btn-sm pull-right" href="{{# path }}joining/index{{/ path }}/{{ service.id }}">
-                {{# isjoinings }}
-                    Edit joining stations
-                {{/ isjoinings }}
-                {{^ isjoinings }}
-                    New joining station
-                {{/ isjoinings }}
+            {{# isjoinings }}
+                <a href="{{# path }}joining/index{{/ path }}/{{ service.id }}" data-toggle="tooltip" title="Edit joining stations">
+                <i class="fas fa-cog"></i>
+            {{/ isjoinings }}
+            {{^ isjoinings }}
+                <a href="{{# path }}joining/index{{/ path }}/{{ service.id }}" data-toggle="tooltip" title="New joining stations">
+                <i class="fas fa-plus"></i>
+            {{/ isjoinings }}
             </a>
         {{/ system.admin }}
-
-        <h3>Joining stations</h3>
+        </h3>
 
         {{^ isjoinings }}
             <div class="alert alert-block alert-error">
@@ -230,11 +242,10 @@
             </table>
         {{/ isjoinings }}
 
-        <a class="btn btn-info btn-sm pull-right" href="{{# path }}limits/edit{{/ path }}/{{ service.id }}">
-            Booking limits
-        </a>
-
-        <h3>Booking limits</h3>
+        <h3>Booking limits
+        <a href="{{# path }}limits/edit{{/ path }}/{{ service.id }}" data-toggle="tooltip" title="Booking limits">
+        <i class="fas fa-cog"></i>
+        </a></h3>
 
         <table class="table table-condensed table-striped">
             <thead>

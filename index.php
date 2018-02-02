@@ -15,9 +15,6 @@ ini_set('html_errors', 1);
 // see if the database has been installed at all
 require_once(dirname(__FILE__) . '/core/install.php');
 
-// Make a check for any schema updates and such
-require_once(dirname(__FILE__) . '/core/update.php');
-
 // If no path is given, use the default
 if (!empty($_SERVER['PATH_INFO'])) {
     $info = $_SERVER['PATH_INFO'];
