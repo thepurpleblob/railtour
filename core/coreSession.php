@@ -16,10 +16,10 @@ class coreSession {
 
     	// Start the session
         $sessionlife = 3600;
-        session_set_cookie_params($sessionlife);
+        session_set_cookie_params($sessionlife, '/');
         session_name('SRPS_Railtour');
         session_start();
-        setcookie(session_name(), session_id(), time() + $sessionlife);
+        setcookie(session_name(), session_id(), time() + $sessionlife, '/');
     }
 
     /**

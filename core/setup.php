@@ -52,4 +52,3 @@ set_exception_handler('exception_handler');
 
 // Sessions
 $coresession = new coreSession;
-

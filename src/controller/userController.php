@@ -77,9 +77,9 @@ class UserController extends coreController
                 if ($user) {
                     $_SESSION['user'] = $user->id;
                     if ($rememberme) {
-                        setcookie('railtouruser', $username, time() + 365 * 24 * 3600);
+                        setcookie('railtouruser', $username, time() + 365 * 24 * 3600, '/');
                     } else {
-                        setcookie('railtouruser', '', time() - 3600);
+                        setcookie('railtouruser', '', time() - 3600, '/');
                     }
                     if (!empty($_SESSION['wantsurl'])) {
                         $redirect = $_SESSION['wantsurl'];

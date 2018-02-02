@@ -1,9 +1,9 @@
 <?php
 
-require(dirname(__FILE__) . '/vendor/autoload.php');
-require(dirname(__FILE__) . '/config.php');
-require(dirname(__FILE__) . '/core/version.php');
-require(dirname(__FILE__) . '/core/setup.php');
+require_once(dirname(__FILE__) . '/vendor/autoload.php');
+require_once(dirname(__FILE__) . '/config.php');
+require_once(dirname(__FILE__) . '/core/version.php');
+require_once(dirname(__FILE__) . '/core/setup.php');
 
 $CFG->basepath = dirname(__FILE__);
 
@@ -13,10 +13,10 @@ ini_set('log_errors', 1);
 ini_set('html_errors', 1);
 
 // see if the database has been installed at all
-require(dirname(__FILE__) . '/core/install.php');
+require_once(dirname(__FILE__) . '/core/install.php');
 
 // Make a check for any schema updates and such
-require(dirname(__FILE__) . '/core/update.php');
+require_once(dirname(__FILE__) . '/core/update.php');
 
 // If no path is given, use the default
 if (!empty($_SERVER['PATH_INFO'])) {

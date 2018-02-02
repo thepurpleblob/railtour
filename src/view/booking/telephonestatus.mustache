@@ -1,0 +1,24 @@
+{{# purchase.bookedby }}
+	<div class="card telephonestatus text-white bg-danger">
+	    <div class="card-header">
+	        TELEPHONE BOOKING 
+	        {{# purchase.bookingref }} (Reference: <strong>{{ purchase.bookingref }}</strong>){{/ purchase.bookingref}}
+	    </div>	
+	    <div class="card-body">
+	        <div class="row card-text">
+                <div class="col">
+                    <strong>Customer</strong><br/>
+                    {{# purchase.title }}{{ purchase.title }}{{/ purchase.title }}
+                    {{ purchase.firstname }}
+                    {{ purchase.surname }}<br>
+                    {{# purchase.address1 }}{{ purchase.address1 }}<br />{{/ purchase.address1 }}
+                    {{# purchase.address2 }}{{ purchase.address2 }}<br />{{/ purchase.address2 }}
+                    {{# purchase.city }}{{ purchase.city }}<br />{{/ purchase.city }}
+                    {{# purchase.county }}{{ purchase.county }}&nbsp;{{/ purchase.county }}
+                    {{# purchase.postcode }}{{ purchase.postcode }}{{/ purchase.postcode }}<br />
+                    {{# purchase.phone }}<i class="fas fa-phone"></i> {{ purchase.phone }}<br />{{/ purchase.phone }}
+                </div>
+	        </div>	
+	    </div>	
+	</div>	
+{{/ purchase.bookedby }}

@@ -130,3 +130,11 @@ tr.purchase_not_ok {
     margin-bottom: 15px;
 }
 
+.telephonestatus {
+    margin-bottom: 25px;
+}
+
+.telephonestatus .card-body {
+    font-size: 80%;
+}
+

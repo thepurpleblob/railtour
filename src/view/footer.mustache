@@ -11,18 +11,19 @@
                     <li>SRPS Railtours Ltd, Registered in Scotland. Reg. No. : 158474</li>
                     <li>Reg. Office : 17-19 North Street, Bo'ness, West Lothian</li>
                     <li>Hosting kindly donated by <a href="http://www.e-learndesign.co.uk">E-Learn Design Limited</a></li> 
+                    {{# config.debugging }}SID: {{ system.sessionid }}{{/ config.debugging }}
                 </ul>
 	        </div>
-	        {{# showlogin }}
-				<div class="col logincol">
-			        {{^ system.loggedin }}
-			            <a class ="btn btn-info" href="{{# path }}user/login{{/path}}"> staff login</a>
-			        {{/ system.loggedin }}
-			        {{# system.loggedin }}
-			            Logged in as {{ system.fullname }}. <a href="{{# path }}user/logout{{/path}}">logout</a>
-			        {{/ system.loggedin }}
-		        </div>
-	        {{/ showlogin }}
+			<div class="col logincol">
+		        {{^ system.loggedin }}
+		            {{# showlogin }}
+		            	<a class ="btn btn-info" href="{{# path }}user/login{{/path}}"> staff login</a>
+		            {{/ showlogin }}
+		        {{/ system.loggedin }}
+		        {{# system.loggedin }}
+		            Logged in as {{ system.fullname }}. <a href="{{# path }}user/logout{{/path}}">logout</a>
+		        {{/ system.loggedin }}
+	        </div>
 	    </div>
     </div>
 </footer>

@@ -165,11 +165,13 @@ class coreController {
             $system->fullname = '';
             $system->loggedin = false;
         }
+        $system->sessionid = session_id();
         $variables['system'] = $system;
         $variables['config'] = $CFG;
         $variables['showlogin'] = (($viewname != 'user/login') && (strpos($viewname, 'booking') !== 0))
             || ($viewname == 'booking/index');
         $variables['haserrors'] = !empty($variables['errors']);
+
 
         // Get template
         $template = $mustache->loadTemplate($viewname . '.mustache');
