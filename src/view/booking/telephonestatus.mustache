@@ -7,7 +7,7 @@
 	    <div class="card-body">
 	        <div class="row card-text">
                 <div class="col">
-                    <strong>Customer</strong><br/>
+                    <strong><u>Customer</u></strong></strong><br/>
                     {{# purchase.title }}{{ purchase.title }}{{/ purchase.title }}
                     {{ purchase.firstname }}
                     {{ purchase.surname }}<br>
@@ -17,7 +17,24 @@
                     {{# purchase.county }}{{ purchase.county }}&nbsp;{{/ purchase.county }}
                     {{# purchase.postcode }}{{ purchase.postcode }}{{/ purchase.postcode }}<br />
                     {{# purchase.phone }}<i class="fas fa-phone"></i> {{ purchase.phone }}<br />{{/ purchase.phone }}
+                    {{# purchase.email}}<i class="fas fa-envelope"></i> {{ purchase.email }}<br />{{/ purchase.email }}
                 </div>
+                <div class="col">
+                    <strong><u>Booking</u></strong><br />
+                    {{# purchase.adults }}Number of adults: {{ purchase.adults }}<br />{{/ purchase.adults }}
+                    {{# purchase.children }}Number of children: {{ purchase.children }}<br />{{/ purchase.children }}
+                    {{# purchase.joining }}Joining at: {{ purchase.joining }}<br />{{/ purchase.joining }}
+                    {{# purchase.destination }}Destination: {{ purchase.destination }}<br />{{/ purchase.destination }}
+                    {{# purchase.class }}Class: {{ purchase.class }}<br />{{/ purchase.class }}
+                </div> 
+                <div class="col">
+                    <strong><u>Meals &amp; supplements</u></strong><br />
+                    {{# purchase.meala }}Quantity {{ service.mealaname }}: {{ purchase.meala }}<br />{{/ purchase.meala }}
+                    {{# purchase.mealb }}Quantity {{ service.mealbname }}: {{ purchase.mealb }}<br />{{/ purchase.mealb }}
+                    {{# purchase.mealc }}Quantity {{ service.mealcname }}: {{ purchase.mealc }}<br />{{/ purchase.mealc }}
+                    {{# purchase.meald }}Quantity {{ service.mealdname }}: {{ purchase.meald }}<br />{{/ purchase.meald }}
+                    {{# purchase.seatsupplement }}Seat supplement: {{ purchase.seatsupplement }}<br />{{/ purchase.seatsupplement }}
+                </div>   
 	        </div>	
 	    </div>	
 	</div>	

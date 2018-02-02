@@ -1,5 +1,7 @@
 {{> header }}
 
+    {{> booking/telephonestatus }}
+
     <h3 class="text-error">Additional options {{# iscomments }}and comments...{{/ iscomments }}</h3>
 
     <form id="additional-form" class="form-horizontal" action="{{# path }}booking/additional{{/ path }}" method="post">

@@ -1,5 +1,7 @@
 {{> header }}
 
+    {{> booking/telephonestatus }}
+
     <h3 class="text-error">Review and pay</h3>
 
     <p>
@@ -74,7 +76,7 @@
 
     <div class="alert alert-error">
         By placing this booking you agree that you have read, understood and agree
-        to our <a href="http://www.srps.org.uk/railtours/conditions.htm" target="_terms">
+        to our <a href="{{# path }}booking/terms{{/ path }}" target="_terms">
         Terms and Conditions</a>
     </div>
 
