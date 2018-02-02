@@ -110,8 +110,7 @@ class coreSession {
         $old = time() - $max;
 
         // get expired sessions
-        $sessions = \ORM::forTable('session')->where_lt('access', $old)->findMany();
-        $sessions->delete();
+        $sessions = \ORM::forTable('session')->where_lt('access', $old)->deleteMany();
 
         return true;
     }
