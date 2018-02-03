@@ -755,10 +755,10 @@ class BookingController extends coreController {
         $purchase->save();
 
         // get the destination
-        $destination = $this->bookinglib->getDestination($serviceid, $purchase->destination);
+        $destination = $this->bookinglib->getDestinationCRS($serviceid, $purchase->destination);
 
         // get the joining station
-        $joining = $this->bookinglib->getJoining($serviceid, $purchase->joining);
+        $joining = $this->bookinglib->getJoiningCRS($serviceid, $purchase->joining);
 
         // display form
         $this->View('booking/review', array(
