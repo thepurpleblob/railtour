@@ -6,11 +6,18 @@
 
     <form id="additional-form" class="form-horizontal" action="{{# path }}booking/additional{{/ path }}" method="post">
         {{# iscomments }}
-            <div class="alert alert-block">
-                You may add a short comment or request here and we will do our best
-                to accommodate you. Please <b>DO NOT</b> use this to ask a question
-                or request special meals - please call us. 
-            </div>  
+            {{# purchase.bookedby }}
+                <div class="alert alert-block">
+                    Add any comment regarding the booking here (max 39 characters).  
+                </div>  
+            {{/ purchase.bookedby }}
+            {{^ purchase.bookedby }}
+                <div class="alert alert-block">
+                    You may add a short comment or request here and we will do our best
+                    to accommodate you. Please <b>DO NOT</b> use this to ask a question
+                    or request special meals - please call us. 
+                </div>  
+            {{/ purchase.bookedby }}
             {{{ form.comment }}}
         {{/ iscomments }}
                     

@@ -5,16 +5,16 @@ namespace thepurpleblob\core;
 class coreSession {
 
     public function __construct() {
-    	session_set_save_handler(
-    		array($this, "_open"),
-    		array($this, "_close"),
-    		array($this, "_read"),
-    		array($this, "_write"),
-    		array($this, "_destroy"),
-    	    array($this, "_gc")
-    	);
+        session_set_save_handler(
+            array($this, "_open"),
+            array($this, "_close"),
+            array($this, "_read"),
+            array($this, "_write"),
+            array($this, "_destroy"),
+            array($this, "_gc")
+        );
 
-    	// Start the session
+        // Start the session
         $sessionlife = 3600;
         session_set_cookie_params($sessionlife, '/');
         session_name('SRPS_Railtour');
@@ -26,14 +26,14 @@ class coreSession {
      * Open the session. Does nothing
      */
     public function _open() {
-    	return true;
+        return true;
     }
 
     /**
      * Close the session. Does nothing
      */
     public function _close() {
-    	return true;
+        return true;
     }
 
     /**
@@ -42,19 +42,19 @@ class coreSession {
      * @return string session data
      */
     public function _read($id) {
-    	$session = \ORM::forTable('session')->where('id', $id)->findOne();
-    	if ($session) {
+        $session = \ORM::forTable('session')->where('id', $id)->findOne();
+        if ($session) {
 
-    		// Check if IP matches
-    		if ($session->ip != $_SERVER['REMOTE_ADDR']) {
-    			$this->_destroy($id);
-    			return false;
-    		}
+            // Check if IP matches
+            if ($session->ip != $_SERVER['REMOTE_ADDR']) {
+                $this->_destroy($id);
+                return false;
+            }
 
-    		return $session->data;
-    	} else {
-    		return '';
-    	}
+            return $session->data;
+        } else {
+            return '';
+        }
     }
 
     /**
@@ -64,24 +64,24 @@ class coreSession {
      * @return bool success
      */
     public function _write($id, $data) {
-    	$session = \ORM::forTable('session')->where('id', $id)->findOne();
-    	if (!$session) {
-    	    $session = \ORM::forTable('session')->create();
-    	    $session->id = $id;
-    	} else {
+        $session = \ORM::forTable('session')->where('id', $id)->findOne();
+        if (!$session) {
+            $session = \ORM::forTable('session')->create();
+            $session->id = $id;
+        } else {
 
-    		// Check if IP matches
-    		if ($session->ip != $_SERVER['REMOTE_ADDR']) {
-    			$this->_destroy($id);
-    			return false;
-    		}
-    	}  
-    	$session->access = time();
-    	$session->data = $data;
-    	$session->ip = $_SERVER['REMOTE_ADDR'];
-    	$session->save();
+            // Check if IP matches
+            if ($session->ip != $_SERVER['REMOTE_ADDR']) {
+                $this->_destroy($id);
+                return false;
+            }
+        }  
+        $session->access = time();
+        $session->data = $data;
+        $session->ip = $_SERVER['REMOTE_ADDR'];
+        $session->save();
 
-    	return true;
+        return true;
     }
 
     /** 
@@ -90,13 +90,13 @@ class coreSession {
      * @return bool success
      */
     public function _destroy($id) {
-    	$session = \ORM::forTable('session')->where('id', $id)->findOne();
-    	if ($session) {
-    		$session->delete();
-    		return true;
-    	} else {
-    		return false;
-    	}
+        $session = \ORM::forTable('session')->where('id', $id)->findOne();
+        if ($session) {
+            $session->delete();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

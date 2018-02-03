@@ -769,9 +769,9 @@ class Booking extends Admin {
         // Fix up date
         foreach ($purchases as $purchase) {
             $purchase->formatteddate = date('d/m/Y', strtotime($purchase->date));
-        }    
+        }
 
-        return $purchases;    
+        return $purchases;
     }
 
     /**

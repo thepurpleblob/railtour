@@ -287,15 +287,15 @@ class coreController {
      * get session
      */
     public function getFromSession($name, $default=null) {
-    	if (isset($_SESSION[$name])) {
-    		return $_SESSION[$name];
-    	} else {
-    		if ($default) {
-    		    $_SESSION[$name] = $default;
-    			return $default;
-    		} else
-    			throw new \Exception("Session data for '$name' was not found");
-    	}
+        if (isset($_SESSION[$name])) {
+            return $_SESSION[$name];
+        } else {
+            if ($default) {
+                $_SESSION[$name] = $default;
+                return $default;
+            } else
+                throw new \Exception("Session data for '$name' was not found");
+        }
     }
 
     /**

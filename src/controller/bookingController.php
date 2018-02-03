@@ -434,8 +434,8 @@ class BookingController extends coreController {
     /**
      * @throws \Exception
      */
-   public function mealsAction()
-    {
+    public function mealsAction() {
+
         // Basics
         $purchase = $this->bookinglib->getSessionPurchase();
         $serviceid = $purchase->serviceid;
@@ -600,8 +600,8 @@ class BookingController extends coreController {
         $passengercount = $purchase->adults + $purchase->children;
 
         // This page will only be shown if we are going to ask about firstsingle
-        // option, or ask for comments.
-        $iscomments = $service->commentbox;
+        // option, or ask for comments. Telephone bookings always allow comments.
+        $iscomments = $service->commentbox || $purchase->bookedby;
         $issupplement = ($numbers->remainingfirstsingles >= $passengercount)
                 && ($purchase->class == 'F')
                 && (($passengercount == 1) || ($passengercount==2))
@@ -866,7 +866,7 @@ class BookingController extends coreController {
             $url = $this->Url('booking/fail') . '/' . $VendorTxCode . '/' . urlencode('Purchase record not found');
             $sagepay->notificationreceipt('INVALID', $url, 'Purchase record not found');
         }
-        
+
         // Now that we have the purchase object, we can save whatever we got back in it
         $this->bookinglib->updatePurchase($purchase, $data);
 
@@ -876,7 +876,7 @@ class BookingController extends coreController {
             $sagepay->notificationreceipt('INVALID', $url, 'VPSSignature not matched');
         }
 
-        // Check Status. 
+        // Check Status.
         // Work out what next action should be
         $status = $purchase->status;
         if ($status == 'OK') {

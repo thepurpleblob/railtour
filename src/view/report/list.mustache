@@ -16,8 +16,6 @@
         be manually checked in Sagepay to establish if payment is complete.
     </div>
 
-    <a class="btn btn-sm btn-warning" href="{{# path }}report/export{{/ path }}/{{ service.id }}">Export bookings</a>
-
     <table class="table table-hover table-condensed">
         <thead>
             <tr>
@@ -35,7 +33,7 @@
         <tbody>
         {{# purchases }}
                 <tr {{# statusclass }}class="alert alert-{{ . }}"{{/ statusclass }} >
-                    <td>{{ bookingref }}</td>
+                    <td>{{ bookingref }} {{# bookedby }}<i class="fas fa-phone"></i>{{/ bookedby }}</td>
                     <td>{{ status }}</td>
                     <td>{{ formatteddate }}</td>
                     <td>{{ firstname }} {{ surname }}</td>
