@@ -933,7 +933,7 @@ class BookingController extends coreController {
                 'servicename' => '',
             ));
         } else {
-            $path = $purchase->bookedby) ? 'booking/telephonecomplete' : 'booking/complete';
+            $path = $purchase->bookedby ? 'booking/telephonecomplete' : 'booking/complete';
             $service = $this->bookinglib->getService($purchase->serviceid);
             $this->View($path, array(
                 'purchase' => $purchase,
