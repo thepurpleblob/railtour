@@ -5,9 +5,8 @@ namespace thepurpleblob\railtour\library;
 use Exception;
 
 /**
- * Class Admin
+ * Class Booking
  * @package thepurpleblob\railtour\library
- * @return array list of services
  */
 class Booking extends Admin {
 
