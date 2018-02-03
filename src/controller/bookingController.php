@@ -672,14 +672,17 @@ class BookingController extends coreController {
             }
 
             // Validate
-            $this->gump->validation_rules(array(
+            $gumprules = array(
                 'surname' => 'required',
                 'firstname' => 'required',
                 'address1' => 'required',
                 'city' => 'required',
                 'postcode' => 'required',
-                'email' => 'required',
-            ));
+            );
+            if (!$purchase->bookedby) {
+                $gumprules['email'] = 'required';
+            }
+            $this->gump->validation_rules($gumprules);
             $this->gump->set_field_names(array(
                 'surname' => 'Surname',
                 'firstname' => 'First name',
@@ -725,7 +728,7 @@ class BookingController extends coreController {
         $form->county = $this->form->text('county', 'County', $purchase->county);
         $form->postcode = $this->form->text('postcode', 'Post code', $purchase->postcode, FORM_REQUIRED);
         $form->phone = $this->form->text('phone', 'Telephone', $purchase->phone);
-        $form->email = $this->form->text('email', 'Email', $purchase->email, FORM_REQUIRED);
+        $form->email = $this->form->text('email', 'Email', $purchase->email, $purchase->bookedby ? FORM_OPTIONAL : FORM_REQUIRED);
 
         // display form
         $this->View('booking/personal', array(

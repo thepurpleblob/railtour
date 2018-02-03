@@ -12,6 +12,11 @@
 
     <table class="table table-striped table-condensed">
         <tbody>
+               {{# purchase.bookedby}}                
+                   <tr>
+                        <td colspan="2" class="alert alert-danger">TELEPHONE BOOKING</td>
+                    </tr>
+                {{/ purchase.bookedby }}
                 <tr>
                     <th>Booking Ref</th>
                     <td>{{ purchase.bookingref }}</td>
@@ -110,10 +115,14 @@
                     <th>eTicket selected?</th>
                     <td>{{ purchase.formattedeticket }}</td>
                 </tr> 
-                                <tr>
+                <tr>
                     <th>eInfo selected?</th>
                     <td>{{ purchase.formattedeinfo }}</td>
                 </tr> 
+                <tr>
+                    <th>Booked by (telephone booking only)</th>
+                    <td>{{ purchase.bookedby }}</td>
+                </tr>
         </tbody>
     </table>
 
