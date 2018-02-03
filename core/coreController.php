@@ -136,6 +136,12 @@ class coreController {
         // No spaces
         $viewname = trim($viewname);
 
+        // Check cache exists
+        $cachedir = $CFG->dirroot . '/cache';
+        if (!is_writable($cachedir)) {
+            throw new \Exception('Cache dir is not writeable ' . $cachedir);
+        }
+
         // get/setup Mustache.
         $mustache = new \Mustache_Engine(array(
             'loader' => new \Mustache_Loader_FilesystemLoader($CFG->dirroot . '/src/view'),
@@ -147,7 +153,8 @@ class coreController {
                     global $CFG;
                     return $CFG->www . '/index.php/' . $path;
                 }
-            )
+            ),
+            'cache' => $cachedir,
         ));
 
         // TODO
@@ -157,6 +164,8 @@ class coreController {
         if ($user) {
             $system->userrole = $user->role;
             $system->admin = $user->role == 'ROLE_ADMIN';
+            $system->organiser = $user->role == 'ROLE_ORGANISER';
+            $system->adminpages = $system->admin || $system->organiser;
             $system->fullname = $user->firstname . ' ' . $user->lastname;
             $system->loggedin = true;
         } else {
@@ -238,22 +247,29 @@ class coreController {
 
     /**
      * Check for login/security
-     * Current role posibilities are ROLE_ADMIN and ROLE_ORGANISER
+     * Current role posibilities are ROLE_ADMIN, ROLE_ORGANISER
+     * and ROLE_TELEPHONE (in that order)
      *
      */
     public function require_login($role, $wantsurl = '') {
+
+        // If someone is logged in, check their role
         if ($user = $this->getSessionUser()) {
-            if ($role =='ROLE_ADMIN') {
-                if ($user->role == 'ROLE_ADMIN') {
-                    return true;
-                } else {
-                    $this->redirect($this->Url('user/roleerror'));
-                }
-            } else {
+            if ($role == 'ROLE_ADMIN' && ($user->role == 'ROLE_ADMIN')) {
                 return true;
             }
+            if ($role == 'ROLE_ORGANISER' && (($user->role == 'ROLE_ORGANISER') || ($user->role == 'ROLE_ADMIN'))) {
+                return true;
+            }
+
+            // Everybody (with a login) can do the Telephone role
+            if ($role == 'ROLE_TELEPHONE') {
+                return true;
+            }
+            $this->redirect('user/roleerror');
         }
 
+        // Not logged in
         $_SESSION['wantsurl'] = $wantsurl;
         $this->redirect('user/login');
     }

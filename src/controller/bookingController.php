@@ -75,7 +75,7 @@ class BookingController extends coreController {
     public function telephoneAction($code)
     {
         // Security
-        $this->require_login('ROLE_ORGANISER', 'booking/telephone/' . $code);
+        $this->require_login('ROLE_TELEPHONE', 'booking/telephone/' . $code);
 
         // Log
         $this->log('Booking started ' . $code);
@@ -179,7 +179,7 @@ class BookingController extends coreController {
         $purchase = $this->bookinglib->getSessionPurchase();
         $serviceid = $purchase->serviceid;
         $service = $this->bookinglib->getService($serviceid);
-        $this->require_login('ROLE_ORGANISER', 'booking/joining');
+        $this->require_login('ROLE_TELEPHONE', 'booking/joining');
 
         // Search for old purchases
         $oldpurchases = $this->bookinglib->findOldPurchase($purchase);
@@ -231,7 +231,7 @@ class BookingController extends coreController {
         // Grab current purchase
         $purchase = $this->bookinglib->getSessionPurchase($serviceid);
         if ($purchase->bookedby) {
-            $this->require_login('ROLE_ORGANISER', 'booking/numbers/' . $serviceid);
+            $this->require_login('ROLE_TELEPHONE', 'booking/numbers/' . $serviceid);
         }
 
         // get acting maxparty
@@ -311,7 +311,7 @@ class BookingController extends coreController {
         $service = $this->bookinglib->getService($serviceid);
 
         if ($purchase->bookedby) {
-            $this->require_login('ROLE_ORGANISER', 'booking/joining');
+            $this->require_login('ROLE_TELEPHONE', 'booking/joining');
         }
 
         // get the joining stations
@@ -383,7 +383,7 @@ class BookingController extends coreController {
         $service = $this->bookinglib->getService($serviceid);
 
         if ($purchase->bookedby) {
-            $this->require_login('ROLE_ORGANISER', 'booking/destination');
+            $this->require_login('ROLE_TELEPHONE', 'booking/destination');
         }
 
         // get the destinations
@@ -442,7 +442,7 @@ class BookingController extends coreController {
         $service = $this->bookinglib->getService($serviceid);
 
         if ($purchase->bookedby) {
-            $this->require_login('ROLE_ORGANISER', 'booking/meals');
+            $this->require_login('ROLE_TELEPHONE', 'booking/meals');
         }
 
         // If there are no meals on this service just bail
@@ -513,7 +513,7 @@ class BookingController extends coreController {
         $service = $this->bookinglib->getService($serviceid);
 
         if ($purchase->bookedby) {
-            $this->require_login('ROLE_ORGANISER', 'booking/class');
+            $this->require_login('ROLE_TELEPHONE', 'booking/class');
         }
 
         // Get the limits for this service:
@@ -590,7 +590,7 @@ class BookingController extends coreController {
         $service = $this->bookinglib->getService($serviceid);
 
         if ($purchase->bookedby) {
-            $this->require_login('ROLE_ORGANISER', 'booking/additional');
+            $this->require_login('ROLE_TELEPHONE', 'booking/additional');
         }
 
         // current counts
@@ -657,7 +657,7 @@ class BookingController extends coreController {
         $service = $this->bookinglib->getService($serviceid);
 
         if ($purchase->bookedby) {
-            $this->require_login('ROLE_ORGANISER', 'booking/personal');
+            $this->require_login('ROLE_TELEPHONE', 'booking/personal');
         }
 
         // hopefully no errors
@@ -746,7 +746,7 @@ class BookingController extends coreController {
         $service = $this->bookinglib->getService($serviceid);
 
        if ($purchase->bookedby) {
-           $this->require_login('ROLE_ORGANISER', 'booking/review');
+           $this->require_login('ROLE_TELEPHONE', 'booking/review');
        }
 
         // work out final fare

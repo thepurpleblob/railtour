@@ -4,8 +4,7 @@ namespace thepurpleblob\railtour\controller;
 
 use thepurpleblob\core\coreController;
 
-class UserController extends coreController
-{
+class UserController extends coreController {
 
     protected $userlib;
 
@@ -27,6 +26,13 @@ class UserController extends coreController
 
         // Create new admin user if required
         $this->userlib->installAdmin();
+    }
+
+    /**
+     * Role problem
+     */
+    public function roleerrorAction() {
+        $this->View('user/roleerror');
     }
 
     /**
@@ -121,6 +127,7 @@ class UserController extends coreController
         $rolechoice = array(
             'ROLE_ADMIN' => 'ROLE_ADMIN',
             'ROLE_ORGANISER' => 'ROLE_ORGANISER',
+            'ROLE_TELEPHONE' => 'ROLE_TELEPHONE',
         );
 
         // find/create the user

@@ -5,3 +5,4 @@ config.php
 .idea/*
 **/.idea/tasks.xml
 **/.idea/workspace.xml
+/cache
