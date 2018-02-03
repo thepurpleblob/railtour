@@ -1,0 +1,42 @@
+{{> header }}
+
+    <h3 class="text-error">Payment declined</h3>
+
+    {{# purchase.bookedby }}
+        <p>The customer's online payment partner has declined the payment. They have not been charged</p>
+        <p>Advise them to contact their card issuer if they require further information. SRPS 
+        Railtours is unable to provide any details</p>
+    {{/ purchase.bookedby }}
+    {{^ purchase.bookedby}}
+        <p>
+            We are sorry, but our online payment partner has declined your payment
+            and your card has not been charged.
+        </p>
+    {{/ purchase.bookedby }}
+    
+    <p>
+        The status message was <b>'{{ purchase.statusdetail }}'</b>
+    </p>
+
+    {{^ purchase.bookedby}}
+        <p>
+            If a valid email address was supplied, an email has been sent to you for your records. Please note that we 
+            have no other information about this transaction. You are advised
+            to contact your card issuer directly. 
+        </p>
+    {{/ purchase.bookedby}}
+
+    <div>
+        {{^ purchase.bookedby}}
+            <a class="btn btn-primary" href="http://www.srps.org.uk/">
+                Return to the SRPS site
+            </a>
+        {{/ purchase.bookedby}}
+        {{# purchase.bookedby}}
+            <a class="btn btn-primary" href="{{ config.www }}">
+                Done
+            </a>
+        {{/ purchase.bookedby}}
+    </div>
+
+{{> footer }}

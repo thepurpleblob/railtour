@@ -727,8 +727,8 @@ class BookingController extends coreController {
         $form->city = $this->form->text('city', 'Town / city', $purchase->city, FORM_REQUIRED);
         $form->county = $this->form->text('county', 'County', $purchase->county);
         $form->postcode = $this->form->text('postcode', 'Post code', $purchase->postcode, FORM_REQUIRED);
-        $form->phone = $this->form->text('phone', 'Telephone', $purchase->phone);
-        $form->email = $this->form->text('email', 'Email', $purchase->email, $purchase->bookedby ? FORM_OPTIONAL : FORM_REQUIRED);
+        $form->phone = $this->form->text('phone', 'Telephone', $purchase->phone, FORM_OPTIONAL, null, 'tel');
+        $form->email = $this->form->text('email', 'Email', $purchase->email, $purchase->bookedby ? FORM_OPTIONAL : FORM_REQUIRED, null, 'email');
 
         // display form
         $this->View('booking/personal', array(
@@ -933,8 +933,9 @@ class BookingController extends coreController {
                 'servicename' => '',
             ));
         } else {
+            $path = $purchase->bookedby) ? 'booking/telephonecomplete' : 'booking/complete';
             $service = $this->bookinglib->getService($purchase->serviceid);
-            $this->View('booking/complete', array(
+            $this->View($path, array(
                 'purchase' => $purchase,
                 'service' => $service,
             ));
@@ -947,173 +948,19 @@ class BookingController extends coreController {
      * @param string $VendorTxCode
      */
     public function declineAction($VendorTxCode) {
-        $booking = $this->getLibrary('Booking');
-        if (!$purchase = $booking->getPurchaseFromVendorTxCode($VendorTxCode)) {
-            $this->View('booking/fail.html.twig', array(
+        if (!$purchase = $this->bookinglib->getPurchaseFromVendorTxCode($VendorTxCode)) {
+            $this->View('booking/fail', array(
                 'status' => 'N/A',
                 'diagnostic' => 'Purchase record could not be found for ' . $VendorTxCode,
             ));
         } else {
-            $service = $booking->Service($purchase->serviceid);
-            $this->View('booking/decline.html.twig', array(
+            $service = $booking->getService($purchase->serviceid);
+            $this->View('booking/decline', array(
                 'purchase' => $purchase,
                 'service' => $service,
             ));
         }
     }
 
-    public function oldnotificationAction()
-    {
-        $em = $this->getDoctrine()->getManager();
-        $sagepay = $this->get('srps_sagepay');
-
-        // initialise sagepay thingy
-        // (needs to access a bunch of params)
-        $sagepay->setParameters($this->container);
-
-        // get the SagePay response object
-        if (empty($_REQUEST['crypt'])) {
-            // it's gone wrong... what do we do?
-            throw new \Exception( 'No or empty crypt field on callback from SagePay');
-        }
-        $crypt = $_REQUEST['crypt'];
-
-        // unscramble the data
-        $sage = $sagepay->decrypt( $crypt );
-
-        // get the important data
-        $bookingref = $sage->VendorTxCode;
-
-        // get the purchase
-        $purchase = $em->getRepository('SRPSBookingBundle:Purchase')
-            ->findOneBy(array('bookingref'=>$bookingref));
-
-        if (!$purchase) {
-            throw new \Exception( 'Unable to find record of booking '.$bookingref);
-        }
-
-        // Get the service object
-        $code = $purchase->getCode();
-        $service = $em->getRepository('SRPSBookingBundle:Service')
-            ->findOneByCode($code);
-        if (!$service) {
-            throw $this->createNotFoundException('Unable to find code ' . $code);
-        }
-
-        // get the destination
-        $destination = $em->getRepository('SRPSBookingBundle:Destination')
-            ->findOneBy(array('crs'=>$purchase->getDestination(), 'serviceid'=>$service->getId()));
-
-        // get the joining station
-         $joining = $em->getRepository('SRPSBookingBundle:Joining')
-            ->findOneBy(array('crs'=>$purchase->getJoining(), 'serviceid'=>$service->getId()));
-
-        // Regardless, record the bookingdata
-        $purchase->setStatus($sage->Status);
-        $purchase->setStatusdetail($sage->StatusDetail);
-        $purchase->setCardtype($sage->CardType);
-        $purchase->setLast4digits($sage->Last4Digits);
-        $purchase->setBankauthcode($sage->BankAuthCode);
-        $purchase->setDeclinecode($sage->DeclineCode);
-        $purchase->setCompleted(true);
-        $em->persist($purchase);
-        $em->flush();
-
-        // send emails IF not already (guard against refresh)
-        if (!$purchase->isEmailsent()) {
-            $message = \Swift_Message::newInstance();
-            $message->setFrom('noreply@srps.org.uk');
-            $message->setTo($purchase->getEmail());
-            $message->setContentType('text/html');
-
-            if ($sage->Status=='OK') {
-                $message->setSubject('Confirmation of SRPS Railtour Booking - ' . $service->getName())
-                    ->setBody(
-                        $this->renderView(
-                            'SRPSBookingBundle:Email:confirm.html.twig',
-                            array(
-                                'purchase' => $purchase,
-                                'service' => $service,
-                                'joining' => $joining,
-                                'destination' => $destination,
-                                ),
-                            'text/html'
-                        )
-                    )
-                    ->addPart(
-                        $this->renderView(
-                            'SRPSBookingBundle:Email:confirm.txt.twig',
-                            array(
-                                'purchase' => $purchase,
-                                'service' => $service,
-                                'joining' => $joining,
-                                'destination' => $destination,
-                                ),
-                            'text/plain'
-                        )
-                    );
-            } else {
-
-                // Status != OK, so the payment failed
-                 $message->setSubject('Failure Notice: SRPS Railtour Booking - ' . $service->getName())
-                    ->setBody(
-                        $this->renderView(
-                            'SRPSBookingBundle:Email:fail.html.twig',
-                            array(
-                                'purchase' => $purchase,
-                                'service' => $service,
-                                'joining' => $joining,
-                                'destination' => $destination,
-                                ),
-                            'text/html'
-                        )
-                    )
-                    ->addPart(
-                        $this->renderView(
-                            'SRPSBookingBundle:Email:fail.txt.twig',
-                            array(
-                                'purchase' => $purchase,
-                                'service' => $service,
-                                'joining' => $joining,
-                                'destination' => $destination,
-                                ),
-                            'text/plain'
-                        )
-                    );
-            }
-            $this->get('mailer')->send($message);
-
-            // also send to backup (if defined)
-            if ($this->container->hasParameter('srpsbackupemail')) {
-
-                // where we send the backup email
-                $srpsbackupemail = $this->container->getParameter('srpsbackupemail');
-
-                $message->setTo($srpsbackupemail);
-                $message->setSubject($service->getCode().'-'.$purchase->getBookingref());
-                $this->get('mailer')->send($message);
-            }
-        }
-
-        // email must have been sent
-        $purchase->setEmailsent(true);
-        $em->persist($purchase);
-        $em->flush();
-
-        // display form
-        if ($sage->Status == 'OK') {
-            return $this->render('SRPSBookingBundle:Booking:complete.html.twig', array(
-                'purchase' => $purchase,
-                'service' => $service,
-                'sage' => $sage,
-            ));
-        } else {
-            return $this->render('SRPSBookingBundle:Booking:decline.html.twig', array(
-                'purchase' => $purchase,
-                'service' => $service,
-                'sage' => $sage,
-            ));
-        }
-    }
 }
 
