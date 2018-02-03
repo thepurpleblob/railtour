@@ -792,4 +792,23 @@ class Booking extends Admin {
         throw new \Exception("Matching purchaseid not found - " . $purchaseid);
     }
 
+    /**
+     * Update purchase with data returned from SagePay
+     * @param object $purchase
+     * @param array $data
+     * @return object
+     */
+    public function updatePurchase($purchase, $data) {
+        $purchase->status = $data['Status'];
+        $purchase->statusdetail = $data['StatusDetail'];
+        $purchase->cardtype = $data['CardType'];
+        $purchase->last4digits = $data['Last4Digits'];
+        $purchase->bankauthcode = $data['BankAuthCode'];
+        $purchase->declinecode = $data['DeclineCode'];
+        $purchase->completed = 1;
+        $purchase->save();
+
+        return $purchase;
+    }
+
 }

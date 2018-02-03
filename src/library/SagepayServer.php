@@ -161,7 +161,7 @@ class SagepayServer {
             'CustomerEmail' => $this->clean($this->purchase->email, 255),
             'BasketXML' => $this->clean($this->buildBasket(), 20000),
             'AllowGiftAid' => 1,
-            'AccountType' => 'E', // TODO - could be 'M' somehow
+            'AccountType' => $this->purchase->bookedby ? 'M' : 'E', 
         ];
 
         // turn these into name=value
