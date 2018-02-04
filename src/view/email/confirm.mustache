@@ -1,0 +1,94 @@
+{# template for the punter's confirmation email #}
+
+<p>
+    Dear {{ purchase.title }} {{ purchase.firstname }} {{ purchase.surname }},
+</p>
+
+<p>
+    Thank you for booking with SRPS Railtours. Your ticket with seat reservations
+    will be sent to you with further information and final timings for the train
+    about a week before the tour.
+</p>
+
+<p>
+    Your booking details are as follows...
+</p>
+
+<p><b>Booking reference: {{ purchase.bookingref }}</b></p>
+
+<address>
+    {{ purchase.title }} {{ purchase.firstname }} {{ purchase.surname }}<br />
+    {{ purchase.address1 }}<br />
+    {{ purchase.address2 }}{{ purchase.address2 ? '<br />' : '' }}
+    {{ purchase.city }}<br />
+    {{ purchase.county }}{{ purchase.county ? '<br />' : '' }}
+    {{ purchase.postcode }}<br />    
+</address>
+
+<p>Contact details:
+    <ul>
+        <li>Telephone: {{ purchase.phone }}</li>
+        <li>Email: {{ purchase.email }}</li>
+    </ul>    
+</p>    
+
+<p>
+    Railtour booking details:
+    <ul>
+        <li>Railtour: {{ service.name }}</li>
+        <li>Date: {{ service.date | date('d/m/Y') }}</li>
+        <li>Boarding at: {{ joining.station }}</li>
+        <li>Destination: {{ destination.name }}</li>
+    </ul>
+</p>
+
+<p>Seats booked: {{ purchase.adults }} adults 
+    {% if purchase.children %}
+        and {{ purchase.children }} children  
+    {% endif %}   
+        in {{ purchase.class=='F' ? 'First' : 'Standard' }} class.
+</p>   
+
+{% if purchase.seatsupplement %}
+    <p>
+        You have requested Window seats in First Class
+    </p>
+{% endif %}    
+
+{% if service.mealavisible and purchase.meala %}
+    {{ service.mealaname }}: {{ purchase.meala }} booked.<br />
+{% endif %}
+{% if service.mealbvisible and purchase.mealb %}
+    {{ service.mealbname }}: {{ purchase.mealb }} booked.<br />
+{% endif %}    
+{% if service.mealcvisible and purchase.mealc %}
+    {{ service.mealcname }}: {{ purchase.mealc }} booked.<br />
+{% endif %}  
+{% if service.mealdvisible and purchase.meald %}
+    {{ service.mealdname }}: {{ purchase.meald }} booked.<br />
+{% endif %}    
+
+<p>Thank you for your payment of &pound;{{ purchase.payment }}.</p>
+
+<p>
+    Please check the above details carefully and phone us on <b>0131 202 1033</b>
+    if you have any questions about this booking. Please do not reply to this 
+    email as the mailbox is not monitored. 
+<p>    
+    
+<p>We hope you have an enjoyable day.</p>
+
+<p><small>
+    SRPS Railtours Ltd. does not accept responsibilities for delays, mishaps or
+    alterations/curtailment of the tour arising from situations outside of its
+    control. Your booking is taken as acceptance of these conditions. SRPS Railtours Ltd.
+    is a trading subsidiary of the Scottish Railway Preservation Society. Your personal
+    details may be recorded in computer systems operated on behalf of the Scottish
+    Railway Preservation Society for the purpose of making travel arrangements
+    and of marketing tours. Your details will not be passed on to any other 
+    organisations.<br />
+    Our terms and conditions are at <a href="http://www.srps.org.uk/railtours/conditions.htm">
+    http://www.srps.org.uk/railtours/conditions.htm</a><br />
+    SRPS Railtours Ltd., Registered in Scotland. Reg. No. 15847<br />
+    Reg. Office 17-19 North Street, Bo'ness, West Lothian.
+</small></p>

@@ -1,0 +1,33 @@
+{# template for the punter's failure email #}
+
+Dear {{ purchase.title }} {{ purchase.firstname }} {{ purchase.surname }},
+
+Booking reference: {{ purchase.bookingref }}
+
+Thank you for booking with SRPS Railtours. However, we regret that your payment
+has been declined by our online payment partner. 
+
+This email contains the information we have recieved for your information. 
+Please DO NOT contact us regarding this payment as we have no other details.
+We advise you to contact your card issuer directly. 
+
+    Card type: {{ purchase.cardtype }}
+    Payment status: {{ purchase.statusdetail }}
+    Bank decline code: {{ purchase.declinecode }}
+
+Please contact us on 0131 202 1033 if you have any other questions about this or
+any other bookings. Please do not reply to this email as the mailbox is not 
+monitored.
+------------------------------------------------------------------------------
+
+SRPS Railtours Ltd. does not accept responsibilities for delays, mishaps or
+alterations/curtailment of the tour arising from situations outside of its
+control. Your booking is taken as acceptance of these conditions. SRPS Railtours Ltd.
+is a trading subsidiary of the Scottish Railway Preservation Society. Your personal
+details may be recorded in computer systems operated on behalf of the Scottish
+Railway Preservation Society for the purpose of making travel arrangements
+and of marketing tours. Your details will not be passed on to any other 
+organisations.
+Our terms and conditions are at http://www.srps.org.uk/railtours/conditions.htm
+SRPS Railtours Ltd., Registered in Scotland. Reg. No. 15847
+Reg. Office 17-19 North Street, Bo'ness, West Lothian.

@@ -157,7 +157,6 @@ class coreController {
             'cache' => $cachedir,
         ));
 
-        // TODO
         // Add some extra variables to array
         $user = $this->getUser();
         $system = new \stdClass();
