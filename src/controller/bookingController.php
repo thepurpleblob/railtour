@@ -854,6 +854,9 @@ class BookingController extends coreController {
         // Library stuff
         $sagepay = $this->getLibrary('SagepayServer');
 
+        // Mailer
+        $mail = $this->getLibrary('Mail');
+
         // POST data from SagePay
         $data = $sagepay->getNotification();
 
@@ -881,16 +884,19 @@ class BookingController extends coreController {
         $status = $purchase->status;
         if ($status == 'OK') {
 
-            // TODO: Emails
+            // Send confirmation email
+            $mail->confirm($purchase);
 
             $url = $this->Url('booking/complete') . '/' . $VendorTxCode;
             $sagepay->notificationreceipt('OK', $url, '');
         } else if ($status == 'ERROR') {
             $url = $this->Url('booking/fail') . '/' . $VendorTxCode . '/' . urlencode($purchase->statusdetail);
             $sagepay->notificationreceipt('OK', $url, $purchase->statusdetail);
+            $mail->error($purchase);
         } else {
             $url = $this->Url('booking/decline') . '/' . $VendorTxCode;
             $sagepay->notificationreceipt('OK', $url, $purchase->statusdetail);
+            $mail->decline($purchase);
         }
 
         die;

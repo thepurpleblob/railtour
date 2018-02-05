@@ -23,4 +23,28 @@ class Mail {
         // Create mailer
         $this->mailer = new Swift_Mailer($transport);
     }
+
+    /**
+     * Send notification of completion
+     * @param object $purchase
+     */
+    public function confirm($purchase) {
+
+    }
+
+    /**
+     * Send notification of error
+     * @param object $purchase
+     */
+    public function error($purchase) {
+        
+    }
+
+    /**
+     * Send notification of completion
+     * @param object $purchase
+     */
+    public function decline($purchase) {
+        
+    }
 }

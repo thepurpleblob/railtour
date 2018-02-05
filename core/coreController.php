@@ -128,8 +128,9 @@ class coreController {
      * render a view
      * @param string $viewname name of view (minus extension)
      * @param array $variables array of variables to be passed
+     * @return string
      */
-    public function View($viewname, $variables=array())
+    public function renderView($viewname, $variables=array())
     {
         global $CFG;
 
@@ -185,9 +186,17 @@ class coreController {
         $template = $mustache->loadTemplate($viewname . '.mustache');
 
         // and render.
-        echo $template->render($variables);
+        return $template->render($variables);
+    }
 
-        // The view is always the last thing we do, so just in case...
+    /**
+     * Display a view
+     * Use this to display the view directly
+     * @param string $viewname name of view (minus extension)
+     * @param array $variables array of variables to be passed
+     */
+    public function View($viewname, $variables=array()) {
+        echo $this->renderView($viewname, $variables);
         die;
     }
 
