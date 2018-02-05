@@ -16,6 +16,10 @@ class Mail {
 
     protected $service;
 
+    protected $joining;
+
+    protected $destination;
+
     protected $extrarecipients;
 
     /**
@@ -35,11 +39,15 @@ class Mail {
         }
 
         // format service
-        $adminlib = $this->controller->getLibrary('Admin');
-        $adminlib->formatService($this->service);
+        $bookinglib = $this->controller->getLibrary('Booking');
+        $bookinglib->formatService($this->service);
 
         // format purchase
         $this->purchase->formattedclass = $purchase->class == 'F' ? 'First' : 'Standard';
+
+        // Find joining and destination
+        $this->joining = $bookinglib->getJoiningCRS($this->service->id, $this->purchase->joining);
+        $this->destination = $bookinglib->getDestinationCRS($this->service->id, $this->purchase->destination);
 
         // Create transport
         $transport = new \Swift_SmtpTransport($CFG->smtpd_host);
@@ -81,10 +89,14 @@ class Mail {
         $body = $this->controller->renderView('email/confirm', array(
             'service' => $this->service,
             'purchase' => $this->purchase,
+            'joining' => $this->joining,
+            'destination' => $this->destination,
         ));
         $bodytxt = $this->controller->renderView('email/confirm_txt', array(
             'service' => $this->service,
             'purchase' => $this->purchase,
+            'joining' => $this->joining,
+            'destination' => $this->destination,
         ));
 
         foreach ($this->getRecipients() as $recipient) {
