@@ -850,12 +850,10 @@ class BookingController extends coreController {
      * @throws \Exception
      */
     public function notificationAction() {
+        global $CFG;
 
         // Library stuff
         $sagepay = $this->getLibrary('SagepayServer');
-
-        // Mailer
-        $mail = $this->getLibrary('Mail');
 
         // POST data from SagePay
         $data = $sagepay->getNotification();
@@ -869,6 +867,11 @@ class BookingController extends coreController {
             $url = $this->Url('booking/fail') . '/' . $VendorTxCode . '/' . urlencode('Purchase record not found');
             $sagepay->notificationreceipt('INVALID', $url, 'Purchase record not found');
         }
+
+        // Mailer
+        $mail = $this->getLibrary('Mail');
+        $mail->initialise($purchase);
+        $mail->setExtrarecipients($CFG->backup_email);
 
         // Now that we have the purchase object, we can save whatever we got back in it
         $this->bookinglib->updatePurchase($purchase, $data);
@@ -885,18 +888,18 @@ class BookingController extends coreController {
         if ($status == 'OK') {
 
             // Send confirmation email
-            $mail->confirm($purchase);
+            $mail->confirm();
 
             $url = $this->Url('booking/complete') . '/' . $VendorTxCode;
             $sagepay->notificationreceipt('OK', $url, '');
         } else if ($status == 'ERROR') {
             $url = $this->Url('booking/fail') . '/' . $VendorTxCode . '/' . urlencode($purchase->statusdetail);
             $sagepay->notificationreceipt('OK', $url, $purchase->statusdetail);
-            $mail->error($purchase);
+            $mail->error();
         } else {
             $url = $this->Url('booking/decline') . '/' . $VendorTxCode;
             $sagepay->notificationreceipt('OK', $url, $purchase->statusdetail);
-            $mail->decline($purchase);
+            $mail->decline();
         }
 
         die;

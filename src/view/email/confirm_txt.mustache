@@ -1,4 +1,3 @@
-{# template for the punter's confirmation email #}
 
 Dear {{ purchase.title }} {{ purchase.firstname }} {{ purchase.surname }},
 
@@ -10,59 +9,76 @@ Your booking details are as follows...
 
 Booking reference: {{ purchase.bookingref }}
 
-{{ purchase.title }}{{ purchase.title ? ' ' : ''}}{{ purchase.firstname }} {{ purchase.surname }}
+{{ purchase.title }} {{ purchase.firstname }} {{ purchase.surname }}
 {{ purchase.address1 }}
-{{ purchase.address2 }}
+{{# purchase.address2 }}{{ purchase.address2 }}{{/ purchase.address2 }}
 {{ purchase.city }}
-{{ purchase.county }}
-{{ purchase.postcode }}    
+{{# purchase.county }}{{ purchase.county }}{{/ purchase.county }}
+{{ purchase.postcode }}   
 
 Contact details:
-
     Telephone: {{ purchase.phone }}
-    Email: {{ purchase.email }}
+    Email: {{ purchase.email }}   
 
 Railtour booking details:
-
     Railtour: {{ service.name }}
-    Date: {{ service.date | date('d/m/Y') }}
+    Date: {{ service.formatteddate  }}
     Boarding at: {{ joining.station }}
     Destination: {{ destination.name }}
-    
-Seats booked: {{ purchase.adults }} adults {% if purchase.children %} and {{ purchase.children }} children  {% endif %} in {{ purchase.class=='F' ? 'First' : 'Standard' }} class.
 
-{% if service.mealavisible and purchase.meala %}{{ service.mealaname }}: {{ purchase.meala }} booked.
-{% endif %}
-{% if service.mealbvisible and purchase.mealb %}{{ service.mealbname }}: {{ purchase.mealb }} booked.
-{% endif %}    
-{% if service.mealcvisible and purchase.mealc %}{{ service.mealcname }}: {{ purchase.mealc }} booked.
-{% endif %}  
-{% if service.mealdvisible and purchase.meald %}{{ service.mealdname }}: {{ purchase.meald }} booked.
-{% endif %}       
+Seats booked: 
+    Adults: {{ purchase.adults }}
+    Children: {{ purchase.children }}
+    Travel class: {{ purchase.formattedclass }}  
 
-{% if purchase.seatsupplement %}
-You have requested Window seats in First Class
-{% endif %}    
 
+{{# purchase.seatsupplement }}
+Supplements:
+    You have requested Window seats in First Class
+{{/ purchase.seatsupplement }}
+
+
+{{# service.mealavisible }}
+    {{# purchase.meala }}
+        {{ service.mealaname }}: {{ purchase.meala }} booked.
+    {{/ purchase.meala }}
+{{/ service.mealavisible }}
+{{# service.mealbvisible }}
+    {{# purchase.mealb }}
+        {{ service.mealbname }}: {{ purchase.mealb }} booked.
+    {{/ purchase.mealb }}
+{{/ service.mealbvisible }}
+{{# service.mealcvisible }}
+    {{# purchase.mealc }}
+        {{ service.mealcname }}: {{ purchase.mealc }} booked.
+    {{/ purchase.mealc }}
+{{/ service.mealcvisible }}
+{{# service.mealdvisible }}
+    {{# purchase.meald }}
+        {{ service.mealdname }}: {{ purchase.meald }} booked.
+    {{/ purchase.meald }}
+{{/ service.mealdvisible }}    
 
 Thank you for your payment of £{{ purchase.payment }}.
 
 Please check the above details carefully and phone us on 0131 202 1033
 if you have any questions about this booking. Please do not reply to this 
-email as the mailbox is not monitored.
+email as the mailbox is not monitored.    
     
 We hope you have an enjoyable day.
 
-------------------------------------------------------------------------------
+The "small print":
+    SRPS Railtours Ltd. does not accept responsibilities for delays, mishaps or
+    alterations/curtailment of the tour arising from situations outside of its
+    control. Your booking is taken as acceptance of these conditions. SRPS Railtours Ltd.
+    is a trading subsidiary of the Scottish Railway Preservation Society. Your personal
+    details may be recorded in computer systems operated on behalf of the Scottish
+    Railway Preservation Society for the purpose of making travel arrangements
+    and of marketing tours. Your details will not be passed on to any other 
+    organisations.
 
-SRPS Railtours Ltd. does not accept responsibilities for delays, mishaps or
-alterations/curtailment of the tour arising from situations outside of its
-control. Your booking is taken as acceptance of these conditions. SRPS Railtours Ltd.
-is a trading subsidiary of the Scottish Railway Preservation Society. Your personal
-details may be recorded in computer systems operated on behalf of the Scottish
-Railway Preservation Society for the purpose of making travel arrangements
-and of marketing tours. Your details will not be passed on to any other 
-organisations.
-Our terms and conditions are at http://www.srps.org.uk/railtours/conditions.htm
-SRPS Railtours Ltd., Registered in Scotland. Reg. No. 15847
-Reg. Office 17-19 North Street, Bo'ness, West Lothian.
+    Our terms and conditions are at http://www.srps.org.uk/railtours/conditions.htm
+
+    SRPS Railtours Ltd., Registered in Scotland. Reg. No. 15847
+    Reg. Office 17-19 North Street, Bo'ness, West Lothian.
+

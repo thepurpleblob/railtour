@@ -1,4 +1,3 @@
-{# template for the punter's confirmation email #}
 
 <p>
     Dear {{ purchase.title }} {{ purchase.firstname }} {{ purchase.surname }},
@@ -19,9 +18,9 @@
 <address>
     {{ purchase.title }} {{ purchase.firstname }} {{ purchase.surname }}<br />
     {{ purchase.address1 }}<br />
-    {{ purchase.address2 }}{{ purchase.address2 ? '<br />' : '' }}
+    {{# purchase.address2 }}{{ purchase.address2 }}<br />{{/ purchase.address2 }}
     {{ purchase.city }}<br />
-    {{ purchase.county }}{{ purchase.county ? '<br />' : '' }}
+    {{# purchase.county }}{{ purchase.county }}<br />{{/ purchase.county }}
     {{ purchase.postcode }}<br />    
 </address>
 
@@ -36,37 +35,47 @@
     Railtour booking details:
     <ul>
         <li>Railtour: {{ service.name }}</li>
-        <li>Date: {{ service.date | date('d/m/Y') }}</li>
+        <li>Date: {{ service.formatteddate  }}</li>
         <li>Boarding at: {{ joining.station }}</li>
         <li>Destination: {{ destination.name }}</li>
     </ul>
 </p>
 
-<p>Seats booked: {{ purchase.adults }} adults 
-    {% if purchase.children %}
-        and {{ purchase.children }} children  
-    {% endif %}   
-        in {{ purchase.class=='F' ? 'First' : 'Standard' }} class.
+<p>Seats booked: 
+    <ul>
+        <li>Adults: {{ purchase.adults }}</li>
+        <li>Children: {{ purchase.children }}</li>
+        <li>Travel class: {{ purchase.formattedclass }}</li>
+    </ul>
 </p>   
 
-{% if purchase.seatsupplement %}
+{{# purchase.seatsupplement }}
     <p>
+        Supplements<br />
         You have requested Window seats in First Class
     </p>
-{% endif %}    
+{{/ purchase.seatsupplement }}
 
-{% if service.mealavisible and purchase.meala %}
-    {{ service.mealaname }}: {{ purchase.meala }} booked.<br />
-{% endif %}
-{% if service.mealbvisible and purchase.mealb %}
-    {{ service.mealbname }}: {{ purchase.mealb }} booked.<br />
-{% endif %}    
-{% if service.mealcvisible and purchase.mealc %}
-    {{ service.mealcname }}: {{ purchase.mealc }} booked.<br />
-{% endif %}  
-{% if service.mealdvisible and purchase.meald %}
-    {{ service.mealdname }}: {{ purchase.meald }} booked.<br />
-{% endif %}    
+{{# service.mealavisible }}
+    {{# purchase.meala }}
+        {{ service.mealaname }}: {{ purchase.meala }} booked.<br />
+    {{/ purchase.meala }}
+{{/ service.mealavisible }}
+{{# service.mealbvisible }}
+    {{# purchase.mealb }}
+        {{ service.mealbname }}: {{ purchase.mealb }} booked.<br />
+    {{/ purchase.mealb }}
+{{/ service.mealbvisible }}
+{{# service.mealcvisible }}
+    {{# purchase.mealc }}
+        {{ service.mealcname }}: {{ purchase.mealc }} booked.<br />
+    {{/ purchase.mealc }}
+{{/ service.mealcvisible }}
+{{# service.mealdvisible }}
+    {{# purchase.meald }}
+        {{ service.mealdname }}: {{ purchase.meald }} booked.<br />
+    {{/ purchase.meald }}
+{{/ service.mealdvisible }}    
 
 <p>Thank you for your payment of &pound;{{ purchase.payment }}.</p>
 

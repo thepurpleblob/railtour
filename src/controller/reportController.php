@@ -11,8 +11,7 @@ class reportController extends coreController {
     /**
      * Constructor
      */
-    public function __construct($exception = false)
-    {
+    public function __construct($exception = false) {
         parent::__construct($exception);
 
         // Library
@@ -24,8 +23,7 @@ class reportController extends coreController {
      * @param $serviceid
      * @param string $sort
      */
-    public function listAction($serviceid, $sort = '')
-    {
+    public function listAction($serviceid, $sort = '') {
         $this->require_login('ROLE_ORGANISER', 'service/show/' . $serviceid);
 
         $service = $this->adminlib->getService($serviceid);;
@@ -85,6 +83,44 @@ class reportController extends coreController {
         header("Content-disposition: attachment; filename=\"$filename\"");
         echo $this->adminlib->getExport($purchases);
         die;
+    }
+
+    /**
+     * Re-send confirm/error/decline email to customer
+     * @param int $purchaseid
+     */
+    public function resendAction($purchaseid) {
+
+        $this->require_login('ROLE_ORGANISER');
+
+        // Get the purchase
+        $purchase = $this->adminlib->getPurchase($purchaseid);
+
+        // ...and the service record
+        $service = $this->adminlib->getService($purchase->serviceid);
+
+        // Set up mailer
+        $mail = $this->getLibrary('Mail');
+        $mail->initialise($purchase);
+
+        // Double check that there's an email to send to
+        if ($purchase->email && $purchase->status) {
+            if (($purchase->status == 'OK') || ($purchase->status == 'OK REPEATED')) {
+                $mail->confirm();
+                $resend = "Confirmation email re-sent";
+            } else {
+                $mail->error();
+                $resend = "Error/Declined email re-sent";
+            }
+        } else {
+            $resend = '';
+        }
+
+        $this->View('report/view', array(
+            'service' => $service,
+            'purchase' => $this->adminlib->formatPurchase($purchase),
+            'resend' => $resend,
+        ));
     }
 }
 

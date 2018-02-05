@@ -3,6 +3,10 @@
 {{> adminmenu }}
 
 <h3 class="adminpage_title">Railtour Reports <i>"{{ service.name }}"</i></h3>
+
+    {{# resend }}
+        <div class="alert alert-success">{{ resend }}</div>
+    {{/ resend}}
     
     {{# purchase.statusclass }}
         <div class="alert alert-block alert-{{ purchase.statusclass }}">
@@ -55,7 +59,11 @@
                 </tr>
                 <tr>
                     <th>Email</th>
-                    <td><a href="mailto:{{ purchase.email }}">{{ purchase.email }}</a></td>
+                    <td><a href="mailto:{{ purchase.email }}">{{ purchase.email }}</a>
+                        {{# purchase.email }}
+                            &nbsp;<a href="{{# path }}report/resend{{/ path }}/{{ purchase.id }}" data-toggle="tooltip" title="Re-send email"><i class="far fa-envelope fa-2x"></i></a>
+                        {{/ purchase.email }}    
+                    </td>
                 </tr>
                 <tr>
                     <th>Joining station</th>

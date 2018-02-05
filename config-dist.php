@@ -45,7 +45,10 @@ $CFG->sage_prefix = 'TS'; // prefix for booking codes (MUST be unique for instal
 
 // Email stuff
 $CFG->smtpd_host = 'mailx.e-learndesign.co.uk';
-$CFG->backup_email = '';
+$CFG->backup_email = array(
+    'roger.haynes@srps.org.uk',
+    'howard@srps.org.uk',
+);
 
 // Contact number
 $CFG->help_number = '01506 825855';
