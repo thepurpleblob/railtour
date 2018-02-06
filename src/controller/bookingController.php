@@ -895,7 +895,7 @@ class BookingController extends coreController {
         } else if ($status == 'ERROR') {
             $url = $this->Url('booking/fail') . '/' . $VendorTxCode . '/' . urlencode($purchase->statusdetail);
             $sagepay->notificationreceipt('OK', $url, $purchase->statusdetail);
-            $mail->error();
+            $mail->decline();
         } else {
             $url = $this->Url('booking/decline') . '/' . $VendorTxCode;
             $sagepay->notificationreceipt('OK', $url, $purchase->statusdetail);

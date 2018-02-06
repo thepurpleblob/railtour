@@ -112,16 +112,30 @@ class Mail {
     }
 
     /**
-     * Send notification of error
-     */
-    public function error() {
-        
-    }
-
-    /**
      * Send notification of completion
      */
     public function decline() {
+
+        // Get messages
+        $body = $this->controller->renderView('email/decline', array(
+            'service' => $this->service,
+            'purchase' => $this->purchase,
+        ));
+        $bodytxt = $this->controller->renderView('email/decline_txt', array(
+            'service' => $this->service,
+            'purchase' => $this->purchase,
+        ));
+
+        foreach ($this->getRecipients() as $recipient) {
+            $message = (new \Swift_Message())
+            ->setSubject('SRPS Railtours - Payment Declined')
+            ->setFrom('noreply@srps.org.uk')
+            ->setTo($recipient)
+            ->setBody($bodytxt)
+            ->addPart($body, 'text/html');
+
+            $this->mailer->send($message);
+        }
         
     }
 }
