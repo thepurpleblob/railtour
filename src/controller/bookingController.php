@@ -880,7 +880,15 @@ class BookingController extends coreController {
         $this->log('mail setup done');
 
         // Now that we have the purchase object, we can save whatever we got back in it
-        $this->bookinglib->updatePurchase($purchase, $data);
+        //$this->bookinglib->updatePurchase($purchase, $data);
+        $purchase->status = $data['Status'];
+        $purchase->statusdetail = $data['StatusDetail'];
+        $purchase->cardtype = $data['CardType'];
+        $purchase->last4digits = $data['Last4Digits'];
+        $purchase->bankauthcode = $data['BankAuthCode'];
+        $purchase->declinecode = $data['DeclineCode'];
+        $purchase->completed = 1;
+        $purchase->save();
         $this->log('Purchase updated');
 
         // Check VPSSignature for validity
