@@ -880,7 +880,8 @@ class BookingController extends coreController {
         $this->log('get mail library');
         $mail = $this->getLibrary('Mail');
         $this->log('mail initialise');
-        $mail->initialise($purchase);
+        $mailpurchase = clone $purchase;
+        $mail->initialise($mailpurchase);
         $this->log('mail extra recipients');
         $mail->setExtrarecipients($CFG->backup_email);
         $this->log('mail setup done');
