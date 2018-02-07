@@ -877,6 +877,7 @@ class BookingController extends coreController {
         $mail->initialise($purchase);
         $this->log('mail extra recipients');
         $mail->setExtrarecipients($CFG->backup_email);
+        $this->log('mail setup done');
 
         // Now that we have the purchase object, we can save whatever we got back in it
         $this->bookinglib->updatePurchase($purchase, $data);
