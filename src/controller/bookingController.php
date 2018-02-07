@@ -869,6 +869,7 @@ class BookingController extends coreController {
             $sagepay->notificationreceipt('INVALID', $url, 'Purchase record not found');
             die;
         }
+        $this->log(var_export($purchase, true));
 
         // Mailer
         $this->log('get mail library');
