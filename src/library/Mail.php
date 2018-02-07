@@ -108,11 +108,12 @@ class Mail {
             ->addPart($body, 'text/html');
 
             $this->mailer->send($message);
+            $this->controller->log('Sending confirm email to ' . $recipient . ' ' . $this->purchase->bookingref );
         }
     }
 
     /**
-     * Send notification of completion
+     * Send notification for decline/fail
      */
     public function decline() {
 
@@ -135,6 +136,7 @@ class Mail {
             ->addPart($body, 'text/html');
 
             $this->mailer->send($message);
+            $this->controller->log('Sending decline email to ' . $recipient . ' ' . $this->purchase->bookingref );
         }
         
     }

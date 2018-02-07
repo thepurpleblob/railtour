@@ -865,7 +865,9 @@ class BookingController extends coreController {
         $VendorTxCode = $data['VendorTxCode'];
         if (!$purchase = $this->bookinglib->getPurchaseFromVendorTxCode($VendorTxCode)) {
             $url = $this->Url('booking/fail') . '/' . $VendorTxCode . '/' . urlencode('Purchase record not found');
+            $this->log('SagePay notification: Purchase not found - ' . $url);
             $sagepay->notificationreceipt('INVALID', $url, 'Purchase record not found');
+            die;
         }
 
         // Mailer
@@ -879,7 +881,9 @@ class BookingController extends coreController {
         // Check VPSSignature for validity
         if (!$sagepay->checkVPSSignature($purchase, $data)) {
             $url = $this->Url('booking/fail') . '/' . $VendorTxCode . '/' . urlencode('VPSSignature not matched');
+            $this->log('SagePay notification: VPS sig no match - ' . $url);
             $sagepay->notificationreceipt('INVALID', $url, 'VPSSignature not matched');
+            die;
         }
 
         // Check Status.
@@ -891,15 +895,18 @@ class BookingController extends coreController {
             $mail->confirm();
 
             $url = $this->Url('booking/complete') . '/' . $VendorTxCode;
+            $this->log('SagePay notification: Confirm sent - ' . $url);
             $sagepay->notificationreceipt('OK', $url, '');
         } else if ($status == 'ERROR') {
             $url = $this->Url('booking/fail') . '/' . $VendorTxCode . '/' . urlencode($purchase->statusdetail);
-            $sagepay->notificationreceipt('OK', $url, $purchase->statusdetail);
+            $this->log('SagePay notification: Booking fail - ' . $url);
             $mail->decline();
+            $sagepay->notificationreceipt('OK', $url, $purchase->statusdetail);
         } else {
             $url = $this->Url('booking/decline') . '/' . $VendorTxCode;
-            $sagepay->notificationreceipt('OK', $url, $purchase->statusdetail);
+            $this->log('SagePay notification: Booking decline - ' . $url);
             $mail->decline();
+            $sagepay->notificationreceipt('OK', $url, $purchase->statusdetail);
         }
 
         die;
