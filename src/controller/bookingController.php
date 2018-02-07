@@ -880,6 +880,7 @@ class BookingController extends coreController {
 
         // Now that we have the purchase object, we can save whatever we got back in it
         $this->bookinglib->updatePurchase($purchase, $data);
+        $this->log('Purchase updated');
 
         // Check VPSSignature for validity
         if (!$sagepay->checkVPSSignature($purchase, $data)) {
@@ -892,12 +893,12 @@ class BookingController extends coreController {
         // Check Status.
         // Work out what next action should be
         $status = $purchase->status;
+        $this->log('Status code checking - ' . $status)
         if ($status == 'OK') {
 
             // Send confirmation email
-            $mail->confirm();
-
             $url = $this->Url('booking/complete') . '/' . $VendorTxCode;
+            $mail->confirm();
             $this->log('SagePay notification: Confirm sent - ' . $url);
             $sagepay->notificationreceipt('OK', $url, '');
         } else if ($status == 'ERROR') {

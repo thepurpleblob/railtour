@@ -795,7 +795,6 @@ class Booking extends Admin {
      * Update purchase with data returned from SagePay
      * @param object $purchase
      * @param array $data
-     * @return object
      */
     public function updatePurchase($purchase, $data) {
         $purchase->status = $data['Status'];
@@ -806,8 +805,6 @@ class Booking extends Admin {
         $purchase->declinecode = $data['DeclineCode'];
         $purchase->completed = 1;
         $purchase->save();
-
-        return $purchase;
     }
 
 }
