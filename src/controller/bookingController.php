@@ -893,7 +893,7 @@ class BookingController extends coreController {
         // Check Status.
         // Work out what next action should be
         $status = $purchase->status;
-        $this->log('Status code checking - ' . $status)
+        $this->log('Status code checking - ' . $status);
         if ($status == 'OK') {
 
             // Send confirmation email
