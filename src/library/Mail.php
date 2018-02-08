@@ -64,7 +64,7 @@ class Mail {
      * @return array
      */
     private function getRecipients() {
-        $recipients = $this->extrarecipient;
+        $recipients = $this->extrarecipients;
         if ($this->purchase->email) {
             $recipients[] = $this->purchase->email;
         }
