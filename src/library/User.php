@@ -35,7 +35,7 @@ class User {
     public function installAdmin() {
 
         // Get all our users
-        $users = \ORM::forTable('User')->findMany();
+        $users = \ORM::forTable('srps_users')->findMany();
 
         // if there are none, we will create the default admin user
         if (!$users) {

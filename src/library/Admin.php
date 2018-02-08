@@ -689,6 +689,21 @@ class Admin {
     }
 
     /**
+     * Get initials for user
+     * @param string $bookedby
+     * @return string
+     */
+    private function getInitials($bookedby) {
+        if ($user = ORM::forTable('srps_users')->where('username', $bookedby)->findOne()) {
+            $ins = substr($user->firstname, 0, 1);
+            $ins .= substr($user->lastname, 0, 1);
+            return $ins;
+        }
+
+        return '';
+    }
+
+    /**
      * Turn the purchases into a big string, according
      * to Roger's requirements
      * @param array $purchases
@@ -775,7 +790,7 @@ class Admin {
 
             // Comment - add booker on the front
             if ($p->bookedby) {
-                $bookedby = $p->bookedby . ', ';
+                $bookedby = $this->getInitials($p->bookedby) . ', ';
             } else {
                 $bookedby = '';
             }
