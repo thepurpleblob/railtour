@@ -748,9 +748,9 @@ class BookingController extends coreController {
         $serviceid = $purchase->serviceid;
         $service = $this->bookinglib->getService($serviceid);
 
-       if ($purchase->bookedby) {
-           $this->require_login('ROLE_TELEPHONE', 'booking/review');
-       }
+        if ($purchase->bookedby) {
+            $this->require_login('ROLE_TELEPHONE', 'booking/review');
+        }
 
         // work out final fare
         $fare = $this->bookinglib->calculateFare($service, $purchase, $purchase->class);

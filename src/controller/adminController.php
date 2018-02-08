@@ -21,6 +21,9 @@ class AdminController extends coreController {
     // default (no route) page shows available services
     public function mainAction() {
 
+        // Must be logged in
+        $this->require_login('ROLE_TELEPHONE', 'admin/main');
+
         // Find available services
         $services = $this->bookinglib->availableServices();
 
