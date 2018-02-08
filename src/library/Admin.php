@@ -702,7 +702,7 @@ class Admin {
             $l = array();
 
             // Record type
-            $l[] = 'O';
+            $l[] = $p->bookedby ? 'P' : 'O';
 
             // Tour ref
             $l[] = $this->clean($p->code);
@@ -773,8 +773,13 @@ class Admin {
             // Meal D
             $l[] = $this->clean($p->meald);
 
-            // Comment
-            $l[] = $this->clean($p->comment, 39);
+            // Comment - add booker on the front
+            if ($p->bookedby) {
+                $bookedby = $p->bookedby . ', ';
+            } else {
+                $bookedby = '';
+            }
+            $l[] = $this->clean($bookedby . $p->comment, 39);
 
             // Payment
             $l[] = $this->clean(intval($p->payment * 100));
