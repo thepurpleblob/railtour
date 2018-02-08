@@ -790,7 +790,7 @@ class Admin {
 
             // Comment - add booker on the front
             if ($p->bookedby) {
-                $bookedby = $this->getInitials($p->bookedby) . ', ';
+                $bookedby = $this->getInitials($p->bookedby) . ' ';
             } else {
                 $bookedby = '';
             }
