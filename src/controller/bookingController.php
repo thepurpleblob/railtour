@@ -874,29 +874,15 @@ class BookingController extends coreController {
             $sagepay->notificationreceipt('INVALID', $url, 'Purchase record not found');
             die;
         }
-        $this->log(var_export($purchase, true));
 
         // Mailer
-        $this->log('get mail library');
         $mail = $this->getLibrary('Mail');
-        $this->log('mail initialise');
         $mailpurchase = clone $purchase;
         $mail->initialise($mailpurchase);
-        $this->log('mail extra recipients');
         $mail->setExtrarecipients($CFG->backup_email);
-        $this->log('mail setup done');
 
         // Now that we have the purchase object, we can save whatever we got back in it
-        //$this->bookinglib->updatePurchase($purchase, $data);
-        $purchase->status = $data['Status'];
-        $purchase->statusdetail = $data['StatusDetail'];
-        $purchase->cardtype = $data['CardType'];
-        $purchase->last4digits = $data['Last4Digits'];
-        $purchase->bankauthcode = $data['BankAuthCode'];
-        $purchase->declinecode = $data['DeclineCode'];
-        $purchase->completed = 1;
-        $purchase->save();
-        $this->log('Purchase updated');
+        $this->bookinglib->updatePurchase($purchase, $data);
 
         // Check VPSSignature for validity
         if (!$sagepay->checkVPSSignature($purchase, $data)) {
@@ -909,7 +895,6 @@ class BookingController extends coreController {
         // Check Status.
         // Work out what next action should be
         $status = $purchase->status;
-        $this->log('Status code checking - ' . $status);
         if ($status == 'OK') {
 
             // Send confirmation email

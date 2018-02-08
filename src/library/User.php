@@ -45,6 +45,9 @@ class User {
             $user->username = 'admin';
             $user->password = md5('admin');
             $user->role = 'ROLE_ADMIN';
+            $user->salt = '';
+            $user->email = '';
+            $user->is_active = 1;
             $user->save();
         }
     }
@@ -82,6 +85,9 @@ class User {
             $user->firstname = '';
             $user->lastname = '';
             $user->role = 'ROLE_ORGANISER';
+            $user->password = '';
+            $user->salt = '';
+            $user->email = '';
             $user->is_active = 1;
         }
 
