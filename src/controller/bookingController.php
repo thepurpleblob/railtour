@@ -608,7 +608,7 @@ class BookingController extends coreController {
                 ;
         if (!($iscomments or $issupplement)) {
             if ($this->back) {
-                redirect('booking/class');
+                $this->redirect('booking/class');
             } else {
                 $this->redirect('booking/personal');
             }
