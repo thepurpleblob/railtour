@@ -1,8 +1,7 @@
 
 
-    <div class="row" id="adminmenu">
-        <div class="col-1">
-            <a href="{{# path }}service/index{{/path}}">
+    <div class="nav" id="adminmenu">
+            <a class="nav-link" href="{{# path }}service/index{{/path}}">
                 <span class="fa-stack fa-2x">
                     <i class="menubackground fa fa-circle fa-stack-2x"></i>
                     <i class="fa fa-subway fa-stack-1x fa-inverse"></i>
@@ -11,10 +10,8 @@
                     Services
                 </span>
             </a>
-        </div>
         {{# system.admin }}
-            <div class="col-1">
-                <a href="{{# path }}user/index{{/path}}">
+                <a class="nav-link" href="{{# path }}user/index{{/path}}">
                     <span class="fa-stack fa-2x">
                         <i class="menubackground fa fa-circle fa-stack-2x"></i>
                         <i class="fa fa-users fa-stack-1x fa-inverse"></i>
@@ -23,12 +20,10 @@
                         Users
                     </span>
                 </a>
-            </div>
         {{/ system.admin }}
         {{# serviceid }}
             {{# system.admin }}
-                <div class="col-1">
-                    <a href="{{# path }}destination/index{{/ path }}/{{ serviceid }}">
+                    <a class="nav-link" href="{{# path }}destination/index{{/ path }}/{{ serviceid }}">
                         <span class="fa-stack fa-2x">
                             <i class="menubackground fa fa-circle fa-stack-2x"></i>
                             <i class="fa fa-map-marker fa-stack-1x fa-inverse"></i>
@@ -37,9 +32,7 @@
                             Destinations
                         </span>
                     </a>
-                </div>
-                <div class="col-1">
-                    <a href="{{# path }}priceband/index{{/ path }}/{{ serviceid }}">
+                    <a class="nav-link" href="{{# path }}priceband/index{{/ path }}/{{ serviceid }}">
                         <span class="fa-stack fa-2x">
                             <i class="menubackground fa fa-circle fa-stack-2x"></i>
                             <i class="fa fa-pound-sign fa-stack-1x fa-inverse"></i>
@@ -48,9 +41,7 @@
                             Price bands
                         </span>
                     </a>
-                </div>
-                <div class="col-1">
-                    <a href="{{# path }}joining/index{{/ path }}/{{ serviceid }}">
+                    <a class="nav-link" href="{{# path }}joining/index{{/ path }}/{{ serviceid }}">
                         <span class="fa-stack fa-2x">
                             <i class="menubackground fa fa-circle fa-stack-2x"></i>
                             <i class="fa fa-building fa-stack-1x fa-inverse"></i>
@@ -59,10 +50,8 @@
                             Stations
                         </span>
                     </a>
-                </div>
             {{/ system.admin }}
-            <div class="col-1">
-                <a href="{{# path }}limits/edit{{/ path }}/{{ serviceid }}">
+                <a class="nav-link" href="{{# path }}limits/edit{{/ path }}/{{ serviceid }}">
                     <span class="fa-stack fa-2x">
                         <i class="menubackground fa fa-circle fa-stack-2x"></i>
                         <i class="fa fa-chart-line fa-stack-1x fa-inverse"></i>
@@ -71,6 +60,5 @@
                             Limits
                     </span>
                 </a>
-            </div>
         {{/ serviceid }}
     </div>
