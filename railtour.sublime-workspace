@@ -4,12 +4,24 @@
 		"selected_items":
 		[
 			[
-				"session_set",
-				"session_set_save_handler"
+				"extrarec",
+				"extrarecipients"
 			],
 			[
-				"session",
-				"sessionlife"
+				"FORM_",
+				"FORM_OPTIONAL"
+			],
+			[
+				"ROLE",
+				"ROLE_TELEPHONE"
+			],
+			[
+				"ROLE_",
+				"ROLE_ORGANISER"
+			],
+			[
+				"price",
+				"pricebandgroupid"
 			],
 			[
 				"choices",
@@ -24,19 +36,27 @@
 	"buffers":
 	[
 		{
-			"file": "src/controller/bookingController.php",
+			"file": "src/view/email/confirm.mustache",
 			"settings":
 			{
-				"buffer_size": 34444,
+				"buffer_size": 3500,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "core/coreController.php",
+			"file": "config.php",
 			"settings":
 			{
-				"buffer_size": 9739,
+				"buffer_size": 1508,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/view/email/confirm_txt.mustache",
+			"settings":
+			{
+				"buffer_size": 2957,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -45,61 +65,34 @@
 			"file": "src/library/Mail.php",
 			"settings":
 			{
-				"buffer_size": 4174,
+				"buffer_size": 4175,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "src/view/header.mustache",
+			"file": "src/library/Booking.php",
 			"settings":
 			{
-				"buffer_size": 2394,
+				"buffer_size": 28583,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "src/controller/adminController.php",
+			"file": "src/controller/bookingController.php",
 			"settings":
 			{
-				"buffer_size": 842,
+				"buffer_size": 34451,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "src/view/admin/main.mustache",
+			"file": "src/library/SagepayServer.php",
 			"settings":
 			{
-				"buffer_size": 955,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/view/booking/decline.mustache",
-			"settings":
-			{
-				"buffer_size": 1411,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/view/booking/fail.mustache",
-			"settings":
-			{
-				"buffer_size": 843,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/schema/schema.php",
-			"settings":
-			{
-				"buffer_size": 6975,
+				"buffer_size": 10306,
 				"line_ending": "Unix"
 			}
 		}
@@ -111,8 +104,8 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 304.0,
-		"last_filter": "",
+		"height": 392.0,
+		"last_filter": "Package Control: ",
 		"selected_items":
 		[
 			[
@@ -149,57 +142,52 @@
 		"/var/www/html/railtour/src/library",
 		"/var/www/html/railtour/src/schema",
 		"/var/www/html/railtour/src/view",
-		"/var/www/html/railtour/src/view/admin",
 		"/var/www/html/railtour/src/view/booking",
 		"/var/www/html/railtour/src/view/email",
-		"/var/www/html/railtour/src/view/priceband",
-		"/var/www/html/railtour/src/view/report",
-		"/var/www/html/railtour/src/view/service",
-		"/var/www/html/railtour/src/view/user"
+		"/var/www/html/railtour/src/view/report"
 	],
 	"file_history":
 	[
-		"/var/www/html/railtour/src/view/booking/complete.mustache",
-		"/var/www/html/railtour/src/view/footer.mustache",
-		"/var/www/html/railtour/src/controller/reportController.php",
+		"/var/www/html/railtour/src/view/email/fail_txt.mustache",
+		"/var/www/html/railtour/src/view/email/fail.mustache",
 		"/var/www/html/railtour/src/library/Admin.php",
+		"/var/www/html/railtour/src/controller/reportController.php",
 		"/var/www/html/railtour/src/view/report/view.mustache",
+		"/var/www/html/railtour/config.php",
+		"/var/www/html/railtour/config-dist.php",
+		"/var/www/html/railtour/src/library/Booking.php",
+		"/var/www/html/railtour/src/view/report/list.mustache",
+		"/var/www/html/railtour/src/library/Mail.php",
+		"/var/www/html/railtour/core/coreController.php",
+		"/var/www/html/railtour/src/view/booking/decline.mustache",
+		"/var/www/html/railtour/src/view/booking/additional.mustache",
+		"/var/www/html/railtour/src/controller/destinationController.php",
+		"/var/www/html/railtour/src/controller/adminController.php",
+		"/var/www/html/railtour/core/update.php",
+		"/var/www/html/railtour/core/coreSession.php",
+		"/var/www/html/railtour/src/view/booking/personal.mustache",
+		"/var/www/html/railtour/src/view/booking/telephonecomplete.mustache",
+		"/var/www/html/railtour/src/controller/bookingController.php",
+		"/var/www/html/railtour/core/coreForm.php",
+		"/var/www/html/railtour/src/library/OldBooking.php",
+		"/var/www/html/railtour/src/view/booking/review.mustache",
+		"/var/www/html/railtour/src/library/SagepayServer.php",
+		"/var/www/html/railtour/src/view/admin/main.mustache",
+		"/var/www/html/railtour/src/view/adminmenu.mustache",
+		"/var/www/html/railtour/src/view/user/roleerror.mustache",
+		"/var/www/html/railtour/core/setup.php",
 		"/var/www/html/railtour/src/library/User.php",
+		"/var/www/html/railtour/index.php",
 		"/var/www/html/railtour/src/controller/userController.php",
 		"/var/www/html/railtour/src/view/booking/class.mustache",
-		"/var/www/html/railtour/src/view/booking/telephonestatus.mustache",
-		"/var/www/html/railtour/core/setup.php",
-		"/var/www/html/railtour/src/schema/schema.php",
-		"/var/www/html/railtour/src/view/booking/review.mustache",
-		"/var/www/html/railtour/src/view/booking/personal.mustache",
-		"/var/www/html/railtour/src/view/booking/additional.mustache",
-		"/var/www/html/railtour/src/view/booking/destination.mustache",
-		"/var/www/html/railtour/src/view/booking/meals.mustache",
-		"/var/www/html/railtour/src/view/booking/joining.mustache",
-		"/var/www/html/railtour/src/view/booking/index.mustache",
-		"/var/www/html/railtour/src/view/booking/telephone.mustache",
-		"/var/www/html/railtour/src/view/adminmenu.mustache",
-		"/var/www/html/railtour/src/view/priceband/edit.mustache",
-		"/var/www/html/railtour/src/view/report/list.mustache",
-		"/var/www/html/railtour/src/view/header.mustache",
-		"/var/www/html/railtour/core/coreSession.php",
-		"/var/www/html/railtour/index.php",
-		"/var/www/html/railtour/src/library/Booking.php",
-		"/var/www/html/railtour/src/view/booking/telephone2.mustache",
-		"/var/www/html/railtour/config.php",
-		"/var/www/html/railtour/src/view/booking/numbers.mustache",
 		"/var/www/html/railtour/src/assets/css/railtour.css",
-		"/var/www/html/railtour/src/assets/css/booking.css",
-		"/var/www/html/railtour/core/coreController.php",
-		"/var/www/html/railtour/src/view/admin/main.mustache",
-		"/var/www/html/railtour/src/view/booking/terms.mustache",
-		"/var/www/html/railtour/src/library/SagepayServer.php",
-		"/var/www/html/railtour/core/update.php",
-		"/var/www/html/railtour/core/version.php",
-		"/var/www/html/railtour/src/library/OldBooking.php",
-		"/var/www/html/railtour/src/view/booking/fail.mustache",
-		"/var/www/html/railtour/core/coreForm.php",
+		"/var/www/html/railtour/src/view/booking/meals.mustache",
+		"/var/www/html/railtour/src/view/booking/destination.mustache",
+		"/var/www/html/railtour/src/view/booking/joining.mustache",
+		"/var/www/html/railtour/src/view/booking/numbers.mustache",
 		"/var/www/html/railtour/src/view/service/edit.mustache",
+		"/var/www/html/railtour/src/view/header.mustache",
+		"/var/www/html/railtour/src/view/formerrors.mustache",
 		"/var/www/html/railtour/src/controller/serviceController.php",
 		"/home/howard/.config/sublime-text-3/Packages/Package Control/Package Control.sublime-settings",
 		"/home/howard/.config/sublime-text-3/Packages/User/Package Control.sublime-settings"
@@ -220,9 +208,11 @@
 		"case_sensitive": false,
 		"find_history":
 		[
-			"user",
-			"true",
-			"back"
+			"redirect",
+			";\n",
+			"ROLE_",
+			"getJoining",
+			"getPurchase"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -240,149 +230,29 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 5,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "src/controller/bookingController.php",
+					"file": "src/view/email/confirm.mustache",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 34444,
+						"buffer_size": 3500,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								25710,
-								25710
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/PHP/PHP.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 13825.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "core/coreController.php",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 9739,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5701,
-								5701
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/PHP/PHP.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 2601.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 8,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "src/library/Mail.php",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4174,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/PHP/PHP.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "src/view/header.mustache",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2394,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2351,
-								2351
+								907,
+								907
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/Mustache/syntax/mustache.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "src/controller/adminController.php",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 842,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								563,
-								563
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/PHP/PHP.sublime-syntax",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
@@ -394,102 +264,158 @@
 					"type": "text"
 				},
 				{
-					"buffer": 5,
-					"file": "src/view/admin/main.mustache",
+					"buffer": 1,
+					"file": "config.php",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 955,
+						"buffer_size": 1508,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								580,
-								580
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Mustache/syntax/mustache.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/PHP/PHP.sublime-syntax"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
-					"file": "src/view/booking/decline.mustache",
+					"buffer": 2,
+					"file": "src/view/email/confirm_txt.mustache",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1411,
+						"buffer_size": 2957,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1336,
-								1336
+								1655,
+								1655
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Mustache/syntax/mustache.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/Mustache/syntax/mustache.sublime-syntax"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
-					"buffer": 7,
-					"file": "src/view/booking/fail.mustache",
+					"buffer": 3,
+					"file": "src/library/Mail.php",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 843,
+						"buffer_size": 4175,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								816,
-								816
+								3266,
+								3266
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Mustache/syntax/mustache.sublime-syntax",
+							"syntax": "Packages/PHP/PHP.sublime-syntax",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 386.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 8,
-					"file": "src/schema/schema.php",
+					"buffer": 4,
+					"file": "src/library/Booking.php",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 6975,
+						"buffer_size": 28583,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								26564,
+								26564
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/PHP/PHP.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 13001.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/controller/bookingController.php",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 34451,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								20709,
+								20709
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/PHP/PHP.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 10540.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "src/library/SagepayServer.php",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 10306,
 						"regions":
 						{
 						},
@@ -503,14 +429,14 @@
 						"settings":
 						{
 							"syntax": "Packages/PHP/PHP.sublime-syntax",
-							"tab_size": 2,
+							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1326.0,
+						"translation.y": 5174.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 3,
 					"type": "text"
 				}
 			]
@@ -518,11 +444,11 @@
 	],
 	"incremental_find":
 	{
-		"height": 25.0
+		"height": 26.0
 	},
 	"input":
 	{
-		"height": 38.0
+		"height": 39.0
 	},
 	"layout":
 	{
@@ -555,7 +481,7 @@
 	"project": "railtour.sublime-project",
 	"replace":
 	{
-		"height": 46.0
+		"height": 48.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -593,7 +519,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 228.0,
+	"side_bar_width": 245.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
