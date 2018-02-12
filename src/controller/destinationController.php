@@ -81,6 +81,10 @@ class DestinationController extends coreController
         $form->crs = $this->form->text('crs', 'CRS', $destination->crs, true);
         $form->name = $this->form->text('name', 'Name', $destination->name, true);
         $form->description = $this->form->textarea('description', 'Description', $destination->description);
+        $form->meala = $this->form->yesno('meala', $service->mealaname . ' available for this destination', $destination->meala);
+        $form->mealb = $this->form->yesno('mealb', $service->mealbname . ' available for this destination', $destination->mealb);
+        $form->mealc = $this->form->yesno('mealc', $service->mealcname . ' available for this destination', $destination->mealc);
+        $form->meald = $this->form->yesno('meald', $service->mealdname . ' available for this destination', $destination->meald);
         $form->ajaxpath = $this->form->hidden('ajaxpath', $this->Url('destination/ajax'));
 
 
@@ -102,6 +106,18 @@ class DestinationController extends coreController
                 $destination->crs = $data['crs'];
                 $destination->name = $data['name'];
                 $destination->description = $data['description'];
+                if (isset($data['meala'])) {
+                    $destination->meala = $data['meala'];
+                }
+                if (isset($data['mealb'])) {
+                    $destination->mealb = $data['mealb'];
+                }
+                if (isset($data['mealc'])) {
+                    $destination->mealc = $data['mealc'];
+                }
+                if (isset($data['meald'])) {
+                    $destination->meald = $data['meald'];
+                }
                 $destination->save();
                 $this->redirect('destination/index/' . $serviceid);
                 return;

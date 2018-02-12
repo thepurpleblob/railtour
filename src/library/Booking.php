@@ -592,7 +592,10 @@ class Booking extends Admin {
         $maxpassengers = $purchase->adults + $purchase->children;
 
         // get the joining station (to see what meals available)
-        $station = $this->getJoining($service->id, $purchase->joining);
+        $station = $this->getJoiningCRS($service->id, $purchase->joining);
+
+        // Get the destination station (to see what meals available)
+        $destination = $this->getDestinationCRS($service->id, $purchase->destination);
 
         $letters = array('a', 'b', 'c', 'd');
         $meals = array();
@@ -611,7 +614,7 @@ class Booking extends Admin {
                 $meal->price = $service->$mealprice;
                 $meal->label = $service->$mealname . "  <span class=\"labelinfo\">(&pound;$meal->price each)</span>";
                 $meal->name = $service->$mealname;
-                $meal->available = $station->$prefix;
+                $meal->available = $station->$prefix && $destination->$prefix;
                 $meal->purchase = $purchase->$prefix;
                 $meal->maxmeals = $numbers->$remaining > $maxpassengers ? $maxpassengers : $numbers->$remaining;
 
@@ -621,6 +624,8 @@ class Booking extends Admin {
                 $meals[$letter] = $meal;
             }
         }
+
+        //echo "<pre>"; var_dump($meals); var_dump($station); var_dump($destination); die;
 
         return array_values($meals);
     }

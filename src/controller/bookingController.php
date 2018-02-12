@@ -447,7 +447,11 @@ class BookingController extends coreController {
 
         // If there are no meals on this service just bail
         if (!$this->bookinglib->mealsAvailable($service)) {
-            $this->redirect('booking/class');
+            if ($this->back) {
+                $this->redirect('booking/destination');
+            } else {
+                $this->redirect('booking/class');
+            }
         }
 
         // Array of meal options for forms
@@ -456,10 +460,24 @@ class BookingController extends coreController {
         // Create validation
         $gumprules = array();
         $fieldnames = array();
+        $showingmeals = false;
         foreach ($meals as $meal) {
+            if (!$meal->available) {
+                continue;
+            }
             $gumprules[$meal->formname] = 'required|integer|min_numeric,0|max_numeric,' . $meal->maxmeals;
             $fieldnames[$meal->formname] = $meal->name;
             $meal->formselect = $this->form->select($meal->formname, $meal->label, $meal->purchase, $meal->choices);
+            $showingmeals = true;
+        }
+
+        // Possibly rules/limits mean that no meal options will be shown
+        if (!$showingmeals) {
+            if ($this->back) {
+                $this->redirect('booking/destination');
+            } else {
+                $this->redirect('booking/class');
+            }
         }
 
         // hopefully no errors

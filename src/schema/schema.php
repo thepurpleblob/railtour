@@ -16,6 +16,10 @@ $schema[] = 'CREATE TABLE `destination` (
   `crs` varchar(5) COLLATE utf8_unicode_ci NOT NULL,
   `description` longtext COLLATE utf8_unicode_ci NOT NULL,
   `bookinglimit` int(11) NOT NULL,
+  `meala` tinyint(1) NOT NULL,
+  `mealb` tinyint(1) NOT NULL,
+  `mealc` tinyint(1) NOT NULL,
+  `meald` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci';
 

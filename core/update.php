@@ -59,6 +59,17 @@ if ($dbversion < 2018012900) {
         )"
     );
 }
+if ($dbversion < 2018021200) {
+    $db->exec('ALTER TABLE destination
+        ADD meala tinyint(1) NOT NULL,
+        ADD mealb tinyint(1) NOT NULL,
+        ADD mealc tinyint(1) NOT NULL,
+        ADD meald tinyint(1) NOT NULL');
+}
+if ($dbversion < 2018021201) {
+    $db->exec('UPDATE destination
+        SET meala=1, mealb=1, mealc=1, meald=1');
+}
 
 // Make config version up to date
 $config->name = 'version';

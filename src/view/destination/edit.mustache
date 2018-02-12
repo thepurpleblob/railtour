@@ -23,6 +23,20 @@
         {{{ form.crs }}}
         {{{ form.name }}}
         {{{ form.description }}}
+
+        {{# service.mealavisible }}
+            {{{ form.meala }}}
+        {{/ service.mealavisible }}
+        {{# service.mealbvisible }}
+            {{{ form.mealb }}}
+        {{/ service.mealbvisible }}
+        {{# service.mealcvisible }}
+            {{{ form.mealc }}}
+        {{/ service.mealcvisible }}
+        {{# service.mealdvisible }}
+            {{{ form.meald }}}
+        {{/ service.mealdvisible }}
+
         {{{ form.ajaxpath }}}
 
         <div>

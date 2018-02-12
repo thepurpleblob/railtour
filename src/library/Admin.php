@@ -270,6 +270,10 @@ class Admin {
         $destination->crs = '';
         $destination->description = '';
         $destination->bookinglimit = 0;
+        $destination->meala = 1;
+        $destination->mealb = 1;
+        $destination->mealc = 1;
+        $destination->meald = 1;
 
         return $destination;
     }
