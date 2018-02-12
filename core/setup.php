@@ -7,13 +7,17 @@ use thepurpleblob\core\coreSession;
  * Custom exception handler
  */
 function exception_handler($e) {
-    echo "<pre>$e</pre>"; die;
-    //$controller = new coreController(true);
-    //$controller->View('header');
-    //$controller->View('exception', array(
-    //    'e' => $e,
-    //));
-    //$controller->View('footer');
+    global $CFG;
+
+    //echo "<pre>$e</pre>"; die;
+    // echo "<pre>"; var_dump($e->getTrace()); die;
+    $controller = new coreController(true);
+    $controller->View('exception', array(
+        'e' => $e,
+        'message' => $e->getMessage(),
+        'trace' => $e->getTraceAsString(),
+        'debugging' => $CFG->debugging,
+    ));
 }
 
 /**

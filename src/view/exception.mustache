@@ -1,0 +1,17 @@
+{{> header }}
+
+<div class="alert alert-danger text-center">
+    OOPS!! SOMETHING HAS GONE WRONG. <br>
+    <i>"{{ message }}"</i>
+</div>    
+
+<div class="card">
+    <div class="card-header">Error details</div>
+    <div class="card-body">
+        <small><pre class="card-text">{{{ trace }}}</pre></small>
+    </div>
+</div>    
+
+
+
+{{> footer }}
