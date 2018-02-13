@@ -316,6 +316,21 @@ class Booking extends Admin {
     }
 
     /**
+     * Use count to get an idea of the progress of the bookings
+     * @param int $serviceid
+     * @param int percentage
+     */
+    public function getProgress($serviceid) {
+
+        $count = $this->countStuff($serviceid);
+
+        $total = $count->bookedfirst + $count->remainingfirst + $count->bookedstandard + $count->remainingstandard;
+        $booked = $count->bookedfirst + $count->bookedstandard;
+
+        return intdiv($booked * 100, $total); 
+    }
+
+    /**
      * Find the current (session) purchase record and/or create a new one if
      * needed
      * @param int $serviceid - needed to create new purchase record only

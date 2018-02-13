@@ -28,6 +28,11 @@ class AdminController extends coreController {
         $services = $this->bookinglib->availableServices();
         $services = $this->bookinglib->formatServices($services);
 
+        // counts
+        foreach ($services as $service) {
+            $service->progress = $this->bookinglib->getProgress($service->id);
+        } 
+
         // Display the services
         $this->View('admin/main', array(
             'services' => $services,
