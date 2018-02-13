@@ -26,6 +26,7 @@ class AdminController extends coreController {
 
         // Find available services
         $services = $this->bookinglib->availableServices();
+        $services = $this->bookinglib->formatServices($services);
 
         // Display the services
         $this->View('admin/main', array(

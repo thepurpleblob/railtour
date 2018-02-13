@@ -17,16 +17,16 @@
 {{/anyservices}}
 
 {{# services }}
-    <div class="card">
-        <div class="card-header"><strong>({{ code }})</strong> {{ name }} on {{ date }}</div>
-        <div class="card-body">
-            <div class="card-text">
-                {{{ description }}}
-                <br /><br />
+    <div class="alert alert-secondary">
+        <div class="row">
+            <div class="col-2"><strong>{{ code }}</strong></div>
+            <div class="col-2">{{ formatteddate }}</div>
+            <div class="col-5">{{ name }}</div>
+            <div class="col-2 align-right">
                 <a class="btn btn-warning" href="{{# path }}booking/telephone{{/ path }}/{{ code }}">Telephone booking</a>
-            </div>
+            </div>        
         </div>
-    </div>
+    </div>    
 {{/ services }}
 
 
