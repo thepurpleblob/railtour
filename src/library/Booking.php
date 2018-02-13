@@ -327,7 +327,7 @@ class Booking extends Admin {
         $total = $count->bookedfirst + $count->remainingfirst + $count->bookedstandard + $count->remainingstandard;
         $booked = $count->bookedfirst + $count->bookedstandard;
 
-        return intdiv($booked * 100, $total); 
+        return round($booked * 100 / $total); 
     }
 
     /**
