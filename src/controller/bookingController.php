@@ -471,14 +471,6 @@ class BookingController extends coreController {
             $showingmeals = true;
         }
 
-        // Possibly rules/limits mean that no meal options will be shown
-        if (!$showingmeals) {
-            if ($this->back) {
-                $this->redirect('booking/destination');
-            } else {
-                $this->redirect('booking/class');
-            }
-        }
 
         // hopefully no errors
         $errors = null;
@@ -516,6 +508,7 @@ class BookingController extends coreController {
             'purchase' => $purchase,
             'service' => $service,
             'meals' => $meals,
+            'showingmeals' => $showingmeals,
             'errors' => $errors,
         ));
     }

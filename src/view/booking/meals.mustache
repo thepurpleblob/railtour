@@ -12,9 +12,24 @@
     {{> form_errors }}
 
     <form id="meals-form" class="form-horizontal" action="{{# path }}booking/meals{{/ path }}" method="post" >
-        {{# meals }}
-            {{{ formselect }}}
-        {{/ meals }}
+        {{# showingmeals }}
+            {{# meals }}
+                {{# maxmeals }}
+                    {{{ formselect }}}
+                {{/ maxmeals }}
+                {{^ maxmeals }}
+                    <div class="alert alert-warning">
+                        Meal '{{ name }}' is sold out.
+                    </div>    
+                {{/ maxmeals }}
+            {{/ meals }}
+        {{/ showingmeals }}
+        {{^ showingmeals }}
+            <div class="alert alert-warning">
+                No meals are available. This is because they are none available to passengers boarding
+                at your chosen joining station and/or travelling to the selected destination. 
+            </div>
+        {{/ showingmeals }}
 
         <div>
             <input type="submit" name="next" value="Next step" class="btn btn-primary" />
