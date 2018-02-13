@@ -24,7 +24,7 @@ class reportController extends coreController {
      * @param string $sort
      */
     public function listAction($serviceid, $sort = '') {
-        $this->require_login('ROLE_ORGANISER', 'service/show/' . $serviceid);
+        $this->require_login('ROLE_ORGANISER', 'report/list/' . $serviceid);
 
         $service = $this->adminlib->getService($serviceid);;
 
@@ -42,7 +42,7 @@ class reportController extends coreController {
 
     public function viewAction($purchaseid) {
 
-        $this->require_login('ROLE_ORGANISER');
+        $this->require_login('ROLE_ORGANISER', 'report/view/' . $purchaseid);
 
         // Get the purchase record
         $purchase = $this->adminlib->getPurchase($purchaseid);
@@ -61,7 +61,7 @@ class reportController extends coreController {
      */
     public function exportAction($serviceid) {
 
-        $this->require_login('ROLE_ORGANISER');
+        $this->require_login('ROLE_ORGANISER', 'report/export/' . $serviceid);
         
         // Get the service object
         $service = $this->adminlib->getService($serviceid);
@@ -91,7 +91,7 @@ class reportController extends coreController {
      */
     public function resendAction($purchaseid) {
 
-        $this->require_login('ROLE_ORGANISER');
+        $this->require_login('ROLE_ORGANISER', 'report/resend/' . $purchaseid);
 
         // Get the purchase
         $purchase = $this->adminlib->getPurchase($purchaseid);

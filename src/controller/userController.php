@@ -205,7 +205,7 @@ class UserController extends coreController {
      */
     public function deleteAction($username) {
 
-        $this->require_login('ROLE_ADMIN', 'user/index');
+        $this->require_login('ROLE_ADMIN', 'user/delete/' . $username);
         
         // check it isn't admin
         if ('admin' == $username) {

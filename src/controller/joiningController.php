@@ -53,7 +53,7 @@ class JoiningController extends coreController {
      */
     public function editAction($serviceid, $joiningid)
     {
-        $this->require_login('ROLE_ADMIN', 'joining/index/' . $serviceid);
+        $this->require_login('ROLE_ADMIN', 'joining/index/' . $serviceid . '/' . $joiningid);
 
         // Fetch basic data
         $service = $this->adminlib->getService($serviceid);
@@ -140,8 +140,10 @@ class JoiningController extends coreController {
      * Deletes a Service entity.
      *
      */
-    public function deleteAction($joiningid)
-    {
+    public function deleteAction($joiningid) {
+
+        $this->require_login('ROLE_ADMIN', 'joining/delete/' . $joiningid);
+
         $serviceid = $this->adminlib->deleteJoining($joiningid);
 
         $this->redirect('joining/index/' . $serviceid);

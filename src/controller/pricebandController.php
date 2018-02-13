@@ -79,7 +79,7 @@ class PricebandController extends coreController {
      */
     public function editAction($serviceid, $pricebandgroupid)
     {
-        $this->require_login('ROLE_ADMIN', 'priceband/index/' . $serviceid);
+        $this->require_login('ROLE_ADMIN', 'priceband/edit/' . $serviceid . '/' . $pricebandgroupid);
 
         // Get pricebandgroup and pricebands (new ones if no $id)
         if ($pricebandgroupid) {
@@ -175,9 +175,8 @@ class PricebandController extends coreController {
      * Deletes a priceband group.
      *
      */
-    public function deleteAction($pricebandgroupid)
-    {
-        $this->require_login('ROLE_ADMIN', 'priceband/index/' . $serviceid);
+    public function deleteAction($pricebandgroupid) {
+        $this->require_login('ROLE_ADMIN', 'priceband/delete/' . $pricebandgroupid);
         
         $serviceid = $this->adminlib->deletePricebandgroup($pricebandgroupid);
 

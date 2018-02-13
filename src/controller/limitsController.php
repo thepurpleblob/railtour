@@ -32,7 +32,7 @@ class LimitsController extends coreController {
     public function editAction($serviceid)
     {
         $service = $this->adminlib->getService($serviceid);
-        $this->require_login('ROLE_ORGANISER', 'service/show/' . $serviceid);
+        $this->require_login('ROLE_ORGANISER', 'limits/edit/' . $serviceid);
 
         $limits = $this->adminlib->getLimits($serviceid);
 

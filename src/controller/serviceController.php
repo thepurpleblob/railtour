@@ -32,7 +32,7 @@ class ServiceController extends coreController {
     public function indexAction() {
         global $CFG;
 
-        $this->require_login('ROLE_ORGANISER');
+        $this->require_login('ROLE_ORGANISER', 'service/index');
 
         $allservices = $this->adminlib->getServices();
 
@@ -91,7 +91,7 @@ class ServiceController extends coreController {
      */
     public function visibleAction($id, $visible) {
 
-        $this->require_login('ROLE_ORGANISER');
+        $this->require_login('ROLE_ORGANISER', 'service/visible/' . $id . '/' . $visible);
 
         $service = $this->adminlib->getService($id);
 
@@ -145,7 +145,7 @@ class ServiceController extends coreController {
      */
     public function editAction($id=null)
     {
-        $this->require_login('ROLE_ADMIN', 'service/show/' . $id);
+        $this->require_login('ROLE_ADMIN', 'service/edit/' . $id);
 
         // Get or create service
         if ($id) {
@@ -283,7 +283,7 @@ class ServiceController extends coreController {
      * @param int $serviceid
      */
     public function duplicateAction($serviceid) {
-        $this->require_login('ROLE_ADMIN', 'service/show/' . $serviceid);
+        $this->require_login('ROLE_ADMIN', 'service/duplicate/' . $serviceid);
 
         $service = $this->adminlib->getService($serviceid);
 
@@ -297,7 +297,7 @@ class ServiceController extends coreController {
      * @param int $serviceid
      */
     public function deleteAction($serviceid) {
-        $this->require_login('ROLE_ADMIN', 'service/show/' . $serviceid);
+        $this->require_login('ROLE_ADMIN', 'service/delete/' . $serviceid);
 
         $service = $this->adminlib->getService($serviceid);
 

@@ -179,7 +179,7 @@ class BookingController extends coreController {
         $purchase = $this->bookinglib->getSessionPurchase();
         $serviceid = $purchase->serviceid;
         $service = $this->bookinglib->getService($serviceid);
-        $this->require_login('ROLE_TELEPHONE', 'booking/joining');
+        $this->require_login('ROLE_TELEPHONE', 'booking/telephone2');
 
         // Search for old purchases
         $oldpurchases = $this->bookinglib->findOldPurchase($purchase);

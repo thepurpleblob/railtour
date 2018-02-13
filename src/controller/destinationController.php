@@ -59,7 +59,7 @@ class DestinationController extends coreController
     public function editAction($serviceid, $destinationid) {
         global $CFG;
 
-        $this->require_login('ROLE_ADMIN', 'destination/index/' . $serviceid);
+        $this->require_login('ROLE_ADMIN', 'destination/index/' . $serviceid . '/' . $destinationid);
 
         if ($destinationid) {
             $destination = $this->adminlib->getDestination($destinationid);
@@ -141,7 +141,7 @@ class DestinationController extends coreController
      * @param int $destinationid
      */
     public function deleteAction($destinationid) {
-        $this->require_login('ROLE_ADMIN', 'destination/index/' . $serviceid);
+        $this->require_login('ROLE_ADMIN', 'destination/delete/' . $destinationid);
 
         $serviceid = $this->adminlib->deleteDestination($destinationid);
 
