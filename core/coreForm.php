@@ -122,7 +122,8 @@ class coreForm {
     
     public function select($name, $label, $selected, $options, $choose='', $labelcol=4, $attrs=null) {
         $id = $name . 'Select';
-        $inputcol = 12 - $labelcol;
+        //$inputcol = 12 - $labelcol;
+        $inputcol = 4;
         if (empty($attrs['class'])) {
             $attrs['class'] = '';
         }

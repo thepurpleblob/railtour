@@ -101,7 +101,7 @@ class Mail {
 
         foreach ($this->getRecipients() as $recipient) {
             $message = (new \Swift_Message())
-            ->setSubject('SRPS Railtours - Confirmation')
+            ->setSubject('SRPS Railtours - Confirmation (' . $this->service->code . ' ' . $this->purchase->bookingref . ')')
             ->setFrom('noreply@srps.org.uk')
             ->setTo($recipient)
             ->setBody($bodytxt)
@@ -129,7 +129,7 @@ class Mail {
 
         foreach ($this->getRecipients() as $recipient) {
             $message = (new \Swift_Message())
-            ->setSubject('SRPS Railtours - Payment Declined')
+            ->setSubject('SRPS Railtours - Payment Declined (' . $this->service->code . ' ' . $this->purchase->bookingref . ')')
             ->setFrom('noreply@srps.org.uk')
             ->setTo($recipient)
             ->setBody($bodytxt)
