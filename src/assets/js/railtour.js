@@ -50,4 +50,19 @@ $( function() {
         }
     );
 
+    // DataTable
+    $('#purchaselist').DataTable({
+        "aoColumns": [
+            null,
+            null,
+            null,
+            null,
+            {"bSortable": false},
+            null,
+            null,
+            null,
+            {"bSortable": false}
+        ]
+    });
+
 });

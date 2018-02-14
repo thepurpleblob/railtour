@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"tele",
+				"telephone2"
+			],
+			[
 				"session_set",
 				"session_set_save_handler"
 			],
@@ -24,27 +28,37 @@
 	"buffers":
 	[
 		{
-			"file": "src/view/joining/edit.mustache",
+			"file": "src/view/booking/meals.mustache",
 			"settings":
 			{
-				"buffer_size": 1255,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/controller/bookingController.php",
-			"settings":
-			{
-				"buffer_size": 35005,
+				"buffer_size": 1342,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "core/coreController.php",
+			"file": "src/view/admin/main.mustache",
 			"settings":
 			{
-				"buffer_size": 9739,
+				"buffer_size": 1297,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/controller/adminController.php",
+			"settings":
+			{
+				"buffer_size": 1348,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/library/Admin.php",
+			"settings":
+			{
+				"buffer_size": 28961,
 				"line_ending": "Unix"
 			}
 		},
@@ -52,41 +66,20 @@
 			"file": "src/library/Booking.php",
 			"settings":
 			{
-				"buffer_size": 28860,
+				"buffer_size": 29329,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "core/setup.php",
+			"contents": "<?php\n\nnamespace thepurpleblob\\railtour\\controller;\n\nuse thepurpleblob\\core\\coreController;\n\nclass BookingController extends coreController {\n\n    public $controller;\n\n    private $bookinglib;\n\n    /**\n     * Constructor\n     * @param bool\n     */\n    public function __construct($exception = false) {\n        parent::__construct($exception);\n\n        // Library\n        $this->bookinglib = $this->getLibrary('Booking');\n    }\n\n    /**\n     * Show terms and conditions page\n     */\n    public function termsAction() {\n        $this->view('booking/terms');\n    }\n\n    /**\n     * Opening page for booking.\n     * @param $code string unique (hopefully) tour code\n     */\n    public function indexAction($code) {\n\n        // Log\n        $this->log('Booking started ' . $code);\n\n        // Clear session and delete expired purchases\n        $this->bookinglib->cleanPurchases();\n\n        // Get the service object\n        $service = $this->bookinglib->serviceFromCode($code);\n        $serviceid = $service->id;\n\n        // count the seats left\n        $count = $this->bookinglib->countStuff($serviceid);\n\n        // Get the limits for this service\n        $limits = $this->bookinglib->getLimits($serviceid);\n\n        // get acting maxparty (best estimate to display to punter)\n        $maxparty = $this->bookinglib->getMaxparty($limits);\n\n        if ($this->bookinglib->canProceedWithBooking($service, $count)) {\n            $this->View('booking/index', array(\n                'code' => $code,\n                'maxparty' => $maxparty,\n                'service' => $service\n            ));\n        } else {\n             $this->View('booking/closed', array(\n                'code' => $code,\n                'service' => $service\n            ));\n        }\n    }\n\n    /**\n     * Opening page for *telephone* bookings.\n     * @param $code string unique (hopefully) tour code\n     * @throws \\Exception\n     */\n    public function telephoneAction($code)\n    {\n        // Security\n        $this->require_login('ROLE_TELEPHONE', 'booking/telephone/' . $code);\n\n        // Log\n        $this->log('Booking started ' . $code);\n\n        // Clear session and delete expired purchases\n        $this->bookinglib->cleanPurchases();\n\n        // Get the service object\n        $service = $this->bookinglib->serviceFromCode($code);\n        $serviceid = $service->id;\n\n        // count the seats left\n        $count = $this->bookinglib->countStuff($serviceid);\n\n        // Get the limits for this service\n        $limits = $this->bookinglib->getLimits($serviceid);\n\n        // get acting maxparty (best estimate to display to punter)\n        $maxparty = $this->bookinglib->getMaxparty($limits);\n\n        // Bail out if this service is unavailable\n        if (!$this->bookinglib->canProceedWithBooking($service, $count)) {\n            $this->View('booking/closed', array(\n                'code' => $code,\n                'service' => $service\n            ));\n        }\n\n        // Grab current purchase\n        $purchase = $this->bookinglib->getSessionPurchase($serviceid);\n\n        // hopefully no errors\n        $errors = null;\n\n        // anything submitted?\n        if ($data = $this->getRequest()) {\n\n            // Cancel?\n            if (!empty($data['cancel'])) {\n                $this->redirect('admin/main', true);\n            }\n\n            // Validate\n            $this->gump->validation_rules(array(\n                'firstname' => 'required',\n                'surname' => 'required',\n                'postcode' => 'required',\n            ));\n            $this->gump->set_field_names(array(\n                'firstname' => 'First name',\n                'surname' => 'Last name',\n                'postcode' => 'Post code',\n            ));\n            if ($data = $this->gump->run($data)) {\n\n                // Now need to 'normalise' some of the fields\n                $purchase->title = ucwords($data['title']);\n                $purchase->surname = ucwords($data['surname']);\n                $purchase->firstname = ucwords($data['firstname']);\n                $purchase->postcode = strtoupper($data['postcode']);\n\n                // Get the booker's username and mark the purchase\n                // as a \"customer not present\" transaction.\n                if (!$user = $this->getUser()) {\n                    throw new \\Exception('User record unexpectedly not found in session!');\n                }\n                $username = $user->username;\n\n                // This means it's a telephone booking\n                $purchase->bookedby = $username;\n                $purchase->save();\n\n                $this->redirect('booking/telephone2');\n            }\n        }\n\n        // Create form\n        $form = new \\stdClass;\n        $form->title = $this->form->text('title', 'Title', $purchase->title);\n        $form->firstname = $this->form->text('firstname', 'First name', $purchase->firstname, FORM_REQUIRED);\n        $form->surname = $this->form->text('surname', 'Surname', $purchase->surname, FORM_REQUIRED);\n        $form->postcode = $this->form->text('postcode', 'Post code', $purchase->postcode, FORM_REQUIRED);\n\n        $this->View('booking/telephone', array(\n            'code' => $code,\n            'maxparty' => $maxparty,\n            'service' => $service,\n            'purchase' => $purchase,\n            'form' => $form,\n            'errors' => $errors,\n        ));\n    }\n\n    /**\n     * Check if old purchase exists for telephone bookings\n     * @param int $id of old purchase\n     */\n    public function telephone2Action($purchaseid = 0) {\n\n        // Basics\n        $purchase = $this->bookinglib->getSessionPurchase();\n        $serviceid = $purchase->serviceid;\n        $service = $this->bookinglib->getService($serviceid);\n        $this->require_login('ROLE_TELEPHONE', 'booking/telephone2');\n\n        // Search for old purchases\n        $oldpurchases = $this->bookinglib->findOldPurchase($purchase);\n\n        // If purchase id provided, make sure it is valid\n        if ($purchaseid) {\n            $oldpurchase = $this->bookinglib->checkPurchaseID($purchaseid, $oldpurchases);\n\n            // Copy address data\n            if (empty($purchase->title)) {\n                $purchase->title = $oldpurchase->title;\n            }\n            $purchase->address1 = $oldpurchase->address1;\n            $purchase->address2 = $oldpurchase->address2;\n            $purchase->city = $oldpurchase->city;\n            $purchase->county = $oldpurchase->county;\n            $purchase->phone = $oldpurchase->phone;\n            $purchase->email = $oldpurchase->email;\n            $purchase->save();\n            $this->redirect('booking/numbers/' . $serviceid);\n        }\n\n        // Should have a postcode\n        if ($oldpurchases = $this->bookinglib->findOldPurchase($purchase)) {\n            $this->View('booking/telephone2', array(\n                'purchases' => $oldpurchases,\n                'service' => $service,\n            ));\n        } else {\n            $this->redirect('booking/numbers/' . $serviceid);\n        }\n\n    }\n\n    /**\n     * First 'proper' booking page.\n     * Ask for numbers of travellers. Also sets up purchase record\n     * and session data.\n     * @param int $serviceid\n     * @throws \\Exception\n     */\n    public function numbersAction($serviceid) {\n        // Basics\n        $service = $this->bookinglib->getService($serviceid);\n\n        // Get the limits for this service:\n        $limits = $this->bookinglib->getLimits($serviceid);\n\n        // Grab current purchase\n        $purchase = $this->bookinglib->getSessionPurchase($serviceid);\n        if ($purchase->bookedby) {\n            $this->require_login('ROLE_TELEPHONE', 'booking/numbers/' . $serviceid);\n        }\n\n        // get acting maxparty\n        $maxparty = $this->bookinglib->getMaxparty($limits);\n\n        // Choices\n        $choices_adult = $this->bookinglib->choices($maxparty, false);\n        $choices_children = $this->bookinglib->choices($maxparty, true);\n\n        // hopefully no errors\n        $errors = null;\n\n        // anything submitted?\n        if ($data = $this->getRequest()) {\n\n            // Cancel?\n            if (!empty($data['cancel'])) {\n                $this->redirect('admin/main', true);\n            }\n\n            // Validate\n            $this->gump->validation_rules(array(\n                'adults' => 'required|integer|min_numeric,1|max_numeric,' . $maxparty,\n                'children' => 'required|integer|min_numeric,0|max_numeric,' . $maxparty,\n            ));\n            $this->gump->set_field_names(array(\n                'adults' => 'Number of adults',\n                'children' => 'Number of children',\n            ));\n            if ($data = $this->gump->run($data)) {\n\n                // check numbers\n                $adults = $data['adults'];\n                $children = $data['children'];\n                if (($adults + $children) > $maxparty) {\n                    $errors[] = 'Total number of travellers must be ' . $maxparty . ' or fewer';\n                } else if (($adults<1) or ($adults>$maxparty) or ($children<0) or ($children>$maxparty)) {\n                    $errors[] = 'Value supplied out of range.';\n                } else {\n                    $purchase->adults = $adults;\n                    $purchase->children = $children;\n                    $purchase->save();\n\n                    $this->redirect('booking/joining');\n                }\n\n            }  else {\n                $errors = array_merge($errors, $this->gump->get_readable_errors());\n            }\n        }\n\n        // Create form\n        $form = new \\stdClass();\n        $form->adults = $this->form->select('adults', 'Number of adults', $purchase->adults, $choices_adult);\n        $form->children = $this->form->select('children', 'Number of children (14 and under)', $purchase->children, $choices_children);\n\n\n        // display form\n        $this->View('booking/numbers', array(\n            'purchase' => $purchase,\n            'service' => $service,\n            'form' => $form,\n            'limits' => $limits,\n            'maxparty' => $maxparty,\n            'errors' => $errors,\n        ));\n    }\n\n    /**\n     * Joining station\n     */\n    public function joiningAction() {\n\n        // Basics\n        $purchase = $this->bookinglib->getSessionPurchase();\n        $serviceid = $purchase->serviceid;\n        $service = $this->bookinglib->getService($serviceid);\n\n        if ($purchase->bookedby) {\n            $this->require_login('ROLE_TELEPHONE', 'booking/joining');\n        }\n\n        // get the joining stations\n        $stations = $this->bookinglib->getJoiningStations($serviceid);\n\n        // If there is only one then there is nothing to do\n        if (count($stations)==1) {\n            reset($stations);\n            $purchase->joining = key($stations);\n            $purchase->save();\n\n            $this->redirect('booking/destination');\n        }\n\n        // hopefully no errors\n        $errors = null;\n\n        // anything submitted?\n        if ($data = $this->getRequest()) {\n\n            // Cancel?\n            if (!empty($data['back'])) {\n                $this->redirect('booking/numbers/' . $serviceid, true);\n            }\n\n            // Validate\n            $this->gump->validation_rules(array(\n                'joining' => 'required',\n            ));\n            $this->gump->set_field_names(array(\n                'joining' => 'Joining station',\n            ));\n            if ($data = $this->gump->run($data)) {\n\n                // check crs is valid\n                $joining = trim($data['joining']);\n                if (empty($stations[$joining])) {\n                    throw new \\Exception('No CRS code returned from form');\n                }\n                $purchase->joining = $joining;\n                $purchase->save();\n                $this->redirect('booking/destination');\n            }\n        }\n\n        // Create form\n        $form = new \\stdClass();\n        $form->joining = $this->form->radio('joining', '', $purchase->joining, $stations);\n\n        // display form\n        $this->View('booking/joining', array(\n            'purchase' => $purchase,\n            'form' => $form,\n            'code' => $purchase->code,\n            'service' => $service,\n            'errors' => $errors,\n        ));\n    }\n\n    /**\n     * @param string $crs\n     * @throws \\Exception\n     */\n    public function destinationAction($crs = '')\n    {\n        // Basics\n        $purchase = $this->bookinglib->getSessionPurchase();\n        $serviceid = $purchase->serviceid;\n        $service = $this->bookinglib->getService($serviceid);\n\n        if ($purchase->bookedby) {\n            $this->require_login('ROLE_TELEPHONE', 'booking/destination');\n        }\n\n        // get the destinations\n        $stations = $this->bookinglib->getDestinationStations($serviceid);\n\n        // If there is only one then there is nothing to do\n        if (count($stations)==1) {\n            reset($stations);\n            $purchase->destination = key($stations);\n            $purchase->save();\n\n            $this->redirect('booking/meals');\n        }\n\n        // Get destinations with extra pricing information\n        $destinations = $this->bookinglib->getDestinationsExtra($purchase, $service);\n\n        // anything submitted?\n        // Will only apply to back in this case\n        if ($data = $this->getRequest()) {\n\n            // Cancel?\n            if (!empty($data['back'])) {\n                $this->redirect('booking/joining/' . $serviceid, true);\n            }\n        }\n\n        // Just links this time, CRS will be in the URL path.\n        if ($crs) {\n\n            // check crs is valid\n            if (empty($stations[$crs])) {\n                throw new \\Exception('No valid CRS code returned from destination form  (supplied was ' . $crs . ')');\n            }\n            $purchase->destination = $crs;\n            $purchase->save();\n            $this->redirect('booking/meals');\n        }\n\n        // display form\n        $this->View('booking/destination', array(\n            'purchase' => $purchase,\n            'destinations' => $destinations,\n            'service' => $service,\n        ));\n    }\n\n    /**\n     * @throws \\Exception\n     */\n    public function mealsAction() {\n\n        // Basics\n        $purchase = $this->bookinglib->getSessionPurchase();\n        $serviceid = $purchase->serviceid;\n        $service = $this->bookinglib->getService($serviceid);\n\n        if ($purchase->bookedby) {\n            $this->require_login('ROLE_TELEPHONE', 'booking/meals');\n        }\n\n        // If there are no meals on this service just bail\n        if (!$this->bookinglib->mealsAvailable($service)) {\n            if ($this->back) {\n                $this->redirect('booking/destination');\n            } else {\n                $this->redirect('booking/class');\n            }\n        }\n\n        // Array of meal options for forms\n        $meals = $this->bookinglib->mealsForm($service, $purchase);\n\n        // Create validation\n        $gumprules = array();\n        $fieldnames = array();\n        $showingmeals = false;\n        foreach ($meals as $meal) {\n            if (!$meal->available) {\n                continue;\n            }\n            $gumprules[$meal->formname] = 'required|integer|min_numeric,0|max_numeric,' . $meal->maxmeals;\n            $fieldnames[$meal->formname] = $meal->name;\n            $meal->formselect = $this->form->select($meal->formname, $meal->label, $meal->purchase, $meal->choices);\n            $showingmeals = true;\n        }\n\n\n        // hopefully no errors\n        $errors = null;\n\n        // anything submitted?\n        if ($data = $this->getRequest()) {\n\n            // Cancel?\n            if (!empty($data['back'])) {\n\n                // We need to know if Destinations would have been displayed\n                $stations = $this->bookinglib->getDestinationStations($serviceid);\n                if (count($stations) > 1) {\n                    $this->redirect('booking/destination', true);\n                } else {\n                    $this->redirect('booking/joining', true);\n                }\n            }\n\n            // Validate\n            $this->gump->validation_rules($gumprules);\n            $this->gump->set_field_names($fieldnames);\n            if ($data = $this->gump->run($data)) {\n                foreach ($meals as $meal) {\n                    $name = $meal->formname;\n                    $purchase->$name = $data[$name];\n                }\n                $purchase->save();\n                $this->redirect('booking/class');\n            }\n        }\n\n        // display form\n        $this->View('booking/meals', array(\n            'purchase' => $purchase,\n            'service' => $service,\n            'meals' => $meals,\n            'showingmeals' => $showingmeals,+\n            'errors' => $errors,\n        ));\n    }\n\n   /**\n    * Book class (first/standard)\n    */\n   public function classAction($class = '') {\n\n        // Basics\n        $purchase = $this->bookinglib->getSessionPurchase();\n        $serviceid = $purchase->serviceid;\n        $service = $this->bookinglib->getService($serviceid);\n\n        if ($purchase->bookedby) {\n            $this->require_login('ROLE_TELEPHONE', 'booking/class');\n        }\n\n        // Get the limits for this service:\n        $limits = $this->bookinglib->getLimits($serviceid);\n\n        // get acting maxparty\n        $maxpartystandard = $this->bookinglib->getMaxparty($limits);\n\n        // get first and standard maximum parties\n        $maxpartyfirst = $limits->maxpartyfirst ? $limits->maxpartyfirst : $maxpartystandard;\n\n        // Get the passenger count\n        $passengercount = $purchase->adults + $purchase->children;\n\n        // get first and standard fares\n        $farestandard = $this->bookinglib->calculateFare($service, $purchase, 'S');\n        $farefirst = $this->bookinglib->calculateFare($service, $purchase, 'F');\n\n        // we need to know about the number\n        // it's a bodge - but if the choice is made then skip this check\n        $numbers = $this->bookinglib->countStuff($serviceid, $purchase);\n        $availablefirst = $numbers->remainingfirst >= $passengercount;\n        $availablestandard = $numbers->remainingstandard >= $passengercount;\n\n        // still might not be available if passengercount exceeds ruling maxparty\n        if ($passengercount > $maxpartyfirst) {\n            $availablefirst = false;\n        }\n        if ($passengercount > $maxpartystandard) {\n            $availablestandard = false;\n        }\n\n        // anything submitted?\n        // Will only apply to back in this case\n        if ($data = $this->getRequest()) {\n\n            // Cancel?\n            if (!empty($data['back'])) {\n                $this->redirect('booking/meals', true);\n            }\n        }\n\n        // Data will come from link\n        if ($class) {\n            if (($class=='F' and $availablefirst) or ($class=='S' and $availablestandard)) {\n                $purchase->class = $class;\n                $purchase->save();\n                $this->redirect('booking/additional');\n            }\n        }\n\n        // display form\n        $this->View('booking/class', array(\n            'purchase' => $purchase,\n            'service' => $service,\n            'farefirst' => $farefirst,\n            'farestandard' => $farestandard,\n            'availablefirst' => $availablefirst,\n            'availablestandard' => $availablestandard,\n            'childname' => $purchase->children == 1 ? 'child' : 'children',\n            'adultname' => $purchase->adults == 1 ? 'adult' : 'adults',\n        ));\n    }\n\n    /**\n     * Ask, if appropriate/enabled, for comments\n     * and/or first class supplements\n     */\n    public function additionalAction() {\n\n        // Basics\n        $purchase = $this->bookinglib->getSessionPurchase();\n        $serviceid = $purchase->serviceid;\n        $service = $this->bookinglib->getService($serviceid);\n\n        if ($purchase->bookedby) {\n            $this->require_login('ROLE_TELEPHONE', 'booking/additional');\n        }\n\n        // current counts\n        $numbers = $this->bookinglib->countStuff($serviceid, $purchase);\n\n        // Get the passenger count\n        $passengercount = $purchase->adults + $purchase->children;\n\n        // This page will only be shown if we are going to ask about firstsingle\n        // option, or ask for comments. Telephone bookings always allow comments.\n        $iscomments = $service->commentbox || $purchase->bookedby;\n        $issupplement = ($numbers->remainingfirstsingles >= $passengercount)\n                && ($purchase->class == 'F')\n                && (($passengercount == 1) || ($passengercount==2))\n                ;\n        if (!($iscomments or $issupplement)) {\n            if ($this->back) {\n                $this->redirect('booking/class');\n            } else {\n                $this->redirect('booking/personal');\n            }\n        }\n\n        // hopefully no errors\n        $errors = null;\n\n        // anything submitted?\n        if ($data = $this->getRequest()) {\n\n            // Cancel?\n            if (!empty($data['back'])) {\n                $this->redirect('booking/class', true);\n            }\n\n            $purchase->comment = empty($data['comment']) ? '' : $data['comment'];\n            $purchase->seatsupplement = empty($data['seatsupplement']) ? 0 : 1;\n            $purchase->save();\n\n            $this->redirect('booking/personal');\n        }\n\n        // Create form\n        $form = new \\stdClass;\n        $form->comment = $this->form->text('comment', '', $purchase->comment);\n        $form->seatsupplement = $this->form->yesno('seatsupplement', 'Window seats in first class', $purchase->seatsupplement);\n\n        // display form\n        $this->View('booking/additional', array(\n            'purchase' => $purchase,\n            'service' => $service,\n            'form' => $form,\n            'iscomments' => $iscomments,\n            'issupplement' => $issupplement,\n        ));\n    }\n\n    /**\n     * Get contact and ticket deliver details\n    */\n    public function personalAction() {\n        // Basics\n        $purchase = $this->bookinglib->getSessionPurchase();\n        $serviceid = $purchase->serviceid;\n        $service = $this->bookinglib->getService($serviceid);\n\n        if ($purchase->bookedby) {\n            $this->require_login('ROLE_TELEPHONE', 'booking/personal');\n        }\n\n        // hopefully no errors\n        $errors = null;\n\n        // anything submitted?\n        if ($data = $this->getRequest()) {\n\n            // Cancel?\n            if (!empty($data['back'])) {\n                $this->redirect('booking/additional', true);\n            }\n\n            // Validate\n            $gumprules = array(\n                'surname' => 'required',\n                'firstname' => 'required',\n                'address1' => 'required',\n                'city' => 'required',\n                'postcode' => 'required',\n            );\n            if (!$purchase->bookedby) {\n                $gumprules['email'] = 'required';\n            }\n            $this->gump->validation_rules($gumprules);\n            $this->gump->set_field_names(array(\n                'surname' => 'Surname',\n                'firstname' => 'First name',\n                'address1' => 'Address line 1',\n                'city' => 'City',\n                'postcode' => 'Post code',\n                'email' => 'Email',\n            ));\n            if ($data = $this->gump->run($data)) {\n\n                // Now need to 'normalise' some of the fields\n                $purchase->title = ucwords($data['title']);\n                $purchase->surname = ucwords($data['surname']);\n                $purchase->firstname = ucwords($data['firstname']);\n                $purchase->address1 = ucwords($data['address1']);\n                $purchase->address2 = ucwords($data['address2']);\n                $purchase->city = ucwords($data['city']);\n                $purchase->county = ucwords($data['county']);\n                $purchase->postcode = strtoupper($data['postcode']);\n                $purchase->phone = $data['phone'];\n                $purchase->email = strtolower($data['email']);\n\n                // eticket is optional\n                if (!$service->eticketenabled) {\n                    $purchase->eticket = 0;\n                } else {\n                    $purchase->eticket = $service->eticketoptional ? $data['eticket'] : 1;\n                }\n\n                $purchase->save();\n                $this->redirect('booking/review');\n            }\n        }\n\n        // Create form\n        $form = new \\stdClass;\n        $form->title = $this->form->text('title', 'Title', $purchase->title);\n        $form->firstname = $this->form->text('firstname', 'First name', $purchase->firstname, FORM_REQUIRED);\n        $form->surname = $this->form->text('surname', 'Surname', $purchase->surname, FORM_REQUIRED);\n        $form->address1 = $this->form->text('address1', 'Address line 1', $purchase->address1, FORM_REQUIRED);\n        $form->address2 = $this->form->text('address2', 'Address line 2', $purchase->address2);\n        $form->city = $this->form->text('city', 'Town / city', $purchase->city, FORM_REQUIRED);\n        $form->county = $this->form->text('county', 'County', $purchase->county);\n        $form->postcode = $this->form->text('postcode', 'Post code', $purchase->postcode, FORM_REQUIRED);\n        $form->phone = $this->form->text('phone', 'Telephone', $purchase->phone, FORM_OPTIONAL, null, 'tel');\n        $form->email = $this->form->text('email', 'Email', $purchase->email, $purchase->bookedby ? FORM_OPTIONAL : FORM_REQUIRED, null, 'email');\n\n        // display form\n        $this->View('booking/personal', array(\n            'purchase' => $purchase,\n            'form' => $form,\n            'service' => $service,\n        ));\n    }\n\n    /**\n     * Last chance to check details\n     */\n    public function reviewAction() {\n\n        // Basics\n        $purchase = $this->bookinglib->getSessionPurchase();\n        $serviceid = $purchase->serviceid;\n        $service = $this->bookinglib->getService($serviceid);\n\n        if ($purchase->bookedby) {\n            $this->require_login('ROLE_TELEPHONE', 'booking/review');\n        }\n\n        // work out final fare\n        $fare = $this->bookinglib->calculateFare($service, $purchase, $purchase->class);\n        $purchase->payment = $fare->total;\n        $purchase->save();\n\n        // get the destination\n        $destination = $this->bookinglib->getDestinationCRS($serviceid, $purchase->destination);\n\n        // get the joining station\n        $joining = $this->bookinglib->getJoiningCRS($serviceid, $purchase->joining);\n\n        // display form\n        $this->View('booking/review', array(\n            'purchase' => $purchase,\n            'service' => $service,\n            'destination' => $destination,\n            'joining' => $joining,\n            'class' => $purchase->class == 'F' ? 'First' : 'Standard',\n            'fare' => $fare,\n            'formatteddate'=> date('d/m/Y', strtotime($service->date)),\n        ));\n    }\n\n    /**\n     * This is a bit different - we get here from the\n     * review page, only if the form is submitted.\n     * This action sends the payment registration to SagePay\n     */\n    public function paymentAction() {\n\n        // Basics\n        $purchase = $this->bookinglib->getSessionPurchase();\n        $serviceid = $purchase->serviceid;\n        $service = $this->bookinglib->getService($serviceid);\n\n        if ($purchase->bookedby) {\n           $this->require_login('ROLE_TELEPHONE', 'booking/payment');\n        }\n\n        // work out final fare\n        $fare = $this->bookinglib->calculateFare($service, $purchase, $purchase->class);\n\n        // Line up Sagepay class\n        $sagepay = $this->getLibrary('SagepayServer');\n        $sagepay->setService($service);\n        $sagepay->setPurchase($purchase);\n        $sagepay->setFare($fare);\n\n        // anything submitted?\n        if ($data = $this->getRequest()) {\n\n            // Anything other than 'next' jumps back\n            if (empty($data['next'])) {\n                $this->redirect('booking/personal', true);\n            }\n\n            // If we get here we can process SagePay stuff\n            // Register payment with Sagepay\n            $sr = $sagepay->register();\n\n            // If false is returned then it went wrong\n            if ($sr === false) {\n                $this->View('booking/fail', array(\n                    'status' => 'N/A',\n                    'diagnostic' => $sagepay->error,\n                ));\n            }\n\n            // check status of registration from SagePay\n            $status = $sr['Status'];\n            if (($status != 'OK') && ($status != 'OK REPEATED')) {\n                $this->View('booking/fail', array(\n                    'status' => $status,\n                    'diagnostic' => $sr['StatusDetail'],\n                ));\n            }\n\n            // update purchase\n            $purchase->securitykey = $sr['SecurityKey'];\n            $purchase->regstatus = $status;\n            $purchase->VPSTxId = $sr['VPSTxId'];\n            $purchase->save();\n\n            // redirect to Sage\n            $url = $sr['NextURL'];\n            header(\"Location: $url\");\n            die;\n        }\n    }\n\n    /**\n     * Sagepay sends a POST notification when the payment is complete\n     * NB: We *cannot* assume anything about our payment timeout anymore\n     * Bear in mind that we can't interact with the user either (server-2-server)\n     * @return mixed\n     * @throws \\Exception\n     */\n    public function notificationAction() {\n        global $CFG;\n\n        // Full strength error logging\n        ini_set('display_errors', 0);\n        ini_set('log_errors', 1);\n        error_reporting(-1);\n\n        // Library stuff\n        $sagepay = $this->getLibrary('SagepayServer');\n\n        // POST data from SagePay\n        $data = $sagepay->getNotification();\n\n        // Log the notification data to debug file (in case it's interesting)\n        $this->log(var_export($data, true));\n\n        // Get the VendorTxCode and use it to look up the purchase\n        $VendorTxCode = $data['VendorTxCode'];\n        if (!$purchase = $this->bookinglib->getPurchaseFromVendorTxCode($VendorTxCode)) {\n            $url = $this->Url('booking/fail') . '/' . $VendorTxCode . '/' . urlencode('Purchase record not found');\n            $this->log('SagePay notification: Purchase not found - ' . $url);\n            $sagepay->notificationreceipt('INVALID', $url, 'Purchase record not found');\n            die;\n        }\n\n        // Mailer\n        $mail = $this->getLibrary('Mail');\n        $mailpurchase = clone $purchase;\n        $mail->initialise($mailpurchase);\n        $mail->setExtrarecipients($CFG->backup_email);\n\n        // Now that we have the purchase object, we can save whatever we got back in it\n        $this->bookinglib->updatePurchase($purchase, $data);\n\n        // Check VPSSignature for validity\n        if (!$sagepay->checkVPSSignature($purchase, $data)) {\n            $url = $this->Url('booking/fail') . '/' . $VendorTxCode . '/' . urlencode('VPSSignature not matched');\n            $this->log('SagePay notification: VPS sig no match - ' . $url);\n            $sagepay->notificationreceipt('INVALID', $url, 'VPSSignature not matched');\n            die;\n        }\n\n        // Check Status.\n        // Work out what next action should be\n        $status = $purchase->status;\n        if ($status == 'OK') {\n\n            // Send confirmation email\n            $url = $this->Url('booking/complete') . '/' . $VendorTxCode;\n            $mail->confirm();\n            $this->log('SagePay notification: Confirm sent - ' . $url);\n            $sagepay->notificationreceipt('OK', $url, '');\n        } else if ($status == 'ERROR') {\n            $url = $this->Url('booking/fail') . '/' . $VendorTxCode . '/' . urlencode($purchase->statusdetail);\n            $this->log('SagePay notification: Booking fail - ' . $url);\n            $mail->decline();\n            $sagepay->notificationreceipt('OK', $url, $purchase->statusdetail);\n        } else {\n            $url = $this->Url('booking/decline') . '/' . $VendorTxCode;\n            $this->log('SagePay notification: Booking decline - ' . $url);\n            $mail->decline();\n            $sagepay->notificationreceipt('OK', $url, $purchase->statusdetail);\n        }\n\n        die;\n    }\n\n    /**\n     * Fail action - we get here if we return error to SagePay\n     * SagePay then redirects here\n     * @param string $VendorTxCode\n     * @param string $message\n     */\n    public function failAction($VendorTxCode, $message) {\n        $message = urldecode($message);\n        if (!$purchase = $this->bookinglib->getPurchaseFromVendorTxCode($VendorTxCode)) {\n            $this->View('booking/fail', array(\n                'status' => 'N/A',\n                'diagnostic' => 'Purchase record could not be found for ' . $VendorTxCode . ' Plus ' . $message,\n                'servicename' => '',\n            ));\n        } else {\n            $service = $this->bookinglib->getService($purchase->serviceid);\n            $this->View('booking/fail', array(\n                'status' => 'N/A',\n                'diagnostic' => $message,\n                'servicename' => $service->name,\n            ));\n        }\n    }\n\n    /**\n     * Complete action - SagePay returns here when all successful\n     * SagePay then redirects here\n     * @param string $VendorTxCode\n     */\n    public function completeAction($VendorTxCode) {\n        if (!$purchase = $this->bookinglib->getPurchaseFromVendorTxCode($VendorTxCode)) {\n            $this->View('booking/fail', array(\n                'status' => 'N/A',\n                'diagnostic' => 'Purchase record could not be found for ' . $VendorTxCode,\n                'servicename' => '',\n            ));\n        } else {\n            $path = $purchase->bookedby ? 'booking/telephonecomplete' : 'booking/complete';\n            $service = $this->bookinglib->getService($purchase->serviceid);\n            $this->View($path, array(\n                'purchase' => $purchase,\n                'service' => $service,\n            ));\n        }\n    }\n\n    /**\n     * Decline action - SagePay returns here when payment declined\n     * SagePay then redirects here\n     * @param string $VendorTxCode\n     */\n    public function declineAction($VendorTxCode) {\n        if (!$purchase = $this->bookinglib->getPurchaseFromVendorTxCode($VendorTxCode)) {\n            $this->View('booking/fail', array(\n                'status' => 'N/A',\n                'diagnostic' => 'Purchase record could not be found for ' . $VendorTxCode,\n            ));\n        } else {\n            $service = $booking->getService($purchase->serviceid);\n            $this->View('booking/decline', array(\n                'purchase' => $purchase,\n                'service' => $service,\n            ));\n        }\n    }\n\n}\n\n",
+			"file": "src/controller/bookingController.php",
+			"file_size": 34768,
+			"file_write_time": 131629961514474900,
 			"settings":
 			{
-				"buffer_size": 28860,
+				"buffer_size": 34769,
 				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/view/destination/edit.mustache",
-			"settings":
-			{
-				"buffer_size": 1623,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/view/joining/edit.mustache",
-			"settings":
-			{
-				"buffer_size": 1255,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/controller/joiningController.php",
-			"settings":
-			{
-				"buffer_size": 5078,
 				"line_ending": "Unix"
 			}
 		}
@@ -141,41 +134,37 @@
 		"/var/www/html/railtour/src/view/destination",
 		"/var/www/html/railtour/src/view/email",
 		"/var/www/html/railtour/src/view/joining",
-		"/var/www/html/railtour/src/view/report"
+		"/var/www/html/railtour/src/view/priceband",
+		"/var/www/html/railtour/src/view/report",
+		"/var/www/html/railtour/src/view/service",
+		"/var/www/html/railtour/src/view/user"
 	],
 	"file_history":
 	[
-		"/var/www/html/railtour/src/view/booking/destination.mustache",
-		"/var/www/html/railtour/src/controller/bookingController.php",
-		"/var/www/html/railtour/src/view/header.mustache",
-		"/var/www/html/railtour/src/library/SagepayServer.php",
-		"/var/www/html/railtour/src/view/email/fail_txt.mustache",
-		"/var/www/html/railtour/src/view/email/fail.mustache",
-		"/var/www/html/railtour/src/library/Admin.php",
+		"/var/www/html/railtour/src/controller/userController.php",
+		"/var/www/html/railtour/src/controller/serviceController.php",
 		"/var/www/html/railtour/src/controller/reportController.php",
-		"/var/www/html/railtour/src/view/report/view.mustache",
-		"/var/www/html/railtour/config.php",
-		"/var/www/html/railtour/config-dist.php",
-		"/var/www/html/railtour/src/library/Booking.php",
-		"/var/www/html/railtour/src/view/report/list.mustache",
-		"/var/www/html/railtour/src/library/Mail.php",
-		"/var/www/html/railtour/core/coreController.php",
-		"/var/www/html/railtour/src/view/booking/decline.mustache",
-		"/var/www/html/railtour/src/view/booking/additional.mustache",
+		"/var/www/html/railtour/src/controller/pricebandController.php",
+		"/var/www/html/railtour/src/controller/limitsController.php",
+		"/var/www/html/railtour/src/controller/joiningController.php",
+		"/var/www/html/railtour/src/controller/bookingController.php",
 		"/var/www/html/railtour/src/controller/destinationController.php",
+		"/var/www/html/railtour/src/view/joining/edit.mustache",
+		"/var/www/html/railtour/src/view/booking/review.mustache",
+		"/var/www/html/railtour/src/view/footer.mustache",
+		"/var/www/html/railtour/src/view/booking/meals.mustache",
 		"/var/www/html/railtour/src/library/Admin.php",
+		"/var/www/html/railtour/src/view/booking/terms.mustache",
+		"/var/www/html/railtour/src/library/Booking.php",
+		"/var/www/html/railtour/core/coreController.php",
+		"/var/www/html/railtour/src/view/destination/edit.mustache",
 		"/var/www/html/railtour/src/view/header.mustache",
 		"/var/www/html/railtour/src/schema/schema.php",
 		"/var/www/html/railtour/core/update.php",
-		"/var/www/html/railtour/core/coreSession.php",
-		"/var/www/html/railtour/src/view/booking/personal.mustache",
-		"/var/www/html/railtour/src/view/booking/telephonecomplete.mustache",
-		"/var/www/html/railtour/core/coreForm.php",
-		"/var/www/html/railtour/src/library/OldBooking.php",
-		"/var/www/html/railtour/src/view/booking/review.mustache",
+		"/var/www/html/railtour/core/version.php",
+		"/var/www/html/railtour/src/controller/adminController.php",
+		"/var/www/html/railtour/src/library/User.php",
 		"/var/www/html/railtour/src/view/admin/main.mustache",
-		"/var/www/html/railtour/src/controller/bookingController.php",
-		"/var/www/html/railtour/core/coreController.php",
 		"/var/www/html/railtour/src/library/Mail.php",
 		"/var/www/html/railtour/src/view/user/login.mustache",
 		"/var/www/html/railtour/src/view/service/index.mustache",
@@ -183,13 +172,13 @@
 		"/var/www/html/railtour/src/view/booking/decline.mustache",
 		"/var/www/html/railtour/src/view/booking/fail.mustache",
 		"/var/www/html/railtour/src/view/booking/complete.mustache",
-		"/var/www/html/railtour/src/view/footer.mustache",
-		"/var/www/html/railtour/src/controller/reportController.php",
 		"/var/www/html/railtour/src/view/report/view.mustache",
-		"/var/www/html/railtour/src/controller/userController.php",
 		"/var/www/html/railtour/src/view/booking/class.mustache",
-		"/var/www/html/railtour/src/assets/css/railtour.css",
-		"/var/www/html/railtour/src/view/booking/meals.mustache",
+		"/var/www/html/railtour/src/view/booking/telephonestatus.mustache",
+		"/var/www/html/railtour/core/setup.php",
+		"/var/www/html/railtour/src/view/booking/personal.mustache",
+		"/var/www/html/railtour/src/view/booking/additional.mustache",
+		"/var/www/html/railtour/src/view/booking/destination.mustache",
 		"/var/www/html/railtour/src/view/booking/joining.mustache",
 		"/var/www/html/railtour/src/view/booking/index.mustache",
 		"/var/www/html/railtour/src/view/booking/telephone.mustache",
@@ -197,25 +186,21 @@
 		"/var/www/html/railtour/src/view/report/list.mustache",
 		"/var/www/html/railtour/core/coreSession.php",
 		"/var/www/html/railtour/index.php",
-		"/var/www/html/railtour/src/library/Booking.php",
 		"/var/www/html/railtour/src/view/booking/telephone2.mustache",
 		"/var/www/html/railtour/config.php",
 		"/var/www/html/railtour/src/view/booking/numbers.mustache",
 		"/var/www/html/railtour/src/assets/css/railtour.css",
 		"/var/www/html/railtour/src/assets/css/booking.css",
-		"/var/www/html/railtour/src/view/booking/terms.mustache",
 		"/var/www/html/railtour/src/library/SagepayServer.php",
 		"/var/www/html/railtour/src/library/OldBooking.php",
 		"/var/www/html/railtour/core/coreForm.php",
 		"/var/www/html/railtour/src/view/service/edit.mustache",
-		"/var/www/html/railtour/src/view/formerrors.mustache",
-		"/var/www/html/railtour/src/controller/serviceController.php",
 		"/home/howard/.config/sublime-text-3/Packages/Package Control/Package Control.sublime-settings",
 		"/home/howard/.config/sublime-text-3/Packages/User/Package Control.sublime-settings"
 	],
 	"find":
 	{
-		"height": 26.0
+		"height": 25.0
 	},
 	"find_in_files":
 	{
@@ -252,24 +237,24 @@
 	"groups":
 	[
 		{
-			"selected": 7,
+			"selected": 1,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "src/view/joining/edit.mustache",
+					"file": "src/view/booking/meals.mustache",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1255,
+						"buffer_size": 1342,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								957,
-								546
+								660,
+								660
 							]
 						],
 						"settings":
@@ -280,146 +265,26 @@
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "src/controller/bookingController.php",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 35005,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								15683,
-								15683
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/PHP/PHP.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 7429.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "core/coreController.php",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 9739,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1946,
-								1956
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/PHP/PHP.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 816.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 7,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "src/library/Booking.php",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 28860,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								21878,
-								21878
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/PHP/PHP.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 5389.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "core/setup.php",
-					"semi_transient": true,
-					"settings":
-					{
-						"buffer_size": 28860,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/PHP/PHP.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 779.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
-					"file": "src/view/destination/edit.mustache",
+					"buffer": 1,
+					"file": "src/view/admin/main.mustache",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1623,
+						"buffer_size": 1297,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								851,
+								851
 							]
 						],
 						"settings":
@@ -432,29 +297,29 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
-					"file": "src/view/joining/edit.mustache",
+					"buffer": 2,
+					"file": "src/controller/adminController.php",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1255,
+						"buffer_size": 1348,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								1059,
+								1059
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Mustache/syntax/mustache.sublime-syntax",
+							"syntax": "Packages/PHP/PHP.sublime-syntax",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
@@ -466,12 +331,12 @@
 					"type": "text"
 				},
 				{
-					"buffer": 7,
-					"file": "src/controller/joiningController.php",
-					"semi_transient": true,
+					"buffer": 3,
+					"file": "src/library/Admin.php",
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5078,
+						"buffer_size": 28961,
 						"regions":
 						{
 						},
@@ -484,15 +349,75 @@
 						],
 						"settings":
 						{
-							"syntax": "Packages/Mustache/syntax/mustache.sublime-syntax",
+							"syntax": "Packages/PHP/PHP.sublime-syntax",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1630.0,
+						"translation.y": 13710.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "src/library/Booking.php",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 29329,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								11812,
+								11812
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/PHP/PHP.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 5143.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/controller/bookingController.php",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 34769,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								16717,
+								16717
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/PHP/PHP.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 11249.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
 					"type": "text"
 				}
 			]
@@ -575,7 +500,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 228.0,
+	"side_bar_width": 242.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
