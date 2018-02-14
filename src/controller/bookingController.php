@@ -743,11 +743,15 @@ class BookingController extends coreController {
         $form->phone = $this->form->text('phone', 'Telephone', $purchase->phone, FORM_OPTIONAL, null, 'tel');
         $form->email = $this->form->text('email', 'Email', $purchase->email, $purchase->bookedby ? FORM_OPTIONAL : FORM_REQUIRED, null, 'email');
 
+        // Do not show email field for telephone bookings if it is empty
+        $showemail = (!$purchase->bookedby) || (!empty($purchase->email)); 
+
         // display form
         $this->View('booking/personal', array(
             'purchase' => $purchase,
             'form' => $form,
             'service' => $service,
+            'showemail' => $showemail,
         ));
     }
 
