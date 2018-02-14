@@ -714,7 +714,9 @@ class BookingController extends coreController {
                 $purchase->county = ucwords($data['county']);
                 $purchase->postcode = strtoupper($data['postcode']);
                 $purchase->phone = $data['phone'];
-                $purchase->email = strtolower($data['email']);
+                if (isset($data['email'])) {
+                    $purchase->email = strtolower($data['email']);
+                }    
 
                 // eticket is optional
                 if (!$service->eticketenabled) {

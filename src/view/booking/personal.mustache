@@ -22,7 +22,9 @@
         {{{ form.county }}}
         {{{ form.postcode }}}
         {{{ form.phone }}}
-        {{{ form.email }}}
+        {{^ purchase.bookedby }}
+            {{{ form.email }}}
+        {{/ purchase.bookedby }}    
 
         {{# service.eticketenabled }}
             {{# service.eticketoptional }}
