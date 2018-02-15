@@ -323,7 +323,11 @@ class BookingController extends coreController {
             $purchase->joining = key($stations);
             $purchase->save();
 
-            $this->redirect('booking/destination');
+            if ($this->back) {
+                $this->redirect('booking/numbers', true);
+            } else {
+                $this->redirect('booking/destination');
+            }    
         }
 
         // hopefully no errors
@@ -395,7 +399,11 @@ class BookingController extends coreController {
             $purchase->destination = key($stations);
             $purchase->save();
 
-            $this->redirect('booking/meals');
+            if ($this->back) {
+                $this->redirect('booking/joining', true);
+            } else {
+                $this->redirect('booking/meals');
+            }    
         }
 
         // Get destinations with extra pricing information
@@ -448,7 +456,7 @@ class BookingController extends coreController {
         // If there are no meals on this service just bail
         if (!$this->bookinglib->mealsAvailable($service)) {
             if ($this->back) {
-                $this->redirect('booking/destination');
+                $this->redirect('booking/destination', true);
             } else {
                 $this->redirect('booking/class');
             }
@@ -619,7 +627,7 @@ class BookingController extends coreController {
                 ;
         if (!($iscomments or $issupplement)) {
             if ($this->back) {
-                $this->redirect('booking/class');
+                $this->redirect('booking/class', true);
             } else {
                 $this->redirect('booking/personal');
             }
