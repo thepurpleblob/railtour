@@ -532,7 +532,9 @@ class Admin {
      * @return array
      */
     public function getLimits($serviceid) {
-        $limits = ORM::forTable('limits')->where('serviceid', $serviceid)->findOne();
+        if (!$limits = ORM::forTable('limits')->where('serviceid', $serviceid)->findOne()) {
+            throw new \Exception('Limits record not found for service id ' . $serviceid);
+        }
 
         return $limits;
     }
