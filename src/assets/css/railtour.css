@@ -138,3 +138,9 @@ tr.purchase_not_ok {
     font-size: 80%;
 }
 
+/* booking forms */
+
+#postcodeText {
+    text-transform: uppercase;
+}
+
