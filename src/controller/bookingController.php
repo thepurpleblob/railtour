@@ -324,7 +324,7 @@ class BookingController extends coreController {
             $purchase->save();
 
             if ($this->back) {
-                $this->redirect('booking/numbers', true);
+                $this->redirect('booking/numbers/' . $serviceid, true);
             } else {
                 $this->redirect('booking/destination');
             }    
