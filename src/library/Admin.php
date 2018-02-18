@@ -532,8 +532,23 @@ class Admin {
      * @return array
      */
     public function getLimits($serviceid) {
+        global $CFG;
+
         if (!$limits = ORM::forTable('limits')->where('serviceid', $serviceid)->findOne()) {
-            throw new \Exception('Limits record not found for service id ' . $serviceid);
+            
+            // Limits table doesn't exist, so create a new one
+            $limits = ORM::forTable('limits')->create();
+            $limits->serviceid = $serviceid;
+            $limits->first = $CFG->default_limit;
+            $limits->standard = $CFG->default_limit;;
+            $limits->firstsingles = 0;
+            $limits->meala = 0;
+            $limits->mealb = 0;
+            $limits->mealc = 0;
+            $limits->meald = 0;
+            $limits->maxparty = $CFG->default_party;
+            $limits->maxpartyfirst = 0;
+            $limits->save();
         }
 
         return $limits;
