@@ -117,7 +117,7 @@
 
         <div>
             {{^ isdestinations }}
-                <div class="alert alert-block alert-error">
+                <div class="alert alert-warning">
                     There are no destinations. You need to create at least one destination first.
                 </div>
             {{/ isdestinations }}
@@ -149,7 +149,7 @@
                 <i class="fas fa-cog"></i>
             {{/ ispricebandgroups }}
             {{^ ispricebandgroups }}
-                <a href="{{# path }}priceband/index{{/ path }}/{{ service.id }}" data-toggle="tooltip" title="New price band">
+                <a href="{{# path }}priceband/edit{{/ path }}/{{ service.id }}/0" data-toggle="tooltip" title="New price band">
                 <i class="fas fa-plus"></i>
             {{/ ispricebandgroups }}
             </a>
@@ -157,7 +157,7 @@
         </h3>
 
         {{^ ispricebandgroups }}
-            <div class="alert alert-block alert-error">
+            <div class="alert alert-warning">
                 There are no price bands. You need to create at least one price band first.
             </div>
         {{/ ispricebandgroups }}
@@ -205,23 +205,32 @@
 
         <h3>Joining stations
         {{# system.admin }}
-            {{# isjoinings }}
-                <a href="{{# path }}joining/index{{/ path }}/{{ service.id }}" data-toggle="tooltip" title="Edit joining stations">
-                <i class="fas fa-cog"></i>
-            {{/ isjoinings }}
-            {{^ isjoinings }}
-                <a href="{{# path }}joining/index{{/ path }}/{{ service.id }}" data-toggle="tooltip" title="New joining stations">
-                <i class="fas fa-plus"></i>
-            {{/ isjoinings }}
+                {{# ispricebandgroups }}
+                {{# isjoinings }}
+                    <a href="{{# path }}joining/index{{/ path }}/{{ service.id }}" data-toggle="tooltip" title="Edit joining stations">
+                    <i class="fas fa-cog"></i>
+                {{/ isjoinings }}
+                {{^ isjoinings }}
+                    <a href="{{# path }}joining/edit{{/ path }}/{{ service.id }}/0" data-toggle="tooltip" title="New joining stations">
+                    <i class="fas fa-plus"></i>
+                {{/ isjoinings }}
+            {{/ ispricebandgroups }}
             </a>
         {{/ system.admin }}
         </h3>
 
+        {{# ispricebandgroups }}
         {{^ isjoinings }}
-            <div class="alert alert-block alert-error">
+            <div class="alert alert-warning">
                 There are no joining stations. You need to add at least one joining station first.
             </div>
         {{/ isjoinings }}
+        {{/ ispricebandgroups }}
+        {{^ ispricebandgroups }}
+            <div class="alert alert-warning">
+                There are no joining stations. However, you must first create Pricebands. 
+            </div>
+        {{/ ispricebandgroups }}
 
         {{# isjoinings }}
             <table class="table table-condensed table-striped">

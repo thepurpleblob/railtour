@@ -6,7 +6,7 @@
 
     {{^ setup }}
         <div class="alert alert-block alert-error">
-            There are no destinations. You need to create at least one destination first.
+            There are no pricebands. You need to create at least one priceband first.
         </div>
     {{/ setup }}
     {{# setup }}
@@ -66,12 +66,13 @@
             {{/ pricebandgroups }}
             </tbody>
         </table>
+    {{/ setup }}
+
 
         <div>
             <a class="btn btn-primary" href="{{# path }}priceband/edit{{/ path }}/{{ service.id }}/0">Add a new price band</a>
             &nbsp;
             <a class="btn btn-warning" href="{{# path }}service/show{{/ path }}/{{ service.id }}">Close</a>
         </div>
-    {{/ setup }}
 
 {{> footer }}
