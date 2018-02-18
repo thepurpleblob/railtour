@@ -141,7 +141,7 @@ class Admin {
         $service->mealbvisible = 0;
         $service->mealcvisible = 0;
         $service->mealdvisible = 0;
-        $service->singlesupplement = 10.00;
+        $service->singlesupplement = 15.00;
         $service->maxparty = 16;
         $service->commentbox = 0;
         $service->eticketenabled = 0;
