@@ -177,8 +177,7 @@ class coreController {
         $system->sessionid = session_id();
         $variables['system'] = $system;
         $variables['config'] = $CFG;
-        $variables['showlogin'] = (($viewname != 'user/login') && (strpos($viewname, 'booking') !== 0))
-            || ($viewname == 'booking/index');
+        $variables['showlogin'] = (($viewname != 'user/login') && (strpos($viewname, 'booking') !== 0));
         $variables['haserrors'] = !empty($variables['errors']);
 
 
