@@ -821,7 +821,8 @@ class Admin {
             $l[] = $this->clean(intval($p->payment * 100));
 
             // Booking Date
-            $l[] = $this->clean($p->date);
+            $fdate = substr($p->date, 0, 4) . substr($p->date, 5, 2) . substr($p->date, 8, 2);
+            $l[] = $this->clean($fdate);
 
             // Seat supplement
             $l[] = $p->seatsupplement ? 'Y' : 'N';

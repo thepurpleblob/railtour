@@ -13,7 +13,7 @@
     Your booking details are as follows...
 </p>
 
-<p><b>Booking reference: {{ purchase.bookingref }}</b></p>
+<p><b>{{# purchase.bookedby }}Telephone {{/ purchase.bookedby }}Booking reference: {{ purchase.bookingref }}</b></p>
 
 <address>
     {{ purchase.title }} {{ purchase.firstname }} {{ purchase.surname }}<br />
