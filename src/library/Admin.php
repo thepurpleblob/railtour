@@ -735,6 +735,12 @@ class Admin {
 
         // create each line
         foreach ($purchases as $p) {
+
+            // Purchase status must be 'OK'
+            if ($p->status != 'OK') {
+                continue;
+            }
+
             $l = array();
 
             // Record type
