@@ -878,9 +878,9 @@ class BookingController extends coreController {
         global $CFG;
 
         // Full strength error logging
+        error_reporting(E_ALL);
         ini_set('display_errors', 0);
         ini_set('log_errors', 1);
-        error_reporting(-1);
 
         // Library stuff
         $sagepay = $this->getLibrary('SagepayServer');

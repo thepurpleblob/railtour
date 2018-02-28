@@ -107,7 +107,7 @@ $schema[] = 'CREATE TABLE `purchase` (
   `statusdetail` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `cardtype` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
   `last4digits` int(11) NOT NULL,
-  `bankauthcode` int(11) NOT NULL,
+  `bankauthcode` varchar(20) NOT NULL,
   `declinecode` int(11) NOT NULL,
   `emailsent` tinyint(1) NOT NULL,
   `eticket` tinyint(1) NOT NULL,

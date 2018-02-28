@@ -70,6 +70,10 @@ if ($dbversion < 2018021201) {
     $db->exec('UPDATE destination
         SET meala=1, mealb=1, mealc=1, meald=1');
 }
+if ($dbversion < 2018022800) {
+    $db->exec('ALTER TABLE purchase
+        MODIFY `bankauthcode` varchar(20) NOT NULL');
+}
 
 // Make config version up to date
 $config->name = 'version';

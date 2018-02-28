@@ -11,6 +11,7 @@ function exception_handler($e) {
 
     //echo "<pre>$e</pre>"; die;
     // echo "<pre>"; var_dump($e->getTrace()); die;
+    error_log($e->getMessage() . "\n" . $e->getTraceAsString());
     $controller = new coreController(true);
     $controller->View('exception', array(
         'e' => $e,

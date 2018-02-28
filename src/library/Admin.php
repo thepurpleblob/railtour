@@ -3,7 +3,7 @@
 namespace thepurpleblob\railtour\library;
 
 // Lifetime of incomplete purchases in seconds
-define('PURCHASE_LIFETIME', 3600);
+define('PURCHASE_LIFETIME', 14400);
 
 use Exception;
 use ORM;
@@ -558,6 +558,10 @@ class Admin {
      * Clear incomplete purchases that are time expired
      */
     public function deleteOldPurchases() {
+
+        // For the time being, don't delete anything
+        //return;
+
         $oldtime = time() - PURCHASE_LIFETIME;
         ORM::forTable('purchase')
             ->where('completed', 0)
