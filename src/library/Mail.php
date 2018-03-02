@@ -118,11 +118,11 @@ class Mail {
     public function decline() {
 
         // Get messages
-        $body = $this->controller->renderView('email/decline', array(
+        $body = $this->controller->renderView('email/fail', array(
             'service' => $this->service,
             'purchase' => $this->purchase,
         ));
-        $bodytxt = $this->controller->renderView('email/decline_txt', array(
+        $bodytxt = $this->controller->renderView('email/fail_txt', array(
             'service' => $this->service,
             'purchase' => $this->purchase,
         ));

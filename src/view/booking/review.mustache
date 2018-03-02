@@ -33,6 +33,34 @@
         
         <dt class="col-3">Travel class</dt>
         <dd class="col-9">{{ class }}</dd>
+
+        {{# service.mealavisible }} 
+            {{# purchase.meala }}
+                <dt class="col-3">{{ service.mealaname }}</dt>
+                <dd class="col-9">{{ purchase.meala }} booked</dd>
+            {{/ purchase.meala }}
+        {{/ service.mealavisible }}
+
+        {{# service.mealbvisible }} 
+            {{# purchase.mealb }}
+                <dt class="col-3">{{ service.mealbname }}</dt>
+                <dd class="col-9">{{ purchase.mealb }} booked</dd>
+            {{/ purchase.mealb }}
+        {{/ service.mealbvisible }}
+
+        {{# service.mealcvisible }} 
+            {{# purchase.mealc }}
+                <dt class="col-3">{{ service.mealcname }}</dt>
+                <dd class="col-9">{{ purchase.mealc }} booked</dd>
+            {{/ purchase.mealc }}
+        {{/ service.mealcvisible }}
+
+        {{# service.mealdvisible }} 
+            {{# purchase.meald }}
+                <dt class="col-3">{{ service.mealdname }}</dt>
+                <dd class="col-9">{{ purchase.meald }} booked</dd>
+            {{/ purchase.meald }}
+        {{/ service.mealdvisible }}
         
         {{# purchase.seatsupplement }}
             <dt class="col-3">Window supplement</dt>
