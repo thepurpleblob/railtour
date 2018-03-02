@@ -777,14 +777,24 @@ class Booking extends Admin {
         if (!$purchase) {
             return false;
         }
+
+        // NOte to self: replace stuff is so that postcodes match
+        // Regardless of customer adding space or no space. 
         $criteria = array(
             'firstname' => $purchase->firstname,
             'surname' => $purchase->surname,
-            'postcode' => $purchase->postcode,
-            'status' => 'OK',
+            'postcode' => str_replace(' ', '', $purchase->postcode),
         );
-        $purchases = \ORM::forTable('purchase')->where($criteria)->order_by_desc('timestamp')->
-            limit(5)->findMany();
+
+        $purchases = \ORM::forTable('purchase')->raw_query('
+            SELECT * FROM purchase
+            WHERE firstname = :firstname
+            AND surname = :surname
+            AND REPLACE(postcode, " ", "") = :postcode
+            AND status = "OK"
+            ORDER BY timestamp DESC
+            LIMIT 5
+        ', $criteria)->findMany();           
 
         // Fix up date
         foreach ($purchases as $purchase) {
