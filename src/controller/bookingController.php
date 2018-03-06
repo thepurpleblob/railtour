@@ -908,7 +908,7 @@ class BookingController extends coreController {
         $mail->setExtrarecipients($CFG->backup_email);
 
         // Now that we have the purchase object, we can save whatever we got back in it
-        $this->bookinglib->updatePurchase($purchase, $data);
+        $purchase = $this->bookinglib->updatePurchase($purchase, $data);
 
         // Check VPSSignature for validity
         if (!$sagepay->checkVPSSignature($purchase, $data)) {
