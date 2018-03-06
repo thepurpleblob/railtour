@@ -500,10 +500,10 @@ class Admin {
         $joining->serviceid = $serviceid;
         $joining->station = '';
         $joining->crs = '';
-        $joining->meala = 0;
-        $joining->mealb = 0;
-        $joining->mealc = 0;
-        $joining->meald = 0;
+        $joining->meala = 1;
+        $joining->mealb = 1;
+        $joining->mealc = 1;
+        $joining->meald = 1;
 
         // find and set to the first pricebandgoup
         $pricebandgroup = array_shift($pricebandgroups);

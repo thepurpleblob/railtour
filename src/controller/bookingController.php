@@ -645,6 +645,7 @@ class BookingController extends coreController {
             }
 
             $purchase->comment = empty($data['comment']) ? '' : $data['comment'];
+            $purchase->comment = substr($purchase->comment, 0, 37);
             $purchase->seatsupplement = empty($data['seatsupplement']) ? 0 : 1;
             $purchase->save();
 
