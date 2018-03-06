@@ -245,12 +245,18 @@ class SagepayServer {
             'CV2Result',
             'GiftAid',
             '3DSecureStatus',
+            'CAVV',
+            'AddressStatus',
+            'PayerStatus',
             'CardType',
             'Last4Digits',
             'VPSSignature',
+            'FraudResponse',
+            'Surcharge',
             'DeclineCode',
             'ExpiryDate',
             'BankAuthCode',
+            'Token'
         ];
 
         return $this->getFields($fields);
