@@ -1,7 +1,7 @@
 
 Dear {{ purchase.title }} {{ purchase.firstname }} {{ purchase.surname }},
 
-Booking reference: {{ purchase.bookingref }}
+{{# purchase.bookedby }}Telephone {{/ purchase.bookedby }}Booking reference: {{ purchase.bookingref }}
 
 Thank you for booking with SRPS Railtours. However, we regret that your payment
 has been declined by our online payment partner. 

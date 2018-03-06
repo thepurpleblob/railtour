@@ -3,7 +3,7 @@
     Dear {{ purchase.title }} {{ purchase.firstname }} {{ purchase.surname }},
 </p>
 
-<p><b>Booking reference: {{ purchase.bookingref }}</b></p>
+<p><b>{{# purchase.bookedby }}Telephone {{/ purchase.bookedby }}Booking reference: {{ purchase.bookingref }}</b></p>
 
 <p>
     Thank you for booking with SRPS Railtours. However, we regret that your payment
