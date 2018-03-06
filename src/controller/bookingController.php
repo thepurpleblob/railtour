@@ -654,7 +654,7 @@ class BookingController extends coreController {
 
         // Create form
         $form = new \stdClass;
-        $form->comment = $this->form->text('comment', '', $purchase->comment);
+        $form->comment = $this->form->text('comment', '', $purchase->comment, false, ['maxlength' => 37]);
         $form->seatsupplement = $this->form->yesno('seatsupplement', 'Window seats in first class', $purchase->seatsupplement);
 
         // display form

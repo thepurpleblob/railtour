@@ -92,7 +92,8 @@ class coreController {
         if (empty($_POST)) {
             return false;
         } else {
-            return $this->gump->sanitize($_POST);
+            return $_POST;
+            //return $this->gump->sanitize($_POST);
         }
     }
 
