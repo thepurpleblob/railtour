@@ -830,9 +830,9 @@ class Booking extends Admin {
         $purchase->status = $data['Status'];
         $purchase->statusdetail = $data['StatusDetail'];
         $purchase->cardtype = $data['CardType'];
-        $purchase->last4digits = $data['Last4Digits'];
+        $purchase->last4digits = empty($data['Last4Digits']) ? '0000' : $data['Last4Digits'];
         $purchase->bankauthcode = $data['BankAuthCode'];
-        $purchase->declinecode = $data['DeclineCode'];
+        $purchase->declinecode = empty($data['DeclineCode']) ? '0000' : $data['DeclineCode'];
         $purchase->completed = 1;
         $purchase->save();
     }
