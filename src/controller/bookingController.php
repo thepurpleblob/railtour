@@ -1003,7 +1003,7 @@ class BookingController extends coreController {
                 'diagnostic' => 'Purchase record could not be found for ' . $VendorTxCode,
             ));
         } else {
-            $service = $booking->getService($purchase->serviceid);
+            $service = $bookinglib->getService($purchase->serviceid);
             $this->View('booking/decline', array(
                 'purchase' => $purchase,
                 'service' => $service,
