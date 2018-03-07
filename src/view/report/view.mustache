@@ -103,7 +103,12 @@
                 </tr>
                 <tr>
                     <th>First window/single requested?</th>
-                    <td>{{ purchase.formattedseatsupplement }}</td>
+                    <td>
+                        {{ purchase.formattedseatsupplement }}
+                        {{# purchase.seatsupplement }}
+                            (&pound;{{ service.singlesupplement }} each)
+                        {{/ purchase.seatsupplement }}
+                    </td>
                 </tr>
                 {{# purchase.comment }}
                     <tr>
