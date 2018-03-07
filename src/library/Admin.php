@@ -614,7 +614,7 @@ class Admin {
         }
         $purchase->formattedeticket = $purchase->eticket ? 'Yes' : 'No';
         $purchase->formattedeinfo = $purchase->einfo ? 'Yes' : 'No';
-        $purchase->formattedseatsupplement = $purchase->setsupplement ? 'Yes' : 'No';
+        $purchase->formattedseatsupplement = $purchase->seatsupplement ? 'Yes' : 'No';
         $purchase->formattedclass = $purchase->class == 'F' ? 'First' : 'Standard';
 
         return $purchase;
