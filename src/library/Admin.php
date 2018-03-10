@@ -820,12 +820,14 @@ class Admin {
             $l[] = $this->clean($p->meald);
 
             // Comment - add booker on the front
+            // Remove 1/2 spurious characters from comment
+            $comment = strlen($p->comment) < 3 ? '' : $p->comment;
             if ($p->bookedby) {
                 $bookedby = $this->getInitials($p->bookedby) . ' ';
             } else {
                 $bookedby = '';
             }
-            $l[] = $this->clean($bookedby . $p->comment, 39);
+            $l[] = $this->clean($bookedby . $comment, 39);
 
             // Payment
             $l[] = $this->clean(intval($p->payment * 100));
