@@ -622,7 +622,7 @@ class Booking extends Admin {
             $remaining = 'remainingmeal' . $letter;
 
             // NB maxmeals=0 if they are sold out
-            if ($service->$mealvisible && $station->$prefix && $destination->prefix) {
+            if ($service->$mealvisible && $station->$prefix && $destination->$prefix) {
                 $meal = new \stdClass();
                 $meal->letter = $letter;
                 $meal->formname = $prefix;
