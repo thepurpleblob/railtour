@@ -17,7 +17,7 @@ class Booking extends Admin {
     public function availableServices() {
 
         // Get 'likely' candidates
-        $potentialservices = \ORM::for_table('service')->where('visible', true)->findMany();
+        $potentialservices = \ORM::for_table('service')->where('visible', true)->order_by_asc('date')->findMany();
 
         // We need to do more checks to see if it is really available
         $services = array();
