@@ -9,8 +9,6 @@ use thepurpleblob\core\coreSession;
 function exception_handler($e) {
     global $CFG;
 
-    //echo "<pre>$e</pre>"; die;
-    // echo "<pre>"; var_dump($e->getTrace()); die;
     error_log($e->getMessage() . "\n" . $e->getTraceAsString());
     $controller = new coreController(true);
     $controller->View('exception', array(

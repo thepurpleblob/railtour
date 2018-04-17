@@ -5,12 +5,14 @@
     <i>"{{ message }}"</i>
 </div>    
 
-<div class="card">
-    <div class="card-header">Error details</div>
-    <div class="card-body">
-        <small><pre class="card-text">{{{ trace }}}</pre></small>
+{{# debugging }}
+    <div class="card">
+        <div class="card-header">Error details</div>
+        <div class="card-body">
+            <small><pre class="card-text">{{{ trace }}}</pre></small>
+        </div>
     </div>
-</div>    
+{{/ debugging }}
 
 
 
