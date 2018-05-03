@@ -473,7 +473,9 @@ class BookingController extends coreController {
             if (!$meal->available) {
                 continue;
             }
-            $gumprules[$meal->formname] = 'required|integer|min_numeric,0|max_numeric,' . $meal->maxmeals;
+            if ($meal->maxmeals) {
+                $gumprules[$meal->formname] = 'required|integer|min_numeric,0|max_numeric,' . $meal->maxmeals;
+            }
             $fieldnames[$meal->formname] = $meal->name;
             $meal->formselect = $this->form->select($meal->formname, $meal->label, $meal->purchase, $meal->choices);
             $showingmeals = true;
@@ -504,7 +506,11 @@ class BookingController extends coreController {
             if ($data = $this->gump->run($data)) {
                 foreach ($meals as $meal) {
                     $name = $meal->formname;
-                    $purchase->$name = $data[$name];
+                    if ($meal->maxmeals) {
+                        $purchase->$name = $data[$name];
+                    } else {
+                        $purchase->$name = 0;
+                    }
                 }
                 $purchase->save();
                 $this->redirect('booking/class');
@@ -1003,7 +1009,7 @@ class BookingController extends coreController {
                 'diagnostic' => 'Purchase record could not be found for ' . $VendorTxCode,
             ));
         } else {
-            $service = $bookinglib->getService($purchase->serviceid);
+            $service = $this->bookinglib->getService($purchase->serviceid);
             $this->View('booking/decline', array(
                 'purchase' => $purchase,
                 'service' => $service,
