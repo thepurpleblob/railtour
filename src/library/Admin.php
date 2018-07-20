@@ -972,7 +972,11 @@ class Admin {
      * @return boolean
      */
     public function is_purchases($serviceid) {
-        return ORM::forTable('purchase')->where('serviceid', $serviceid)->count() > 0;
+        $this->deleteOldPurchases();
+        return ORM::forTable('purchase')->where([
+            'serviceid' => $serviceid,
+            'completed' => 1
+         ])->count() > 0;
     }
 
     /**
