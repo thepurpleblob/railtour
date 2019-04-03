@@ -23,7 +23,7 @@ class Booking extends Admin {
         $services = array();
         foreach ($potentialservices as $service) {
             $count = $this->countStuff($service->id);
-            if ($this->canProceedWithBooking($service, $count)) {
+            if ($this->canProceedWithBooking($service, $count, true)) {
                 $services[$service->id] = $service;
             }
         }
@@ -82,13 +82,18 @@ class Booking extends Admin {
      * Basic checks to ensure booking can procede
      * @param object $service
      * @param object $count
+     * @param bool $showempty return true even if no seats left
      * TODO: Fix the date shit so it works!
      * @return bool
      */
-    public function canProceedWithBooking($service, $count) {
+    public function canProceedWithBooking($service, $count, $showempty = false) {
         $today = date('Y-m-d');
-        $seatsavailable =
-            (($count->remainingfirst > 0) or ($count->remainingstandard > 0));
+        if ($showempty) {
+            $seatsavailable = true;
+        } else {
+            $seatsavailable = 
+                (($count->remainingfirst > 0) or ($count->remainingstandard > 0));
+        }
         $isvisible = ($service->visible);
         $isindate = ($service->date > $today);
 
@@ -328,6 +333,16 @@ class Booking extends Admin {
         $booked = $count->bookedfirst + $count->bookedstandard;
 
         return round($booked * 100 / $total); 
+    }
+
+    /**
+     * Check if there are no remaining seats
+     * @param int $serviceid
+     * @return bool
+     */
+    public function anySeatsRemaining($serviceid) {
+        $count = $this->countStuff($serviceid);
+        return $count->remainingfirst || $count->remainingstandard;
     }
 
     /**

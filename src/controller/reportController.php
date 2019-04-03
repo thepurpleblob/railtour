@@ -32,7 +32,7 @@ class reportController extends coreController {
         $this->adminlib->cleanPurchases();
 
         // get the purchases for this service
-        $purchases = $this->adminlib->getPurchases($serviceid);
+        $purchases = $this->adminlib->getPurchases($serviceid, true, true);
 
         $this->View('report/list', array(
             'service' => $service,

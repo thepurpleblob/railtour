@@ -637,18 +637,29 @@ class Admin {
      * Get purchases for service
      * @param int serviceid
      * @param bool $completed
+     * @param bool $descending
      * @return array
      */
-    public function getPurchases($serviceid, $completed = true) {
+    public function getPurchases($serviceid, $completed = true, $descending = false) {
         $dbcompleted = $completed ? 1 : 0;
 
-        $purchases = ORM::forTable('purchase')
-            ->where(array(
-                'serviceid' => $serviceid,
-                'completed' => $dbcompleted,
-            ))
-            ->order_by_asc('timestamp')
-            ->findMany();
+        if (!$descending) {
+            $purchases = ORM::forTable('purchase')
+                ->where(array(
+                    'serviceid' => $serviceid,
+                    'completed' => $dbcompleted,
+                ))
+                ->order_by_asc('timestamp')
+                ->findMany();
+        } else {
+            $purchases = ORM::forTable('purchase')
+                ->where(array(
+                    'serviceid' => $serviceid,
+                    'completed' => $dbcompleted,
+                ))
+                ->order_by_desc('timestamp')
+                ->findMany();
+        }
 
         return $purchases;
     }

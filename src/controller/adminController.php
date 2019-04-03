@@ -31,6 +31,7 @@ class AdminController extends coreController {
         // counts
         foreach ($services as $service) {
             $service->progress = $this->bookinglib->getProgress($service->id);
+            $service->anyseatsremaining = $this->bookinglib->anySeatsRemaining($service->id);
             if ($service->progress > 80) {
                 $service->progresscol = 'bg-danger';
             } else if ($service->progress > 50) {
