@@ -2,24 +2,85 @@
 
 namespace thepurpleblob\core;
 
+define('SESSION_COOKIE', 'sessionpb');
+
 class coreSession {
 
-    public function __construct() {
-        session_set_save_handler(
-            array($this, "_open"),
-            array($this, "_close"),
-            array($this, "_read"),
-            array($this, "_write"),
-            array($this, "_destroy"),
-            array($this, "_gc")
-        );
+    private $pdo = null;
+
+    protected $sessionid = '';
+
+    private static $instance = null;
+
+    public function __construct($pdo) {
+        if ($_COOKIE[SESSION_COOKIE]) {
+            $this->sessionid = $_COOKIE[SESSION_COOKIE];
+        } else {
+            $this->sessionid = coreSession::generateSessionID();
+        }
 
         // Start the session
         $sessionlife = 3600;
-        session_set_cookie_params($sessionlife, '/');
-        session_name('SRPS_Railtour');
-        session_start();
-        setcookie(session_name(), session_id(), time() + $sessionlife, '/');
+        setcookie(SESSION_COOKIE, $this->sessionid, time() + $sessionlife);
+    }
+
+    /**
+     * Create sessionid
+     * @return string
+     */
+    private static function generateSessionID() {
+        $id = sha1(uniqid($_SERVER['REMOTE_ADDR'], true));
+
+        return substr($id, 0, 32);
+    }
+
+    /**
+     * Get the instance of the class
+     */
+    protected static function getInstance() {
+        if (!self::$instance ) {
+            self::$instance = new coreSession(\ORM::get_db());
+        }
+
+        return self::$instance;
+    }
+
+    /**
+     * Execute PDO query
+     * @param string $sql
+     * @param array $params
+     * @return array
+     */
+    private function _query($sql, $params = []) {
+        $stmt = $this->pdo->prepare($sql);
+        if ($stmt->execute($params)) {
+            $rows = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $rows[] = $row;
+            }
+            return $rows;
+        }
+
+        return [];
+    }
+
+    /**
+     * Internal write to database function
+     * @param string $name
+     * @param mixed $value
+     */
+    private function _write($name, $value) {
+
+    }
+
+    /**
+     * Write to session
+     * @param string $name
+     * @param mixed $value;
+     */
+    public static function write($name, $value) {
+        $session = self::getInstance();
+        $session->_write($name, $value);
     }
 
     /**

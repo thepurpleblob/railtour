@@ -3,21 +3,9 @@
 namespace thepurpleblob\railtour\controller;
 
 use thepurpleblob\core\coreController;
+use thepurpleblob\railtour\library\User;
 
-class UserController extends coreController {
-
-    protected $userlib;
-
-    /**
-     * Constructor
-     */
-    public function __construct($exception = false)
-    {
-        parent::__construct($exception);
-
-        // Library
-        $this->userlib = $this->getLibrary('User');
-    }
+class userController extends coreController {
 
     /**
      * Not an action really
@@ -25,7 +13,7 @@ class UserController extends coreController {
     public function installAction() {
 
         // Create new admin user if required
-        $this->userlib->installAdmin();
+        User::installAdmin();
     }
 
     /**
@@ -42,7 +30,7 @@ class UserController extends coreController {
     {
         $this->require_login('ROLE_ADMIN', 'user/index');
 
-        $users = $this->userlib->getUsers();
+        $users = User::getUsers();
 
         $this->View('user/index', array(
             'users' => $users,
@@ -78,7 +66,7 @@ class UserController extends coreController {
                 $rememberme = isset($data['rememberme']);
 
                 // Validate user
-                $user = $this->userlib->validate($username, $password);
+                $user = User::validate($username, $password);
 
                 if ($user) {
                     $_SESSION['user'] = $user->id;
@@ -131,7 +119,7 @@ class UserController extends coreController {
         );
 
         // find/create the user
-        $user = $this->userlib->getUser($username);
+        $user = User::getUser($username);
 
         // hopefully no errors
         $errors = null;
@@ -212,7 +200,7 @@ class UserController extends coreController {
             throw new \Exception("may not delete primary admin");
         }
         
-        $this->userlib->delete($username);
+        User::delete($username);
 
         $this->redirect('user/index/User deleted');
     }    

@@ -23,6 +23,9 @@ $schema[] = 'CREATE TABLE `destination` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci';
 
+$schema[] = 'UPDATE destination
+    SET meala=1, mealb=1, mealc=1, meald=1';
+
 $schema[] = 'CREATE TABLE `joining` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `serviceid` int(11) NOT NULL,
@@ -173,4 +176,4 @@ $schema[] = 'CREATE TABLE `session` (
   `data` text,
   `ip` varchar(32) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4'';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4';

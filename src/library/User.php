@@ -18,32 +18,39 @@ class User {
      * @param string $password
      * @return mixed user object or false
      */
-    public function validate($username, $password) {
+    public static function validate($username, $password) {
         $user = \ORM::for_table('srps_users')
             ->where(array(
                 'username' => $username,
-                'password' => md5($password),
             ))
             ->findOne();
 
-        return $user;
+        if (password_verify($password, $user->password)) {    
+            if (password_needs_rehash($user->password, PASSWORD_DEFAULT)) {
+                $user->password = password_hash($password, PASSWORD_DEFAULT);
+                $user->save();
+            }
+            return $user;
+        } else {
+            return false;
+        }
     }
 
     /**
      * Create admin user (if there isn't one)
      */
-    public function installAdmin() {
+    public static function installAdmin() {
 
         // Get all our users
         $users = \ORM::forTable('srps_users')->findMany();
 
         // if there are none, we will create the default admin user
         if (!$users) {
-            $user = \ORM::forTable('User')->create();
+            $user = \ORM::forTable('srps_users')->create();
             $user->firstname = 'admin';
             $user->lastname = 'admin';
             $user->username = 'admin';
-            $user->password = md5('admin');
+            $user->password = password_hash('password', PASSWORD_DEFAULT);
             $user->role = 'ROLE_ADMIN';
             $user->salt = '';
             $user->email = '';
@@ -56,7 +63,7 @@ class User {
      * Get all users
      * @return array user objects
      */
-    public function getUsers() {
+    public static function getUsers() {
         $users = \ORM::forTable('srps_users')->findMany();
 
         // Check if editable
@@ -73,7 +80,7 @@ class User {
      * @param string $username username to find or empty for new
      * @return object user record
      */
-    public function getUser($username) {
+    public static function getUser($username) {
         if (!empty($username)) {
             $user = \ORM::forTable('srps_users')->where('username', $username)->findOne();
             if (!$user) {
@@ -98,7 +105,7 @@ class User {
      * Delete user
      * @param string $username
      */
-    public function delete($username) {
+    public static function delete($username) {
 
         // find the user
         $user = \ORM::forTable('srps_users')->where('username', $username)->findOne();

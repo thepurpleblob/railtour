@@ -1,11 +1,38 @@
 <?php
 
 require_once(dirname(__FILE__) . '/vendor/autoload.php');
-require_once(dirname(__FILE__) . '/config.php');
 require_once(dirname(__FILE__) . '/core/version.php');
-require_once(dirname(__FILE__) . '/core/setup.php');
 
-$CFG->basepath = dirname(__FILE__);
+// Debugging helper
+function dd($message, ...$values) {
+    echo "<pre>$message";
+    foreach ($values as $value) {
+        var_dump($value);
+    }
+    echo "</pre>";
+    die;
+}
+
+// Error handling
+//$whoops = new \Whoops\Run;
+//$whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
+//$whoops->register();
+
+// Use classes
+use thepurpleblob\core\setup;
+use thepurpleblob\core\install;
+
+// Dotenv
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+// Basic setup and checks
+setup::database();
+install::action($version);
+
+// Start sessions
+$db = ORM::get_db();
+$session = new Zebra_Session($db, '8zgHypW38HjSt');
 
 error_reporting(E_ALL);
 ini_set('display_errors', 'stdout');
