@@ -1,36 +1,18 @@
 
 
-    <div class="nav" id="adminmenu">
-            <a class="nav-link" href="{{# path }}service/index{{/path}}">
-                <span class="fa-stack fa-2x">
-                    <i class="menubackground fa fa-circle fa-stack-2x"></i>
-                    <i class="fa fa-subway fa-stack-1x fa-inverse"></i>
-                </span>
-                <span class="admintext">
-                    Services
-                </span>
+    <div class="navbar navbar-expand-lg navbar-light bg-light" id="adminmenu">
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+            <a class="nav-item nav-link" href="{{# path }}service/index{{/path}}">
+                Services
             </a>
-        {{# system.admin }}
-                <a class="nav-link" href="{{# path }}user/index{{/path}}">
-                    <span class="fa-stack fa-2x">
-                        <i class="menubackground fa fa-circle fa-stack-2x"></i>
-                        <i class="fa fa-users fa-stack-1x fa-inverse"></i>
-                    </span>
-                    <span class="admintext">
-                        Users
-                    </span>
-                </a>
-        {{/ system.admin }}
+            <a class="nav-item nav-link {{^ system.admin }}disabled{{/ system.admin}}" href="{{# path }}user/index{{/path}}">
+                Users
+            </a>
         {{# serviceid }}
             {{# system.admin }}
-                    <a class="nav-link" href="{{# path }}destination/index{{/ path }}/{{ serviceid }}">
-                        <span class="fa-stack fa-2x">
-                            <i class="menubackground fa fa-circle fa-stack-2x"></i>
-                            <i class="fa fa-map-marker fa-stack-1x fa-inverse"></i>
-                        </span>
-                        <span class="admintext">
+                    <a class="nav-item nav-link" href="{{# path }}destination/index{{/ path }}/{{ serviceid }}">
                             Destinations
-                        </span>
                     </a>
                     <a class="nav-link" href="{{# path }}priceband/index{{/ path }}/{{ serviceid }}">
                         <span class="fa-stack fa-2x">
@@ -61,4 +43,6 @@
                     </span>
                 </a>
         {{/ serviceid }}
+           </div>
+        </div>
     </div>

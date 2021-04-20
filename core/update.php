@@ -32,13 +32,6 @@ class update {
             $db->exec('ALTER TABLE limits
                   ADD minparty int(11) NOT NULL,
                   ADD minpartyfirst int(11) NOT NULL');
-            $db->exec('CREATE TABLE `session_data` (
-                `session_id` varchar(32) NOT NULL default "",
-                `hash` varchar(32) NOT NULL default "",
-                `session_data` blob NOT NULL,
-                `session_expire` int(11) NOT NULL default 0,
-                PRIMARY KEY  (`session_id`)
-              )');
 
             // update password
             // (obviously, change to a better one)
@@ -47,6 +40,36 @@ class update {
                 $user->password = password_hash('password', PASSWORD_DEFAULT);
                 $user->save();
             }
+        }
+
+        if ($dbversion < 2021041900) {
+            $db->exec('TRUNCATE TABLE session');
+            $db->exec('ALTER TABLE session
+                ADD name varchar(32) NOT NULL default ""
+                AFTER access');
+            $db->exec('CREATE UNIQUE INDEX uq_idna
+                ON session
+                (id, name)');
+        }
+
+        if ($dbversion < 2021041901) {
+            $db->exec('DROP TABLE session');
+            $db->exec('CREATE TABLE session (
+                `id` int NOT NULL AUTO_INCREMENT,
+                `sessionid` varchar(32) NOT NULL,
+                `access` int unsigned DEFAULT NULL,
+                `name` varchar(32) NOT NULL DEFAULT "",
+                `data` text,
+                `ip` varchar(32) DEFAULT NULL,
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `uq_sina` (`sessionid`,`name`)
+                )');
+        }
+
+        if ($dbversion < 2021041902) {
+            $db->exec('ALTER TABLE service
+                ADD mealsinfirst int(1) NOT NULL DEFAULT 1,
+                ADD mealsinstandard int(1) NOT NULL DEFAULT 1');
         }
 
         // Make config version up to date

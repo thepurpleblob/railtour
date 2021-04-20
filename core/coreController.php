@@ -133,27 +133,25 @@ class coreController {
      */
     public function renderView($viewname, $variables=array())
     {
-        global $CFG;
 
         // No spaces
         $viewname = trim($viewname);
 
         // Check cache exists
-        $cachedir = $CFG->dirroot . '/cache';
+        $cachedir = $_ENV['dirroot'] . '/cache';
         if (!is_writable($cachedir)) {
             throw new \Exception('Cache dir is not writeable ' . $cachedir);
         }
 
         // get/setup Mustache.
         $mustache = new \Mustache_Engine(array(
-            'loader' => new \Mustache_Loader_FilesystemLoader($CFG->dirroot . '/src/view'),
+            'loader' => new \Mustache_Loader_FilesystemLoader($_ENV['dirroot'] . '/src/view'),
             'helpers' => array(
                 'yesno' => function($bool) {
                     return $bool ? 'Yes' : 'No';
                 },
                 'path' => function($path) {
-                    global $CFG;
-                    return $CFG->www . '/index.php/' . $path;
+                    return $_ENV['www'] . '/index.php/' . $path;
                 }
             ),
             'cache' => $cachedir,
@@ -177,7 +175,7 @@ class coreController {
         }
         $system->sessionid = session_id();
         $variables['system'] = $system;
-        $variables['config'] = $CFG;
+        $variables['config'] = (object)$_ENV;
         $variables['showlogin'] = (($viewname != 'user/login') && (strpos($viewname, 'booking') !== 0));
         $variables['haserrors'] = !empty($variables['errors']);
 
@@ -217,9 +215,8 @@ class coreController {
      * Create a url from path
      */
     public function Url($path) {
-        global $CFG;
 
-        return $CFG->www . '/index.php/' . $path;
+        return $_ENV['www'] . '/index.php/' . $path;
     }
 
     /**
@@ -227,10 +224,9 @@ class coreController {
      * @param string $path relative path
      * @parm bool $back flag rearwards links so they (can be) handled appropriately
      */
-    public function redirect($path, $back = false) {
-        global $CFG;
+    public function redirect($path, $back = 0) {
 
-        $_SESSION['back'] = $back;
+        Session::write('back', $back);
         $url = $this->Url($path);
         header("Location: $url");
         die;
@@ -241,10 +237,10 @@ class coreController {
      * @return mixed user object or false
      */
     public static function getSessionUser() {
-        if (empty($_SESSION['user'])) {
+        if (!Session::exists('user')) {
             return false;
         }
-        $userid = $_SESSION['user'];
+        $userid = (int)Session::read('user');
         $user = \ORM::forTable('srps_users')->findOne($userid);
         if (!$user) {
             throw new \Exception("User id $userid not found in db");
@@ -278,7 +274,7 @@ class coreController {
         }
 
         // Not logged in
-        $_SESSION['wantsurl'] = $wantsurl;
+        Session::write('wantsurl', $wantsurl);
         $this->redirect('user/login');
     }
 
@@ -292,36 +288,11 @@ class coreController {
     }
 
     /**
-     * get session
-     */
-    public function getFromSession($name, $default=null) {
-        if (isset($_SESSION[$name])) {
-            return $_SESSION[$name];
-        } else {
-            if ($default) {
-                $_SESSION[$name] = $default;
-                return $default;
-            } else
-                throw new \Exception("Session data for '$name' was not found");
-        }
-    }
-
-    /**
-     * Set a value in session
-     * @param $name
-     * @param $value
-     */
-    public function setSession($name, $value) {
-        $_SESSION[$name] = $value;
-    }
-
-    /**
      * Get library (Business rules?) class (from src/library directory)
      */
     public function getLibrary($name) {
-        global $CFG;
 
-        $classname = '\\thepurpleblob\\' . $CFG->projectname . '\\library\\' . $name;
+        $classname = '\\thepurpleblob\\' . $_ENV['projectname'] . '\\library\\' . $name;
         $lib = new $classname;
 
         // So class can reference the controller
@@ -334,20 +305,19 @@ class coreController {
      * Write to log file (only write if logging is actually enabled
      */
     public function log($message) {
-        global $CFG;
 
         // End of line character (in case it's wrong)
         $eol = "\r\n";
 
         // Forget if if debugging not enabled.
-        if (empty($CFG->debugging)) {
+        if (empty($_ENV['debugging'])) {
             return;
         }
 
-        $filename = $CFG->dirroot . '/log/debug';
+        $filename = $_ENV['dirroot'] . '/log/debug';
         $preamble = date('Y-m-d H:i | ') . $_SERVER['REMOTE_ADDR'];
-        if (isset($_SESSION['purchaseid'])) {
-            $purchaseid = $_SESSION['purchaseid'];
+        if (Session::exists('purchaseid')) {
+            $purchaseid = Session::read('purchaseid');
             $preamble .= '| ID:' . $purchaseid . $eol;
         }
         file_put_contents($filename, $preamble . $message . $eol, LOCK_EX | FILE_APPEND);

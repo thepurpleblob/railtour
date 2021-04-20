@@ -45,6 +45,7 @@ class DestinationController extends coreController
 
         $this->View('destination/index',
             array(
+                'nodestinations' => empty($destinations),
                 'destinations' => $destinations,
                 'service' => $service,
                 'serviceid' => $serviceid

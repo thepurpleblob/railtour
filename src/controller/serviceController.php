@@ -3,6 +3,7 @@
 namespace thepurpleblob\railtour\controller;
 
 use thepurpleblob\core\coreController;
+use thepurpleblob\core\Session;
 
 /**
  * Service controller.
@@ -30,8 +31,6 @@ class ServiceController extends coreController {
      * @throws \Exception
      */
     public function indexAction() {
-        global $CFG;
-
         $this->require_login('ROLE_ORGANISER', 'service/index');
 
         $allservices = $this->adminlib->getServices();
@@ -40,9 +39,9 @@ class ServiceController extends coreController {
         $maxyear = $this->adminlib->getFilteryear();
         $filteryear = $this->getParam('filter_year', 0);
         if ($filteryear) {
-            $this->setSession('filteryear', $filteryear);
+            Session::write('filteryear', $filteryear);
         } else {
-            $filteryear = $this->getFromSession('filteryear', $maxyear);
+            $filteryear = Session::read('filteryear', $maxyear);
         }
         
         // get possible years and filter results
@@ -52,7 +51,7 @@ class ServiceController extends coreController {
         foreach ($allservices as $service) {
 
             // munge some data for template while here
-            $service->showbookingbutton = $service->visible and $CFG->enablebooking;
+            $service->showbookingbutton = $service->visible and $_ENV['enablebooking'];
 
             $servicedate = $service->date;
             $year = substr($servicedate, 0, 4);
@@ -65,7 +64,7 @@ class ServiceController extends coreController {
         }
 
         // get booking status
-        $enablebooking = $CFG->enablebooking;
+        $enablebooking = $_ENV['enablebooking'];
 
         // Create form
         $form = new \stdClass();

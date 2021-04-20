@@ -2,8 +2,12 @@
 
 {{> adminmenu }}
 
-    <h3 class="adminpage_title">Destinations <i>"{{ service.name }}"</i></h3>
+<h3 class="adminpage_title">Destinations <i>"{{ service.name }}"</i></h3>
 
+{{# nodestinations }}
+    <div class="alert alert-warning">No destinations have been created</div>
+{{/ nodestinations}}
+{{^ nodestinations }}
     <table class="table table-striped">
         <thead>
             <tr>
@@ -13,7 +17,7 @@
             </tr>
         </thead>
         <tbody>
-        {{# destinations }}
+            {{# destinations }}
                 <tr>
                     <td>{{ name }}</td>
                     <td>{{ crs }}</td>
@@ -29,17 +33,18 @@
                         {{/ used }}
                     </td>
                 </tr>
-        {{/ destinations }}
-            </tbody>
-        </table>
+            {{/ destinations }}
+        </tbody>
+    </table>
+{{/ nodestinations }}
 
-        <div>
-            <a class="btn btn-primary" href="{{# path }}destination/edit{{/ path }}/{{ service.id }}/0">
-                Add a new destination
-            </a>&nbsp;
-            <a class="btn btn-warning" href="{{# path }}service/show{{/path}}/{{ service.id }}">
-                Back
-            </a>
-        </div>
+<div>
+    <a class="btn btn-primary" href="{{# path }}destination/edit{{/ path }}/{{ service.id }}/0">
+        Add a new destination
+    </a>&nbsp;
+    <a class="btn btn-warning" href="{{# path }}service/show{{/path}}/{{ service.id }}">
+        Back
+    </a>
+</div>
 
 {{> footer }}

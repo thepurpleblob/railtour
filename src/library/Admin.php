@@ -7,7 +7,7 @@ define('PURCHASE_LIFETIME', 14400);
 
 use Exception;
 use ORM;
-
+use thepurpleblob\core\Session;
 
 /**
  * Class Admin
@@ -23,9 +23,8 @@ class Admin {
      * Need to call this first, if you want to use this data
      */
     public function initialiseStations() {
-        global $CFG;
 
-        $stationsjson = file_get_contents($CFG->dirroot . '/src/assets/json/stations.json');
+        $stationsjson = file_get_contents($_ENV['dirroot'] . '/src/assets/json/stations.json');
         $locations = json_decode($stationsjson);
         $locations = $locations->locations;
         $crs = array();
@@ -146,6 +145,8 @@ class Admin {
         $service->commentbox = 0;
         $service->eticketenabled = 0;
         $service->eticketforce = 0;
+        $service->mealsinfirst = 1;
+        $service->mealsinstandard = 1;
 
         return $service;
     }
@@ -532,22 +533,23 @@ class Admin {
      * @return array
      */
     public function getLimits($serviceid) {
-        global $CFG;
 
         if (!$limits = ORM::forTable('limits')->where('serviceid', $serviceid)->findOne()) {
             
             // Limits table doesn't exist, so create a new one
             $limits = ORM::forTable('limits')->create();
             $limits->serviceid = $serviceid;
-            $limits->first = $CFG->default_limit;
-            $limits->standard = $CFG->default_limit;;
+            $limits->first = $_ENV['default_limit'];
+            $limits->standard = $_ENV['default_limit'];
             $limits->firstsingles = 0;
             $limits->meala = 0;
             $limits->mealb = 0;
             $limits->mealc = 0;
             $limits->meald = 0;
-            $limits->maxparty = $CFG->default_party;
+            $limits->maxparty = $_ENV['default_party'];
             $limits->maxpartyfirst = 0;
+            $limits->minparty = 0;
+            $limits->minpartyfirst = 0;
             $limits->save();
         }
 
@@ -572,12 +574,12 @@ class Admin {
         // an interesting problem!
 
         // See if the current purchase still exists
-        if (isset($_SESSION['purchaseid'])) {
-            $purchaseid = $_SESSION['purchaseid'];
+        if (Session::exists('purchaseid')) {
+            $purchaseid = Session::read('purchaseid');
             $purchase = ORM::forTable('purchase')->findOne($purchaseid);
             if (!$purchase) {
-                unset($_SESSION['key']);
-                unset($_SESSION['purchaseid']);
+                Session::delete('key');
+                Session::delete('purchaseid');
 
                 // Redirect out of here
                 $this->controller->View('booking/timeout');
@@ -591,8 +593,8 @@ class Admin {
     public function cleanPurchases() {
 
         // TODO (fix) remove the key and the purchaseid
-        unset($_SESSION['key']);
-        unset($_SESSION['purchaseid']);
+        Session::delete('key');
+        Session::delete('purchaseid');
 
         // get incomplete purchases
         $this->deleteOldPurchases();

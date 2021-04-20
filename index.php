@@ -3,6 +3,8 @@
 require_once(dirname(__FILE__) . '/vendor/autoload.php');
 require_once(dirname(__FILE__) . '/core/version.php');
 
+use thepurpleblob\core\Session;
+
 // Debugging helper
 function dd($message, ...$values) {
     echo "<pre>$message";
@@ -14,9 +16,9 @@ function dd($message, ...$values) {
 }
 
 // Error handling
-//$whoops = new \Whoops\Run;
-//$whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
-//$whoops->register();
+$whoops = new \Whoops\Run;
+$whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
+$whoops->register();
 
 // Use classes
 use thepurpleblob\core\setup;
@@ -29,10 +31,7 @@ $dotenv->load();
 // Basic setup and checks
 setup::database();
 install::action($version);
-
-// Start sessions
-$db = ORM::get_db();
-$session = new Zebra_Session($db, '8zgHypW38HjSt');
+Session::session_start();
 
 error_reporting(E_ALL);
 ini_set('display_errors', 'stdout');
@@ -46,7 +45,7 @@ require_once(dirname(__FILE__) . '/core/install.php');
 if (!empty($_SERVER['PATH_INFO'])) {
     $info = $_SERVER['PATH_INFO'];
 } else {
-    $info = '/' . $CFG->defaultroute;
+    $info = '/' . $_ENV['defaultroute'];
 }
 
 if ($info) {
@@ -65,7 +64,7 @@ if (!$action_name = $paths[2]) {
 }
 
 // try to load controller
-$controller_name = '\\thepurpleblob\\' . $CFG->projectname . '\\controller\\' . $controller_name . 'Controller';
+$controller_name = '\\thepurpleblob\\' . $_ENV['projectname'] . '\\controller\\' . $controller_name . 'Controller';
 if (!class_exists($controller_name)) {
     throw new Exception("Controller class does not exist - $controller_name");
 }

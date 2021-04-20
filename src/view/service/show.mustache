@@ -118,7 +118,8 @@
         <div>
             {{^ isdestinations }}
                 <div class="alert alert-warning">
-                    There are no destinations. You need to create at least one destination first.
+                    There are no destinations. 
+                    <a  href="{{# path }}destination/index{{/ path }}/{{ service.id }}">You need to create at least one destination first.</a>
                 </div>
             {{/ isdestinations }}
             {{# isdestinations }}
@@ -158,7 +159,8 @@
 
         {{^ ispricebandgroups }}
             <div class="alert alert-warning">
-                There are no price bands. You need to create at least one price band first.
+                There are no price bands. 
+                <a href="{{# path }}priceband/edit{{/ path }}/{{ service.id }}/0">You need to create at least one price band first.</a>
             </div>
         {{/ ispricebandgroups }}
 

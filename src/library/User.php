@@ -19,11 +19,13 @@ class User {
      * @return mixed user object or false
      */
     public static function validate($username, $password) {
-        $user = \ORM::for_table('srps_users')
+        if (!$user = \ORM::for_table('srps_users')
             ->where(array(
                 'username' => $username,
             ))
-            ->findOne();
+            ->findOne()) {
+                return false;
+            }
 
         if (password_verify($password, $user->password)) {    
             if (password_needs_rehash($user->password, PASSWORD_DEFAULT)) {

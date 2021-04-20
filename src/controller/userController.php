@@ -3,6 +3,7 @@
 namespace thepurpleblob\railtour\controller;
 
 use thepurpleblob\core\coreController;
+use thepurpleblob\core\Session;
 use thepurpleblob\railtour\library\User;
 
 class userController extends coreController {
@@ -69,14 +70,14 @@ class userController extends coreController {
                 $user = User::validate($username, $password);
 
                 if ($user) {
-                    $_SESSION['user'] = $user->id;
+                    Session::write('user', $user->id);
                     if ($rememberme) {
                         setcookie('railtouruser', $username, time() + 365 * 24 * 3600, '/');
                     } else {
                         setcookie('railtouruser', '', time() - 3600, '/');
                     }
-                    if (!empty($_SESSION['wantsurl'])) {
-                        $redirect = $_SESSION['wantsurl'];
+                    if (Session::exists('wantsurl')) {
+                        $redirect = Session::read('wantsurl');
                     } else {
                         $redirect = 'admin/main';
                     }
@@ -100,10 +101,10 @@ class userController extends coreController {
         global $CFG;
 
         // Just remove the user session
-        unset($_SESSION['user']);
+        Session::delete('user');
 
         // TODO: we might want to be cleverer about this...
-        $this->redirect($CFG->defaultroute);
+        $this->redirect($_ENV['defaultroute']);
     }
     
     public function editAction($username = '')

@@ -45,15 +45,14 @@ class coreForm {
     public function text($name, $label, $value, $required=false, $attrs=null, $type='text') {
         $id = $name . 'Text';
         $reqstr = $required ? 'required="true"' : '';
-        $validation = $required && !$value ? '&nbsp;<small class="rt-required">(required)</small>' : '';
-        $html = '<div class="form-group">';
+        $validation = $required && !$value ? '&nbsp;<small class="text-danger">(required)</small>' : '';
+        $html = '<div class="mb-3">';
         if ($label) {
-            $html .= '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . ' ' . $validation . '</label>';
+            $html .= '    <label for="' . $id . '" class="form-label">' . $label . ' ' . $validation . '</label>';
         }
-        $html .= '    <div class="col-sm-8">';
         $html .= '    <input type="' . $type . '" class="form-control input-sm" name="'.$name.'" id="'.$id.'" value="'.$value.'" '.
             $this->attributes($attrs) . ' ' . $reqstr . '/>';  
-        $html .= '</div></div>';
+        $html .= '</div>';
 
         return $html;
     }
@@ -70,12 +69,12 @@ class coreForm {
         $localdate = date('d/m/Y', $timestamp);
         $id = $name . 'Date';
         $reqstr = $required ? 'required' : '';;
-        $html = '<div class="form-group">';
+        $html = '<div class="mb-3">';
         if ($label) {
             $html .= '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
         }
         $html .= '    <div class="col-sm-8">';
-        $html .= '    <input type="text" class="form-control input-sm datepicker" name="'.$name.'" id="'.$id.'" value="'.$localdate.'" '.
+        $html .= '    <input type="date" class="form-control input-sm datepicker" name="'.$name.'" id="'.$id.'" value="'.$localdate.'" '.
             $this->attributes($attrs) . ' ' . $reqstr . '/>';
 
         $html .= '</div></div>';
@@ -94,15 +93,14 @@ class coreForm {
     public function textarea($name, $label, $value, $required=false, $attrs=null) {
         $id = $name . 'Textarea';
         $reqstr = $required ? 'required="true"' : '';
-        $html = '<div class="form-group">';
+        $html = '<div class="mb-3">';
         if ($label) {
-            $html .= '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
+            $html .= '    <label for="' . $id . '" class="form-label">' . $label . '</label>';
         }
-        $html .= '    <div class="col-sm-8">';
         $html .= '    <textarea class="form-control input-sm" name="'.$name.'" id="'.$id.'" '.$this->attributes($attrs) . ' ' . $reqstr . '/>';
         $html .= $value;
         $html .= '    </textarea>';
-        $html .= '</div></div>';
+        $html .= '</div>';
 
         return $html;
     }
@@ -128,12 +126,12 @@ class coreForm {
             $attrs['class'] = '';
         }
         $attrs['class'] .= ' form-control input-sm';
-        $html = '<div class="form-group">';
+        $html = '<div class="mb-3">';
         if ($label) {
             $html .= '    <label for="' . $id . '" class="col-sm-' . $labelcol . ' control-label">' . $label . '</label>';
         }
         $html .= '    <div class="col-sm-' . $inputcol .'">';
-        $html .= '    <select name="'.$name.'" id="' . $id . '" ' . $this->attributes($attrs) . '">';
+        $html .= '    <select class="form-select" name="'.$name.'" id="' . $id . '" ' . $this->attributes($attrs) . '">';
         if ($choose) {
         	$html .= '<option selected disabled="disabled">'.$choose.'</option>';
         }
