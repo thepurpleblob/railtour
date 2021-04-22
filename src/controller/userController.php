@@ -170,12 +170,12 @@ class userController extends coreController {
         // Create form
         $form = new \stdClass();
         $usernameattrs = $user->username ? ['disabled' => 'disabled'] : [];
-        $form->username = $this->form->text('username', 'Username', $user->username, FORM_REQUIRED, $usernameattrs);
-        $form->firstname = $this->form->text('firstname', 'First name', $user->firstname, FORM_REQUIRED);
-        $form->lastname = $this->form->text('lastname', 'Last name', $user->lastname, FORM_REQUIRED);
-        $form->password = $this->form->password('password', 'Password');
-        $form->role = $this->form->select('role', 'Role', $user->role, $rolechoice);
-        $form->is_active = $this->form->yesno('is_active', 'Active account?', $user->is_active);
+        $form->username = Form::text('username', 'Username', $user->username, FORM_REQUIRED, $usernameattrs);
+        $form->firstname = Form::text('firstname', 'First name', $user->firstname, FORM_REQUIRED);
+        $form->lastname = Form::text('lastname', 'Last name', $user->lastname, FORM_REQUIRED);
+        $form->password = Form::password('password', 'Password');
+        $form->role = Form::select('role', 'Role', $user->role, $rolechoice);
+        $form->is_active = Form::yesno('is_active', 'Active account?', $user->is_active);
         
         // display form
         $this->View('user/edit', array(

@@ -22,6 +22,7 @@ class Admin {
      * Set up the stations json data
      * Need to call this first, if you want to use this data
      */
+    /*
     public function initialiseStations() {
 
         $stationsjson = file_get_contents($_ENV['dirroot'] . '/src/assets/json/stations.json');
@@ -33,15 +34,17 @@ class Admin {
         }
         $this->stations = $crs;
     }
+    */
 
     /**
      * Find station/location from crs
      * @param string $crs
      * @return object
      */
-    public function getCRSLocation($crs) {
-        if (isset($this->stations[$crs])) {
-            return $this->stations[$crs];
+    public static function getCRSLocation($crs) {
+        $station = \ORM::forTable('station')->where('crs', $crs)->findOne();
+        if ($station) {
+            return $station->name;
         } else {
             return null;
         }
@@ -52,7 +55,7 @@ class Admin {
      * @param object $service
      * @return object
      */
-    public function formatService($service) {
+    public static function formatService($service) {
         $service->unixdate = strtotime($service->date);
         $service->formatteddate = date('d/m/Y', $service->unixdate);
         $service->formattedvisible = $service->visible ? 'Yes' : 'No';
@@ -65,6 +68,8 @@ class Admin {
         $service->formattedmealbname = $service->mealbname ? $service->mealbname : 'Meal B';
         $service->formattedmealcname = $service->mealcname ? $service->mealcname : 'Meal C';
         $service->formattedmealdname = $service->mealdname ? $service->mealdname : 'Meal D';
+        $service->formattedmealsinfirst = $service->mealsinfirst ? 'Yes' : 'No';
+        $service->formattedmealsinstandard = $service->mealsinstandard ? 'Yes' : 'No';
 
         // ETicket selected
         if ($service->eticketenabled) {
@@ -82,9 +87,9 @@ class Admin {
      * @param array $services
      * @return array
      */
-    public function formatServices($services) {
+    public static function formatServices($services) {
         foreach ($services as $service) {
-            $this->formatService($service);
+            Admin::formatService($service);
         }
 
         return $services;
@@ -94,7 +99,7 @@ class Admin {
      * Get all services
      * @return array
      */
-    public function getServices() {
+    public static function getServices() {
         $allservices = ORM::forTable('service')->order_by_asc('date')->findMany();
 
         return $allservices;
@@ -104,8 +109,8 @@ class Admin {
      * Get default year
      * @return int year
      */
-    public function getFilteryear() {
-        $allservices = $this->getServices();
+    public static function getFilteryear() {
+        $allservices = Admin::getServices();
         $maxyear = 0;
         foreach ($allservices as $service) {
             $year = substr($service->date, 0, 4);
@@ -121,7 +126,7 @@ class Admin {
      * Create new Service
      * @return object
      */
-    public function createService() {
+    public static function createService() {
         $service = ORM::for_table('service')->create();
         $service->code = '';
         $service->name = '';
@@ -157,11 +162,11 @@ class Admin {
      * @return object
      * @throws Exception
      */
-    public function getService($id = 0) {
+    public static function getService($id = 0) {
         $service = ORM::forTable('service')->findOne($id);
 
         if ($service === 0) {
-            $service = $this->createService();
+            $service = Admin::createService();
             return $service;
         }
 
@@ -180,7 +185,7 @@ class Admin {
      * @return array
      * @throws Exception
      */
-    public function getPricebands($serviceid, $pricebandgroupid, $save=true) {
+    public static function getPricebands($serviceid, $pricebandgroupid, $save=true) {
         $destinations = ORM::forTable('destination')->where('serviceid', $serviceid)->order_by_asc('destination.name')->findMany();
         if (!$destinations) {
             throw new Exception('No destinations found for serviceid = ' . $serviceid);
@@ -220,7 +225,7 @@ class Admin {
      * @param object $pricebandgroup
      * @return bool
      */
-    public function isPricebandUsed($pricebandgroup) {
+    public static function isPricebandUsed($pricebandgroup) {
 
         // find joining stations that specify this group
         $joinings = ORM::forTable('joining')->where('pricebandgroupid', $pricebandgroup->id)->findMany();
@@ -238,7 +243,7 @@ class Admin {
      * @param int $serviceid
      * @return array
      */
-    public function getDestinations($serviceid) {
+    public static function getDestinations($serviceid) {
         $destinations = ORM::forTable('destination')->where('serviceid', $serviceid)->findMany();
 
         return $destinations;
@@ -250,7 +255,7 @@ class Admin {
      * @return object
      * @throws Exception
      */
-    public function getDestination($destinationid) {
+    public static function getDestination($destinationid) {
         $destination = ORM::forTable('destination')->findOne($destinationid);
         if (!$destination) {
             throw new Exception('Destination was not found id=' . $destinationid);
@@ -264,7 +269,7 @@ class Admin {
      * @param int $serviceid
      * @return object
      */
-    public function createDestination($serviceid) {
+    public static function createDestination($serviceid) {
         $destination = ORM::forTable('destination')->create();
         $destination->serviceid = $serviceid;
         $destination->name = '';
@@ -286,13 +291,13 @@ class Admin {
      * @return int
      * @throws Exception
      */
-    public function deleteDestination($destinationid) {
-        $destination = $this->getDestination($destinationid);
+    public static function deleteDestination($destinationid) {
+        $destination = Admin::getDestination($destinationid);
         $serviceid = $destination->serviceid;
-        if (!$this->isDestinationUsed($destination)) {
+        if (!Admin::isDestinationUsed($destination)) {
 
             // delete pricebands associated with this
-            ORM::for_table('Priceband')->where('destinationid', $destinationid)->delete_many();
+            ORM::for_table('priceband')->where('destinationid', $destinationid)->delete_many();
 
             // delete the destination
             $destination->delete();
@@ -307,7 +312,7 @@ class Admin {
      * @param object $destination
      * @return boolean true if used
      */
-    public function isDestinationUsed($destination) {
+    public static function isDestinationUsed($destination) {
 
         // find pricebands that specify this destination
         $pricebands = ORM::forTable('priceband')->where('destinationid', $destination->id)->findMany();
@@ -333,10 +338,10 @@ class Admin {
      * @return object
      * @throws Exception
      */
-    private function mungePricebandgroup($pricebandgroup) {
+    private static function mungePricebandgroup($pricebandgroup) {
         $pricebandgroupid = $pricebandgroup->id;
         $serviceid = $pricebandgroup->serviceid;
-        $bandtable = $this->getPricebands($serviceid, $pricebandgroupid);
+        $bandtable = Admin::getPricebands($serviceid, $pricebandgroupid);
         $pricebandgroup->bandtable = $bandtable;
 
         return $pricebandgroup;
@@ -347,9 +352,9 @@ class Admin {
      * @return array
      * @throws Exception
      */
-    public function mungePricebandgroups($pricebandgroups) {
+    public static function mungePricebandgroups($pricebandgroups) {
         foreach ($pricebandgroups as $pricebandgroup) {
-            $this->mungePricebandgroup($pricebandgroup);
+            Admin::mungePricebandgroup($pricebandgroup);
         }
 
         return $pricebandgroups;
@@ -360,7 +365,7 @@ class Admin {
      * @param int $serviceid
      * @return array
      */
-    public function getPricebandgroups($serviceid) {
+    public static function getPricebandgroups($serviceid) {
         $pricebandgroups = ORM::forTable('pricebandgroup')->where('serviceid', $serviceid)->findMany();
 
         return $pricebandgroups;
@@ -372,14 +377,12 @@ class Admin {
      * @return object
      * @throws Exception
      */
-    public function getPricebandgroup($pricebandgroupid) {
+    public static function getPricebandgroup($pricebandgroupid) {
         $pricebandgroup = ORM::forTable('pricebandgroup')->findOne($pricebandgroupid);
 
         if (!$pricebandgroup) {
             throw new Exception('Unable to find Pricebandgroup record for id = ' . $pricebandgroupid);
         }
-
-        //$this->mungePricebandgroup($pricebandgroup);
 
         return $pricebandgroup;
     }
@@ -389,7 +392,7 @@ class Admin {
      * @param int $serviceid
      * @return object pricebandgroup
      */
-    public function createPricebandgroup($serviceid) {
+    public static function createPricebandgroup($serviceid) {
         $pricebandgroup = ORM::forTable('pricebandgroup')->create();
         $pricebandgroup->serviceid = $serviceid;
         $pricebandgroup->name = '';
@@ -404,10 +407,10 @@ class Admin {
      * @return int serviceid
      * @throws Exception
      */
-    public function deletePricebandgroup($pricebandgroupid) {
-        $pricebandgroup = $this->getPricebandgroup($pricebandgroupid);
+    public static function deletePricebandgroup($pricebandgroupid) {
+        $pricebandgroup = Admin::getPricebandgroup($pricebandgroupid);
         $serviceid = $pricebandgroup->serviceid;
-        if (!$this->isPricebandUsed($pricebandgroup)) {
+        if (!Admin::isPricebandUsed($pricebandgroup)) {
 
             // Remove pricebands associated with this group
             ORM::forTable('priceband')->where('pricebandgroupid', $pricebandgroupid)->deleteMany();
@@ -423,7 +426,7 @@ class Admin {
      * @param array $pricebandgroups
      * @return array
      */
-    public function pricebandgroupOptions($pricebandgroups) {
+    public static function pricebandgroupOptions($pricebandgroups) {
         $options = array();
         foreach ($pricebandgroups as $pricebandgroup) {
             $options[$pricebandgroup->id] = $pricebandgroup->name;
@@ -438,8 +441,8 @@ class Admin {
      * @return object
      * @throws Exception
      */
-    private function mungeJoining($joining) {
-        $pricebandgroup = $this->getPricebandgroup($joining->pricebandgroupid);
+    private static function mungeJoining($joining) {
+        $pricebandgroup = Admin::getPricebandgroup($joining->pricebandgroupid);
         $joining->pricebandname = $pricebandgroup->name;
 
         return $joining;
@@ -451,9 +454,9 @@ class Admin {
      * @return array
      * @throws Exception
      */
-    public function mungeJoinings($joinings) {
+    public static function mungeJoinings($joinings) {
         foreach ($joinings as $joining) {
-            $this->mungeJoining($joining);
+            Admin::mungeJoining($joining);
         }
 
         return $joinings;
@@ -465,11 +468,11 @@ class Admin {
      * @return array
      * @throws Exception
      */
-    public function getJoinings($serviceid) {
+    public static function getJoinings($serviceid) {
         $joinings = ORM::forTable('joining')->where('serviceid', $serviceid)->findMany();
 
         foreach ($joinings as $joining) {
-            $this->mungeJoining($joining);
+            Admin::mungeJoining($joining);
         }
 
         return $joinings;
@@ -481,7 +484,7 @@ class Admin {
      * @return object
      * @throws Exception
      */
-    public function getJoining($joiningid) {
+    public static function getJoining($joiningid) {
         $joining = ORM::forTable('joining')->findOne($joiningid);
         if (!$joining) {
             throw new \Exception('Unable to find joining, id = ' . $joiningid);
@@ -496,7 +499,7 @@ class Admin {
      * @param $pricebandgroups array
      * @return object new (empty) joining object
      */
-    public function createJoining($serviceid, $pricebandgroups) {
+    public static function createJoining($serviceid, $pricebandgroups) {
         $joining = ORM::forTable('joining')->create();
         $joining->serviceid = $serviceid;
         $joining->station = '';
@@ -519,8 +522,8 @@ class Admin {
      * @return int
      * @throws Exception
      */
-    public function deleteJoining($joiningid) {
-        $joining = $this->getJoining($joiningid);
+    public static function deleteJoining($joiningid) {
+        $joining = Admin::getJoining($joiningid);
         $serviceid = $joining->serviceid;
         $joining->delete();
 
@@ -532,7 +535,7 @@ class Admin {
      * @param int $serviceid
      * @return array
      */
-    public function getLimits($serviceid) {
+    public static function getLimits($serviceid) {
 
         if (!$limits = ORM::forTable('limits')->where('serviceid', $serviceid)->findOne()) {
             
@@ -558,8 +561,10 @@ class Admin {
 
     /**
      * Clear incomplete purchases that are time expired
+     * @return boolean true if current purchase has been deleted
+     *                 (redirect required)
      */
-    public function deleteOldPurchases() {
+    public static function deleteOldPurchases() {
 
         // For the time being, don't delete anything
         //return;
@@ -582,22 +587,24 @@ class Admin {
                 Session::delete('purchaseid');
 
                 // Redirect out of here
-                $this->controller->View('booking/timeout');
+                return true;
             }
         }
+
+        return false;
     }
 
     /**
      * Clear the current session data and delete any expired purchases
      */
-    public function cleanPurchases() {
+    public static function cleanPurchases() {
 
         // TODO (fix) remove the key and the purchaseid
         Session::delete('key');
         Session::delete('purchaseid');
 
         // get incomplete purchases
-        $this->deleteOldPurchases();
+        return Admin::deleteOldPurchases();
     }
 
     /**
@@ -605,7 +612,7 @@ class Admin {
      * @param object $purchase
      * @return object
      */
-    public function formatPurchase($purchase) {
+    public static function formatPurchase($purchase) {
         $purchase->unixdate = strtotime($purchase->date);
         $purchase->formatteddate = date('d/m/Y', $purchase->unixdate);
         $purchase->statusclass = '';
@@ -627,9 +634,9 @@ class Admin {
      * @param array $purchases
      * @return array
      */
-    public function formatPurchases($purchases) {
+    public static function formatPurchases($purchases) {
         foreach ($purchases as $purchase) {
-            $this->formatPurchase($purchase);
+            Admin::formatPurchase($purchase);
         }
 
         return $purchases;
@@ -642,7 +649,7 @@ class Admin {
      * @param bool $descending
      * @return array
      */
-    public function getPurchases($serviceid, $completed = true, $descending = false) {
+    public static function getPurchases($serviceid, $completed = true, $descending = false) {
         $dbcompleted = $completed ? 1 : 0;
 
         if (!$descending) {
@@ -672,7 +679,7 @@ class Admin {
      * @return object
      * @throws Exception
      */
-    public function getPurchase($purchaseid) {
+    public static function getPurchase($purchaseid) {
         $purchase = ORM::forTable('purchase')->findOne($purchaseid);
 
         if (!$purchase) {
@@ -687,7 +694,7 @@ class Admin {
      * @param int $serviceid
      * @return boolean
      */
-    public function isPricebandsConfigured($serviceid) {
+    public static function isPricebandsConfigured($serviceid) {
 
         // presumably we need at least one pricebandgroup
         $pricebandgroup_count = ORM::forTable('pricebandgroup')->where('serviceid', $serviceid)->count();
@@ -710,7 +717,7 @@ class Admin {
      * @param int $length
      * @return bool|string
      */
-    private function clean($string, $length=255) {
+    private static function clean($string, $length=255) {
 
         // sanitize the string
         $string = trim(filter_var($string, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW ));
@@ -731,7 +738,7 @@ class Admin {
      * @param string $bookedby
      * @return string
      */
-    private function getInitials($bookedby) {
+    private static function getInitials($bookedby) {
         if ($user = ORM::forTable('srps_users')->where('username', $bookedby)->findOne()) {
             $ins = substr($user->firstname, 0, 1);
             $ins .= substr($user->lastname, 0, 1);
@@ -747,7 +754,7 @@ class Admin {
      * @param array $purchases
      * @return string
      */
-    public function getExport($purchases) {
+    public static function getExport($purchases) {
         $lines = array();
 
         // create each line
@@ -764,55 +771,55 @@ class Admin {
             $l[] = $p->bookedby ? 'P' : 'O';
 
             // Tour ref
-            $l[] = $this->clean($p->code);
+            $l[] = Admin::clean($p->code);
 
             // Bkg ref
-            $l[] = $this->clean($p->bookingref);
+            $l[] = Admin::clean($p->bookingref);
 
             // Surname
-            $l[] = $this->clean($p->surname, 20);
+            $l[] = Admin::clean($p->surname, 20);
 
             // Title
-            $l[] = $this->clean($p->title, 12);
+            $l[] = Admin::clean($p->title, 12);
 
             // First names
-            $l[] = $this->clean($p->firstname, 20);
+            $l[] = Admin::clean($p->firstname, 20);
 
             // Address line 1
-            $l[] = $this->clean($p->address1, 25);
+            $l[] = Admin::clean($p->address1, 25);
 
             // Address line 2
-            $l[] = $this->clean($p->address2, 25);
+            $l[] = Admin::clean($p->address2, 25);
 
             // Address line 3
-            $l[] = $this->clean($p->city, 25);
+            $l[] = Admin::clean($p->city, 25);
 
             // Address line 4
-            $l[] = $this->clean($p->county, 25);
+            $l[] = Admin::clean($p->county, 25);
 
             // Post code
-            $l[] = $this->clean($p->postcode, 8);
+            $l[] = Admin::clean($p->postcode, 8);
 
             // Phone No
-            $l[] = $this->clean($p->phone, 15);
+            $l[] = Admin::clean($p->phone, 15);
 
             // Email
-            $l[] = $this->clean($p->email, 50);
+            $l[] = Admin::clean($p->email, 50);
 
             // Start
-            $l[] = $this->clean($p->joining);
+            $l[] = Admin::clean($p->joining);
 
             // Destination
-            $l[] = $this->clean($p->destination);
+            $l[] = Admin::clean($p->destination);
 
             // Class
-            $l[] = $this->clean($p->class, 1);
+            $l[] = Admin::clean($p->class, 1);
 
             // Adults
-            $l[] = $this->clean($p->adults);
+            $l[] = Admin::clean($p->adults);
 
             // Children
-            $l[] = $this->clean($p->children);
+            $l[] = Admin::clean($p->children);
 
             // OAP (not used)
             $l[] = '0';
@@ -821,33 +828,33 @@ class Admin {
             $l[] = '0';
 
             // Meal A
-            $l[] = $this->clean($p->meala);
+            $l[] = Admin::clean($p->meala);
 
             // Meal B
-            $l[] = $this->clean($p->mealb);
+            $l[] = Admin::clean($p->mealb);
 
             // Meal C
-            $l[] = $this->clean($p->mealc);
+            $l[] = Admin::clean($p->mealc);
 
             // Meal D
-            $l[] = $this->clean($p->meald);
+            $l[] = Admin::clean($p->meald);
 
             // Comment - add booker on the front
             // Remove 1/2 spurious characters from comment
             $comment = strlen($p->comment) < 3 ? '' : $p->comment;
             if ($p->bookedby) {
-                $bookedby = $this->getInitials($p->bookedby) . ' ';
+                $bookedby = Admin::getInitials($p->bookedby) . ' ';
             } else {
                 $bookedby = '';
             }
-            $l[] = $this->clean($bookedby . $comment, 39);
+            $l[] = Admin::clean($bookedby . $comment, 39);
 
             // Payment
-            $l[] = $this->clean(intval($p->payment * 100));
+            $l[] = Admin::clean(intval($p->payment * 100));
 
             // Booking Date
             $fdate = substr($p->date, 0, 4) . substr($p->date, 5, 2) . substr($p->date, 8, 2);
-            $l[] = $this->clean($fdate);
+            $l[] = Admin::clean($fdate);
 
             // Seat supplement
             $l[] = $p->seatsupplement ? 'Y' : 'N';
@@ -873,7 +880,7 @@ class Admin {
      * @param object $to
      * @return mixed
      */
-    private function duplicateRecord($from, $to) {
+    private static function duplicateRecord($from, $to) {
         $fields = $from->as_array();
         unset($fields['id']);
         foreach ($fields as $name => $value) {
@@ -889,13 +896,13 @@ class Admin {
      * @return object
      * @throws Exception
      */
-    public function duplicate($service) {
+    public static function duplicate($service) {
 
         $serviceid = $service->id;
 
         // duplicate service
         $newservice = ORM::forTable('service')->create();
-        $this->duplicateRecord($service, $newservice);
+        Admin::duplicateRecord($service, $newservice);
         $newservice->code = "CHANGE";
         $newservice->date = date("Y-m-d");
         $newservice->visible = 0;
@@ -909,7 +916,7 @@ class Admin {
         if ($destinations) {
             foreach ($destinations as $destination) {
                 $newdestination = ORM::forTable('destination')->create();
-                $this->duplicateRecord($destination, $newdestination);
+                Admin::duplicateRecord($destination, $newdestination);
                 $newdestination->serviceid = $newserviceid;
                 $newdestination->save();
                 $destmap[$destination->id] = $newdestination->id();
@@ -935,7 +942,7 @@ class Admin {
         if ($joinings) {
             foreach ($joinings as $joining) {
                 $newjoining = ORM::forTable('joining')->create();
-                $this->duplicateRecord($joining, $newjoining);
+                Admin::duplicateRecord($joining, $newjoining);
                 $newjoining->serviceid = $newserviceid;
                 if (empty($pbmap[$joining->pricebandgroupid])) {
                     throw new Exception('No pricebandgroup mapping exists for id = ' . $joining->pricebandgroupid);
@@ -953,7 +960,7 @@ class Admin {
                     throw new Exception('No pricebandgroup mapping exists for id = ' . $priceband->pricebandgroupid);
                 }
                 $newpriceband = ORM::forTable('priceband')->create();
-                $this->duplicateRecord($priceband, $newpriceband);
+                Admin::duplicateRecord($priceband, $newpriceband);
                 $newpriceband->serviceid = $newserviceid;
                 if (empty($destmap[$priceband->destinationid])) {
                     throw new Exception('No destination mapping exists for id = ' . $priceband->destinationid);
@@ -971,7 +978,7 @@ class Admin {
         $limits = ORM::forTable('limits')->where('serviceid', $serviceid)->findOne();
         if ($limits) {
             $newlimits = ORM::forTable('limits')->create();
-            $this->duplicateRecord($limits, $newlimits);
+            Admin::duplicateRecord($limits, $newlimits);
             $newlimits->serviceid = $newserviceid;
             $newlimits->save();
         }
@@ -984,8 +991,8 @@ class Admin {
      * @param int $serviceid
      * @return boolean
      */
-    public function is_purchases($serviceid) {
-        $this->deleteOldPurchases();
+    public static function is_purchases($serviceid) {
+        Admin::deleteOldPurchases();
         return ORM::forTable('purchase')->where([
             'serviceid' => $serviceid,
             'completed' => 1
@@ -997,11 +1004,11 @@ class Admin {
      * @param object $service
      * @throws Exception
      */
-    public function deleteService($service) {
+    public static function deleteService($service) {
 
         // Check there are no purchases. We should not have got here if there
         // are, but we'll check anyway
-        if ($this->is_purchases($service->id)) {
+        if (Admin::is_purchases($service->id)) {
             throw new Exception('Trying to delete service with purchases. id = ' . $service->id);
         }
 

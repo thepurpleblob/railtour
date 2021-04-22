@@ -4,26 +4,14 @@ namespace thepurpleblob\railtour\controller;
 
 use thepurpleblob\core\coreController;
 use thepurpleblob\core\Session;
+use thepurpleblob\core\Form;
+use thepurpleblob\railtour\library\Admin;
 
 /**
  * Service controller.
  *
  */
 class ServiceController extends coreController {
-
-    protected $adminlib;
-
-    /**
-     * Constructor
-     * @param bool $exception
-     */
-    public function __construct($exception = false)
-    {
-        parent::__construct($exception);
-
-        // Library
-        $this->adminlib = $this->getLibrary('Admin');
-    }
 
     /**
      * Lists all Service entities.
@@ -33,10 +21,10 @@ class ServiceController extends coreController {
     public function indexAction() {
         $this->require_login('ROLE_ORGANISER', 'service/index');
 
-        $allservices = $this->adminlib->getServices();
+        $allservices = Admin::getServices();
 
         // submitted year
-        $maxyear = $this->adminlib->getFilteryear();
+        $maxyear = Admin::getFilteryear();
         $filteryear = $this->getParam('filter_year', 0);
         if ($filteryear) {
             Session::write('filteryear', $filteryear);
@@ -68,12 +56,12 @@ class ServiceController extends coreController {
 
         // Create form
         $form = new \stdClass();
-        $form->filter_year = $this->form->select('filter_year', 'Tour season', $filteryear, $years, '', 4, array(
+        $form->filter_year = Form::select('filter_year', 'Tour season', $filteryear, $years, '', 4, array(
             'class' => 'select_autosubmit'
         ));
 
         $this->View('service/index', array(
-            'services' => $this->adminlib->formatServices($services),
+            'services' => Admin::formatServices($services),
             'is_services' => !empty($services),
             'enablebooking' => $enablebooking,
             'form' => $form,
@@ -92,7 +80,7 @@ class ServiceController extends coreController {
 
         $this->require_login('ROLE_ORGANISER', 'service/visible/' . $id . '/' . $visible);
 
-        $service = $this->adminlib->getService($id);
+        $service = Admin::getService($id);
 
         if (!$service) {
             throw new \Exception('Unable to find Service entity.');
@@ -116,24 +104,25 @@ class ServiceController extends coreController {
     {
         $this->require_login('ROLE_ORGANISER', 'service/show/' . $id);
 
-        $service = $this->adminlib->getService($id);
+        $service = Admin::getService($id);
 
         // Get the other information stored for this service
-        $destinations = $this->adminlib->getDestinations($id);
-        $pricebandgroups = $this->adminlib->getPricebandgroups($id);
-        $joinings = $this->adminlib->getJoinings($id);
-        $limits = $this->adminlib->getLimits($id);
+        $destinations = Admin::getDestinations($id);
+        $pricebandgroups = Admin::getPricebandgroups($id);
+        $joinings = Admin::getJoinings($id);
+        $limits = Admin::getLimits($id);
 
         $this->View('service/show', array(
-            'service' => $this->adminlib->formatService($service),
+            'service' => Admin::formatService($service),
             'destinations' => $destinations,
             'isdestinations' => !empty($destinations),
-            'pricebandgroups' => $this->adminlib->mungePricebandgroups($pricebandgroups),
+            'pricebandgroups' => Admin::mungePricebandgroups($pricebandgroups),
             'ispricebandgroups' => !empty($pricebandgroups),
             'isjoinings' => !empty($joinings),
             'joinings' => $joinings,
             'limits' => $limits,
             'serviceid' => $id,
+            'saved' => Session::read('saved_service', 0),
         ));
     }
 
@@ -148,9 +137,9 @@ class ServiceController extends coreController {
 
         // Get or create service
         if ($id) {
-            $service = $this->adminlib->getService($id);
+            $service = Admin::getService($id);
         } else {
-            $service = $this->adminlib->createService();
+            $service = Admin::createService();
         }
 
         // ETicket options
@@ -169,26 +158,28 @@ class ServiceController extends coreController {
 
         // Create form
         $form = new \stdClass;
-        $form->code = $this->form->text('code', 'Code', $service->code, FORM_REQUIRED );
-        $form->name = $this->form->text('name', 'Name', $service->name, FORM_REQUIRED );
-        $form->description = $this->form->textarea('description', 'Description', $service->description, FORM_REQUIRED );
-        $form->visible = $this->form->yesno('visible', 'Visible', $service->visible);
-        $form->date = $this->form->date('date', 'Date', $service->date, FORM_REQUIRED);
-        $form->singlesupplement = $this->form->text('singlesupplement', 'Single supplement', $service->singlesupplement);
-        $form->commentbox = $this->form->yesno('commentbox', 'Comment box', $service->commentbox);
-        $form->eticket = $this->form->select('eticket', 'ETicket mode', $service->eticket, $etoptions);
-        $form->mealaname = $this->form->text('mealaname', '', $service->mealaname, FORM_REQUIRED);
-        $form->mealavisible = $this->form->yesno('mealavisible', '', $service->mealavisible);
-        $form->mealaprice = $this->form->text('mealaprice', '', $service->mealaprice);
-        $form->mealbname = $this->form->text('mealbname', '', $service->mealbname, FORM_REQUIRED);
-        $form->mealbvisible = $this->form->yesno('mealbvisible', '', $service->mealbvisible);
-        $form->mealbprice = $this->form->text('mealbprice', '', $service->mealbprice);
-        $form->mealcname = $this->form->text('mealcname', '', $service->mealcname, FORM_REQUIRED);
-        $form->mealcvisible = $this->form->yesno('mealcvisible', '', $service->mealcvisible);
-        $form->mealcprice = $this->form->text('mealcprice', '', $service->mealcprice);
-        $form->mealdname = $this->form->text('mealdname', '', $service->mealdname, FORM_REQUIRED);
-        $form->mealdvisible = $this->form->yesno('mealdvisible', '', $service->mealdvisible);
-        $form->mealdprice = $this->form->text('mealdprice', '', $service->mealdprice);
+        $form->code = Form::text('code', 'Code', $service->code, FORM_REQUIRED );
+        $form->name = Form::text('name', 'Name', $service->name, FORM_REQUIRED );
+        $form->description = Form::textarea('description', 'Description', $service->description, FORM_REQUIRED );
+        $form->visible = Form::yesno('visible', 'Visible', $service->visible);
+        $form->date = Form::date('date', 'Date', $service->date, FORM_REQUIRED);
+        $form->singlesupplement = Form::text('singlesupplement', 'Single supplement', $service->singlesupplement);
+        $form->commentbox = Form::yesno('commentbox', 'Comment box', $service->commentbox);
+        $form->eticket = Form::select('eticket', 'ETicket mode', $service->eticket, $etoptions);
+        $form->mealsinfirst = Form::yesno('mealsinfirst', 'Meals available in First', $service->mealsinfirst);
+        $form->mealsinstandard = Form::yesno('mealsinstandard', 'Meals available in Standard', $service->mealsinstandard);
+        $form->mealaname = Form::text('mealaname', '', $service->mealaname, FORM_REQUIRED);
+        $form->mealavisible = Form::yesno('mealavisible', '', $service->mealavisible);
+        $form->mealaprice = Form::text('mealaprice', '', $service->mealaprice);
+        $form->mealbname = Form::text('mealbname', '', $service->mealbname, FORM_REQUIRED);
+        $form->mealbvisible = Form::yesno('mealbvisible', '', $service->mealbvisible);
+        $form->mealbprice = Form::text('mealbprice', '', $service->mealbprice);
+        $form->mealcname = Form::text('mealcname', '', $service->mealcname, FORM_REQUIRED);
+        $form->mealcvisible = Form::yesno('mealcvisible', '', $service->mealcvisible);
+        $form->mealcprice = Form::text('mealcprice', '', $service->mealcprice);
+        $form->mealdname = Form::text('mealdname', '', $service->mealdname, FORM_REQUIRED);
+        $form->mealdvisible = Form::yesno('mealdvisible', '', $service->mealdvisible);
+        $form->mealdprice = Form::text('mealdprice', '', $service->mealdprice);
 
         // hopefully no errors
         $errors = null;
@@ -213,6 +204,8 @@ class ServiceController extends coreController {
                 'visible' => 'required|integer',
                 'date' => 'required',
                 'eticket' => 'required|integer',
+                'mealsinfirst' => 'required|integer',
+                'mealsinstandard' => 'required|integer',
                 'commentbox' => 'required|integer',
                 'mealaname' => 'required',
                 'mealavisible' => 'required|integer',
@@ -233,9 +226,11 @@ class ServiceController extends coreController {
                 $service->name = $data['name'];
                 $service->description = $data['description'];
                 $service->visible = $data['visible'];
-                $dp = date_parse_from_format('d/m/Y', $data['date']);
+                $dp = date_parse_from_format('Y-m-d', $data['date']);
                 $service->date = $dp['year'] . '-' . $dp['month'] . '-' . $dp['day'];
                 $service->commentbox = $data['commentbox'];
+                $service->mealsinfirst = $data['mealsinfirst'];
+                $service->mealsinstandard = $data['mealsinstandard'];
                 $service->mealaname = $data['mealaname'];
                 $service->mealavisible = $data['mealavisible'];
                 $service->mealaprice = $data['mealaprice'];
@@ -259,6 +254,7 @@ class ServiceController extends coreController {
                 }
 
                 $service->save();
+                Session::writeFlash('saved_service', 1);
 
                 $id = $service->id();
                 $this->redirect('service/show/' . $id);
@@ -273,7 +269,7 @@ class ServiceController extends coreController {
             'form' => $form,
             'etoptions' => $etoptions,
             'etselected' => $etselected,
-            'errors' => $errors
+            'errors' => $errors,
         ));
     }
 
@@ -284,9 +280,9 @@ class ServiceController extends coreController {
     public function duplicateAction($serviceid) {
         $this->require_login('ROLE_ADMIN', 'service/duplicate/' . $serviceid);
 
-        $service = $this->adminlib->getService($serviceid);
+        $service = Admin::getService($serviceid);
 
-        $newservice = $this->adminlib->duplicate($service);
+        $newservice = Admin::duplicate($service);
 
         $this->redirect('service/edit/' . $newservice->id);
     }
@@ -298,10 +294,10 @@ class ServiceController extends coreController {
     public function deleteAction($serviceid) {
         $this->require_login('ROLE_ADMIN', 'service/delete/' . $serviceid);
 
-        $service = $this->adminlib->getService($serviceid);
+        $service = Admin::getService($serviceid);
 
         // If there are purchases, we're out of here
-        if ($this->adminlib->is_purchases($serviceid)) {
+        if (Admin::is_purchases($serviceid)) {
             $haspurchases = true;
         } else {
             $haspurchases = false;
@@ -311,7 +307,7 @@ class ServiceController extends coreController {
 
                 // Delete?
                 if (!empty($data['delete'])) {
-                    $this->adminlib->deleteService($service);
+                    Admin::deleteService($service);
                 }
                 $this->redirect('service/index');
             }

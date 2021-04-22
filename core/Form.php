@@ -6,12 +6,12 @@ namespace thepurpleblob\core;
 define('FORM_REQUIRED', true);
 define('FORM_OPTIONAL', false);
 
-class coreForm {
+class Form {
     
     /*
      * Fill arrays for drop-downs
      */
-    private function fill($low, $high) {
+    private static function fill($low, $high) {
         $a = array();
         for ($i=$low; $i<=$high; $i++) {
             $a[$i] = $i;
@@ -22,7 +22,7 @@ class coreForm {
     /**
      * Create additional attributes
      */
-    private function attributes($attrs) {
+    private static function attributes($attrs) {
         if (!$attrs) {
             return ' ';
         }
@@ -42,7 +42,7 @@ class coreForm {
      * @param string $type option HTML5 type
      * @return string
      */
-    public function text($name, $label, $value, $required=false, $attrs=null, $type='text') {
+    public static function text($name, $label, $value, $required=false, $attrs=null, $type='text') {
         $id = $name . 'Text';
         $reqstr = $required ? 'required="true"' : '';
         $validation = $required && !$value ? '&nbsp;<small class="text-danger">(required)</small>' : '';
@@ -51,7 +51,7 @@ class coreForm {
             $html .= '    <label for="' . $id . '" class="form-label">' . $label . ' ' . $validation . '</label>';
         }
         $html .= '    <input type="' . $type . '" class="form-control input-sm" name="'.$name.'" id="'.$id.'" value="'.$value.'" '.
-            $this->attributes($attrs) . ' ' . $reqstr . '/>';  
+            Form::attributes($attrs) . ' ' . $reqstr . '/>';  
         $html .= '</div>';
 
         return $html;
@@ -64,18 +64,18 @@ class coreForm {
      * @param bool|false $required
      * @param null $attrs
      */
-    public function date($name, $label, $date, $required=false, $attrs=null) {
+    public static function date($name, $label, $date, $required=false, $attrs=null) {
         $timestamp = strtotime($date);
-        $localdate = date('d/m/Y', $timestamp);
+        $localdate = date('Y-m-d', $timestamp);
         $id = $name . 'Date';
-        $reqstr = $required ? 'required' : '';;
+        $reqstr = $required ? 'required' : '';
         $html = '<div class="mb-3">';
         if ($label) {
             $html .= '    <label for="' . $id . '" class="col-sm-4 control-label">' . $label . '</label>';
         }
         $html .= '    <div class="col-sm-8">';
         $html .= '    <input type="date" class="form-control input-sm datepicker" name="'.$name.'" id="'.$id.'" value="'.$localdate.'" '.
-            $this->attributes($attrs) . ' ' . $reqstr . '/>';
+            Form::attributes($attrs) . ' ' . $reqstr . '/>';
 
         $html .= '</div></div>';
 
@@ -90,14 +90,15 @@ class coreForm {
      * @param null $attrs
      * @return string
      */
-    public function textarea($name, $label, $value, $required=false, $attrs=null) {
+    public static function textarea($name, $label, $value, $required=false, $attrs=null) {
         $id = $name . 'Textarea';
         $reqstr = $required ? 'required="true"' : '';
+        $validation = $required && !$value ? '&nbsp;<small class="text-danger">(required)</small>' : '';
         $html = '<div class="mb-3">';
         if ($label) {
-            $html .= '    <label for="' . $id . '" class="form-label">' . $label . '</label>';
+            $html .= '    <label for="' . $id . '" class="form-label">' . $label . $validation . '</label>';
         }
-        $html .= '    <textarea class="form-control input-sm" name="'.$name.'" id="'.$id.'" '.$this->attributes($attrs) . ' ' . $reqstr . '/>';
+        $html .= '    <textarea class="form-control input-sm" name="'.$name.'" id="'.$id.'" '. Form::attributes($attrs) . ' ' . $reqstr . '/>';
         $html .= $value;
         $html .= '    </textarea>';
         $html .= '</div>';
@@ -105,7 +106,7 @@ class coreForm {
         return $html;
     }
     
-    public function password($name, $label) {
+    public static function password($name, $label) {
         $id = $name . 'Password';
         $html = '<div class="form-group">';
         if ($label) {
@@ -118,7 +119,7 @@ class coreForm {
         return $html;
     }   
     
-    public function select($name, $label, $selected, $options, $choose='', $labelcol=4, $attrs=null) {
+    public static function select($name, $label, $selected, $options, $choose='', $labelcol=4, $attrs=null) {
         $id = $name . 'Select';
         //$inputcol = 12 - $labelcol;
         $inputcol = 4;
@@ -128,10 +129,9 @@ class coreForm {
         $attrs['class'] .= ' form-control input-sm';
         $html = '<div class="mb-3">';
         if ($label) {
-            $html .= '    <label for="' . $id . '" class="col-sm-' . $labelcol . ' control-label">' . $label . '</label>';
+            $html .= '    <label for="' . $id . '" class="control-label">' . $label . '</label>';
         }
-        $html .= '    <div class="col-sm-' . $inputcol .'">';
-        $html .= '    <select class="form-select" name="'.$name.'" id="' . $id . '" ' . $this->attributes($attrs) . '">';
+        $html .= '    <select class="form-select" name="'.$name.'" id="' . $id . '" ' . Form::attributes($attrs) . '">';
         if ($choose) {
         	$html .= '<option selected disabled="disabled">'.$choose.'</option>';
         }
@@ -143,7 +143,7 @@ class coreForm {
             }
             $html .= '<option value="'.$value.'" '.$strsel.'>'.$option.'</option>';
         }
-        $html .= '    </select></div>';
+        $html .= '    </select>';
         $html .= "</div>";
 
         return $html;
@@ -152,7 +152,7 @@ class coreForm {
     /**
      * NOTE: Label currently doesn't do anything (it used to)
      */
-    public function radio($name, $label, $selected, $options, $labelcol=4) {
+    public static function radio($name, $label, $selected, $options, $labelcol=4) {
         $id = $name . 'Radio';
         $inputcol = 12 - $labelcol;
         $html = '<div class="form-group">';
@@ -175,16 +175,27 @@ class coreForm {
         return $html;
     }
 
-    public function yesno($name, $label, $yes) {
+    public static function yesno($name, $label, $yes) {
         $options = array(
             0 => 'No',
             1 => 'Yes',
         );
         $selected = $yes ? 1 : 0;
-        return $this->select($name, $label, $selected, $options);
+        return Form::select($name, $label, $selected, $options);
     }
 
-    public function errors($errors) {
+    public static function switch($name, $label, $on) {
+        $id = $name . 'Switch';
+        $checked = $on ? 'checked' : '';
+        $html = '<div class="form-check form-switch">';
+        $html .= '  <input class="form-check-input" type="checkbox" id="' . $id . '" ' . $checked . '>';
+        $html .= '  <label class="form-check-label" for="' . $id . '">' . $label . '</label>';
+        $html .= '</div>';
+
+        return $html;
+    }
+
+    public static function errors($errors) {
         if (!$errors) {
             return;
         }
@@ -195,12 +206,12 @@ class coreForm {
         echo "</ul>";
     }
     
-    public function hidden($name, $value) {
+    public static function hidden($name, $value) {
         $id = $name . 'Hidden';
         return '<input type="hidden" name="'.$name.'" value="'.$value.'" id="' . $id . '"/>';
     }
     
-    public function buttons($save='Save', $cancel='Cancel', $swap=false) {
+    public static function buttons($save='Save', $cancel='Cancel', $swap=false) {
         $html = '<div class="form-group">';
         $html .= '<div class="col-sm-offset-4 col-sm-8">';
         if (!$swap) {

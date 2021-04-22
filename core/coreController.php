@@ -9,8 +9,6 @@ class coreController {
     /** @var GUMP  */
     protected $gump;
 
-    protected $form;
-
     protected $paths;
 
     protected $back;
@@ -48,26 +46,10 @@ class coreController {
         });
     }
 
-    /**
-     * Instantiate class in library
-     * @param string $name
-     * @return mixed
-     */
-    public function getLib($name) {
-        $namespace = 'lib';
-        $classname = $namespace . '\\' . $name;
-        $lib = new $classname;
-
-        $lib->controller = $this;
-
-        return $lib;
-    }
-
     public function __construct($exception=false) {
         
         // if exception handler, don't bother with this stuff
         if (!$exception) {
-            $this->form = new coreForm();
             $this->extendGump();
             $this->gump = new GUMP();
             if (isset($_SESSION['back'])) {

@@ -2,16 +2,13 @@
 
 {{> adminmenu }}
 
-    {{# service.name }}
-        <h3 class="adminpage_title">{{service.name}} ({{ service.code }})</h3>
-    {{/ service.name }}
-    {{^ service.name }}
-        <h3 class="adminpage_title">Create new service</h3>
-    {{/ service.name }}
+<div class="container-fluid px-4">
+
+    <h1 class="display-6 text-center">{{ service.name }}</h1>
 
     {{> formerrors }}
 
-    <form id="service-edit-form" class="validate-form form-horizontal" action="{{# path }}service/edit{{/ path }}/{{ service.id }}" method="post" >
+    <form id="service-edit-form" class="validate-form form-horizontal container border shadow p-3" action="{{# path }}service/edit{{/ path }}/{{ service.id }}" method="post" >
         {{{ form.code }}}
         {{{ form.name  }}}
         {{{ form.description }}}
@@ -20,6 +17,8 @@
         {{{ form.singlesupplement }}}
         {{{ form.commentbox }}}
         {{{ form.eticket }}}
+        {{{ form.mealsinstandard }}}
+        {{{ form.mealsinfirst }}}
 
         <table class="table">
             <thead>
@@ -63,5 +62,6 @@
             <input type="submit" name="cancel" value="Cancel" formnovalidate="formnovalidate" class="btn btn-warning" />
         </div>
     </form>
+</div>
 
 {{> footer }}

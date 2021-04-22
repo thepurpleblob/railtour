@@ -42,16 +42,6 @@ class update {
             }
         }
 
-        if ($dbversion < 2021041900) {
-            $db->exec('TRUNCATE TABLE session');
-            $db->exec('ALTER TABLE session
-                ADD name varchar(32) NOT NULL default ""
-                AFTER access');
-            $db->exec('CREATE UNIQUE INDEX uq_idna
-                ON session
-                (id, name)');
-        }
-
         if ($dbversion < 2021041901) {
             $db->exec('DROP TABLE session');
             $db->exec('CREATE TABLE session (
@@ -70,6 +60,11 @@ class update {
             $db->exec('ALTER TABLE service
                 ADD mealsinfirst int(1) NOT NULL DEFAULT 1,
                 ADD mealsinstandard int(1) NOT NULL DEFAULT 1');
+        }
+
+        if ($dbversion < 2021042200) {
+            $db->exec('ALTER TABLE session
+                ADD flash int(1) NOT NULL DEFAULT "0"');
         }
 
         // Make config version up to date

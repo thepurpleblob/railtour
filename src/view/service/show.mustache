@@ -2,315 +2,344 @@
 
 {{> adminmenu }}
 
-    <h2 class="adminpage_title">{{ service.name }} ({{ service.code }})</h2>
+<div class="container-fluid px-4">
 
-    </h2>
+    <h1 class="display-6 text-center">{{ service.name }}</h1>
 
-    <h3>Summary
-    {{# system.admin }}
-        <a  href="{{# path }}service/edit{{/path}}/{{ service.id }}" data-toggle="tooltip" title="Edit service">
-            <i class="fas fa-cog"></i>
-        </a>
-    {{/ system.admin }}
-    </h3>
+    <div class="container p-3 border shadow rounded">
 
-    {{^ service.visible }}
-    <div class="alert alert-danger">
-        This service is not currently available for booking. Change <b>Visible</b>
-        to <b>Yes</b> if required.
-    </div>
-    {{/ service.visible }}
+        {{# saved }}
+            <div class="alert alert-success">
+                Service details saved.
+            </div>
+        {{/ saved }}
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Code</th>
-                <td>{{ service.code }}</td>
-            </tr>
-            <tr>
-                <th>Name</th>
-                <td>{{ service.name }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{{ service.description }}}</td>
-            </tr>
-            <tr>
-                <th>Visible</th>
-                <td>{{ service.formattedvisible }}</td>
-            </tr>
-            <tr>
-                <th>Date</th>
-                <td>{{ service.formatteddate }}</td>
-            </tr>
-            <tr>
-                <th>First window/single supplement</th>
-                <td>&pound;{{ service.singlesupplement }}</td>
-            </tr>
-            <tr>
-                <th>Display comment field</th>
-                <td>{{ service.formattedcommentbox }}</td>
-            </tr>
-            <tr>
-                <th>ETicket mode</th>
-                <td>{{ service.formattedetmode }}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div class="accordion">
-        <h3>Meals</h3>
-        <div>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>&nbsp;</th>
-                        <th>Name</th>
-                        <th>Visible</th>
-                        <th>Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th class="lead">A</th>
-                        <td>{{ service.mealaname }}</td>
-                        <td>{{ service.formattedmealavisible }}</td>
-                        <td>&pound;{{ service.mealaprice }}</td>
-                    </tr>
-                    <tr>
-                        <th class="lead">B</th>
-                        <td>{{ service.mealbname }}</td>
-                        <td>{{ service.formattedmealbvisible }}</td>
-                        <td>&pound;{{ service.mealbprice }}</td>
-                    </tr>
-                    <tr>
-                        <th class="lead">C</th>
-                        <td>{{ service.mealcname }}</td>
-                        <td>{{ service.formattedmealcvisible }}</td>
-                        <td>&pound;{{ service.mealcprice }}</td>
-                    </tr>
-                    <tr>
-                        <th class="lead">D</th>
-                        <td>{{ service.mealdname }}</td>
-                        <td>{{ service.formattedmealdvisible }}</td>
-                        <td>&pound;{{ service.mealdprice }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-
-        <h3>Destinations
-        {{# system.admin }}
-                {{# isdestinations }}
-                    <a  href="{{# path }}destination/index{{/ path }}/{{ service.id }}" data-toggle="tooltip" title="Edit destinations">
-                    <i class="fas fa-cog"></i>
-                {{/ isdestinations }}
-                {{^ isdestinations }}
-                    <a  href="{{# path }}destination/index{{/ path }}/{{ service.id }}" data-toggle="tooltip" title="New destination">
-                    <i class="fas fa-plus"></i>
-                {{/ isdestinations }}
-            </a>
-        {{/ system.admin }}
-        </h3>
-        
-
-        <div>
-            {{^ isdestinations }}
-                <div class="alert alert-warning">
-                    There are no destinations. 
-                    <a  href="{{# path }}destination/index{{/ path }}/{{ service.id }}">You need to create at least one destination first.</a>
+        <div class="row">
+            <div class="col">
+                <h3>Summary</h3>
+            </div>
+            {{# system.admin }}
+                <div class="col text-end">
+                    <a class="btn btn-primary" href="{{# path }}service/edit{{/path}}/{{ service.id }}" data-toggle="tooltip" title="Edit service">
+                        Edit
+                    </a>
                 </div>
-            {{/ isdestinations }}
-            {{# isdestinations }}
-                <table class="table table-condensed table-striped">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{# destinations }}
-                            <tr>
-                                <td>{{ name }} <span class="badge">{{ crs }}</span></td>
-                                <td>{{{ description }}}</td>
-                            </tr>
-                        {{/ destinations }}
-                    </tbody>
-                </table>
-            {{/ isdestinations }}
+             {{/ system.admin }}
         </div>
 
+        {{^ service.visible }}
+        <div class="alert alert-danger">
+            This service is not currently available for booking. Change <b>Visible</b>
+            to <b>Yes</b> if required.
+        </div>
+        {{/ service.visible }}
 
-        <h3>Price bands
-        {{# system.admin }}
-            {{# ispricebandgroups }}
-                <a href="{{# path }}priceband/index{{/ path }}/{{ service.id }}" data-toggle="tooltip" title="Edit price bands">
-                <i class="fas fa-cog"></i>
-            {{/ ispricebandgroups }}
-            {{^ ispricebandgroups }}
-                <a href="{{# path }}priceband/edit{{/ path }}/{{ service.id }}/0" data-toggle="tooltip" title="New price band">
-                <i class="fas fa-plus"></i>
-            {{/ ispricebandgroups }}
-            </a>
-        {{/ system.admin }}
-        </h3>
-
-        {{^ ispricebandgroups }}
-            <div class="alert alert-warning">
-                There are no price bands. 
-                <a href="{{# path }}priceband/edit{{/ path }}/{{ service.id }}/0">You need to create at least one price band first.</a>
-            </div>
-        {{/ ispricebandgroups }}
-
-        {{# ispricebandgroups }}
-            <table class="table table-condensed table-hover">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{# pricebandgroups }}
-                        <tr>
-                            <td>{{ name }}</td>
-                        </tr>
-                        <tr>
-                            <td colspan="3">
-                                <table class="table table-condensed table-priceband">
-                                    <thead>
-                                        <tr>
-                                            <th>Destination</th>
-                                            <th>First</th>
-                                            <th>Standard</th>
-                                            <th>Child</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    {{# bandtable }}
-                                        <tr>
-                                            <td>{{ name }}</td>
-                                            <td>&pound;{{ first }}</td>
-                                            <td>&pound;{{ standard }}</td>
-                                            <td>&pound;{{ child }}</td>
-                                        </tr>
-                                    {{/ bandtable }}
-                                    </tbody>
-                                </table>
-                            </td>
-                        </tr>
-                    {{/ pricebandgroups }}
-                </tbody>
-            </table>
-        {{/ ispricebandgroups }}
-
-        <h3>Joining stations
-        {{# system.admin }}
-                {{# ispricebandgroups }}
-                {{# isjoinings }}
-                    <a href="{{# path }}joining/index{{/ path }}/{{ service.id }}" data-toggle="tooltip" title="Edit joining stations">
-                    <i class="fas fa-cog"></i>
-                {{/ isjoinings }}
-                {{^ isjoinings }}
-                    <a href="{{# path }}joining/edit{{/ path }}/{{ service.id }}/0" data-toggle="tooltip" title="New joining stations">
-                    <i class="fas fa-plus"></i>
-                {{/ isjoinings }}
-            {{/ ispricebandgroups }}
-            </a>
-        {{/ system.admin }}
-        </h3>
-
-        {{# ispricebandgroups }}
-        {{^ isjoinings }}
-            <div class="alert alert-warning">
-                There are no joining stations. You need to add at least one joining station first.
-            </div>
-        {{/ isjoinings }}
-        {{/ ispricebandgroups }}
-        {{^ ispricebandgroups }}
-            <div class="alert alert-warning">
-                There are no joining stations. However, you must first create Pricebands. 
-            </div>
-        {{/ ispricebandgroups }}
-
-        {{# isjoinings }}
-            <table class="table table-condensed table-striped">
-                <thead>
-                    <tr>
-                        <th>Station</th>
-                        <th>Price band</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{# joinings }}
-                        <tr>
-                            <td>{{ station }} <span class="badge">{{ crs }}</span></td>
-                            <td>{{ pricebandname }}</td>
-                        </tr>
-                    {{/ joinings }}
-                </tbody>
-            </table>
-        {{/ isjoinings }}
-
-        <h3>Booking limits
-        <a href="{{# path }}limits/edit{{/ path }}/{{ service.id }}" data-toggle="tooltip" title="Booking limits">
-        <i class="fas fa-cog"></i>
-        </a></h3>
-
-        <table class="table table-condensed table-striped">
-            <thead>
-                <tr>
-                    <th>Limit</th>
-                    <th>Value</th>
-                </tr>
-            </thead>
+        <table class="table mb-3">
             <tbody>
                 <tr>
-                    <td>Seats in first</td>
-                    <td>{{ limits.first }}</td>
+                    <th>Code</th>
+                    <td>{{ service.code }}</td>
                 </tr>
                 <tr>
-                    <td>Seats in standard</td>
-                    <td>{{ limits.standard }}</td>
+                    <th>Name</th>
+                    <td>{{ service.name }}</td>
                 </tr>
                 <tr>
-                    <td>Single seat supplements</td>
-                    <td>{{ limits.firstsingles }}
-                </td>
-                <tr>
-                    <td><b>Meal A:</b> {{ service.formattedmealaname }}</td>
-                    <td>{{ limits.meala }}</td>
+                    <th>Description</th>
+                    <td>{{{ service.description }}}</td>
                 </tr>
                 <tr>
-                    <td><b>Meal B:</b> {{ service.formattedmealbname }}</td>
-                    <td>{{ limits.mealb }}</td>
+                    <th>Visible</th>
+                    <td>{{ service.formattedvisible }}</td>
                 </tr>
                 <tr>
-                    <td><b>Meal C:</b> {{ service.formattedmealcname }}</td>
-                    <td>{{ limits.mealc }}</td>
+                    <th>Date</th>
+                    <td>{{ service.formatteddate }}</td>
                 </tr>
                 <tr>
-                    <td><b>Meal D:</b> {{ service.formattedmealdname }}</td>
-                    <td>{{ limits.meald }}</td>
+                    <th>First window/single supplement</th>
+                    <td>&pound;{{ service.singlesupplement }}</td>
                 </tr>
                 <tr>
-                    <td>Maximum party (standard)</td>
-                    <td>{{ limits.maxparty }}</td>
+                    <th>Display comment field</th>
+                    <td>{{ service.formattedcommentbox }}</td>
                 </tr>
                 <tr>
-                    <td>Maximum party (first)</td>
-                    <td>{{ limits.maxpartyfirst }}</td>
+                    <th>ETicket mode</th>
+                    <td>{{ service.formattedetmode }}</td>
                 </tr>
+                <tr>
+                    <th>Meals available in Standard</th>
+                    <td>{{ service.formattedmealsinstandard }}</td>
+                </tr>
+                <tr>
+                    <th>Meals available in First</th>
+                    <td>{{ service.formattedmealsinfirst }}</td>
+                </th>
             </tbody>
         </table>
 
-    </div> <!-- accordion wrapper -->
+        <div class="accordion mt-3">
+            <h3>Meals</h3>
+            <div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>&nbsp;</th>
+                            <th>Name</th>
+                            <th>Visible</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th class="lead">A</th>
+                            <td>{{ service.mealaname }}</td>
+                            <td>{{ service.formattedmealavisible }}</td>
+                            <td>&pound;{{ service.mealaprice }}</td>
+                        </tr>
+                        <tr>
+                            <th class="lead">B</th>
+                            <td>{{ service.mealbname }}</td>
+                            <td>{{ service.formattedmealbvisible }}</td>
+                            <td>&pound;{{ service.mealbprice }}</td>
+                        </tr>
+                        <tr>
+                            <th class="lead">C</th>
+                            <td>{{ service.mealcname }}</td>
+                            <td>{{ service.formattedmealcvisible }}</td>
+                            <td>&pound;{{ service.mealcprice }}</td>
+                        </tr>
+                        <tr>
+                            <th class="lead">D</th>
+                            <td>{{ service.mealdname }}</td>
+                            <td>{{ service.formattedmealdvisible }}</td>
+                            <td>&pound;{{ service.mealdprice }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-    <div>
-        <a class="btn btn-success" href="{{# path }}service/index{{/ path }}">
-            Back to the list
-        </a>
+
+            <div class="row">
+                <div class="col">
+                    <h3>Destinations</h3>
+                </div>
+                {{# system.admin }}
+                    <div class="col text-end">
+                        <a class="btn btn-primary"  href="{{# path }}destination/index{{/ path }}/{{ service.id }}" data-toggle="tooltip" title="Edit destinations">
+                            Edit
+                        </a>
+                    </div>    
+                {{/ system.admin }}
+            </div>
+            
+
+            <div>
+                {{^ isdestinations }}
+                    <div class="alert alert-warning">
+                        There are no destinations. 
+                        <a  href="{{# path }}destination/index{{/ path }}/{{ service.id }}">You need to create at least one destination first.</a>
+                    </div>
+                {{/ isdestinations }}
+                {{# isdestinations }}
+                    <table class="table table-condensed table-striped">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{# destinations }}
+                                <tr>
+                                    <td>{{ name }} <span class="badge">{{ crs }}</span></td>
+                                    <td>{{{ description }}}</td>
+                                </tr>
+                            {{/ destinations }}
+                        </tbody>
+                    </table>
+                {{/ isdestinations }}
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <h3>Price bands</h3>
+                </div>
+                {{# system.admin }}
+                    <div class="col text-end">
+                        <a class="btn btn-primary" href="{{# path }}priceband/index{{/ path }}/{{ service.id }}" data-toggle="tooltip" title="Edit price bands">
+                            Edit
+                        </a>
+                    </div>
+                {{/ system.admin }}
+            </div>
+
+            {{^ ispricebandgroups }}
+                {{^ isdestinations }}
+                    <div class="alert alert-warning">
+                        There are no pricebands. However, you must create at least one destination first
+                    </div>
+                {{/ isdestinations}}
+                {{# isdestinations}}
+                    <div class="alert alert-warning">
+                        There are no price bands. 
+                        <a href="{{# path }}priceband/index{{/ path }}/{{ service.id }}">You need to create at least one price band first.</a>
+                    </div>
+                {{/ isdestinations }}
+            {{/ ispricebandgroups }}
+
+            {{# ispricebandgroups }}
+                <table class="table table-condensed table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{# pricebandgroups }}
+                            <tr>
+                                <td>{{ name }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">
+                                    <table class="table table-condensed table-priceband">
+                                        <thead>
+                                            <tr>
+                                                <th>Destination</th>
+                                                <th>First</th>
+                                                <th>Standard</th>
+                                                <th>Child</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        {{# bandtable }}
+                                            <tr>
+                                                <td>{{ name }}</td>
+                                                <td>&pound;{{ first }}</td>
+                                                <td>&pound;{{ standard }}</td>
+                                                <td>&pound;{{ child }}</td>
+                                            </tr>
+                                        {{/ bandtable }}
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        {{/ pricebandgroups }}
+                    </tbody>
+                </table>
+            {{/ ispricebandgroups }}
+
+            <div class="row">
+                <div class="col">
+                    <h3>Joining stations</h3>
+                </div>
+                {{# system.admin }}
+                    <div class="col text-end">
+                        <a class="btn btn-primary" href="{{# path }}joining/index{{/ path }}/{{ service.id }}" data-toggle="tooltip" title="Edit joining stations">
+                            Edit
+                        </a>
+                    </div>
+                {{/ system.admin }}
+            </div>
+
+            {{# ispricebandgroups }}
+            {{^ isjoinings }}
+                <div class="alert alert-warning">
+                    There are no joining stations. You need to add at least one joining station first.
+                </div>
+            {{/ isjoinings }}
+            {{/ ispricebandgroups }}
+            {{^ ispricebandgroups }}
+                <div class="alert alert-warning">
+                    There are no joining stations. However, you must first create Pricebands. 
+                </div>
+            {{/ ispricebandgroups }}
+
+            {{# isjoinings }}
+                <table class="table table-condensed table-striped">
+                    <thead>
+                        <tr>
+                            <th>Station</th>
+                            <th>Price band</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{# joinings }}
+                            <tr>
+                                <td>{{ station }} <span class="badge">{{ crs }}</span></td>
+                                <td>{{ pricebandname }}</td>
+                            </tr>
+                        {{/ joinings }}
+                    </tbody>
+                </table>
+            {{/ isjoinings }}
+
+            <div class="row">
+                <div class="col">
+                    <h3>Booking limits</h3>
+                </div>
+                <div class="col text-end">
+                    <a class="btn btn-primary" href="{{# path }}limits/edit{{/ path }}/{{ service.id }}" data-toggle="tooltip" title="Booking limits">
+                        Limits
+                    </a>
+                </div>
+            </div>
+
+            <table class="table table-condensed table-striped">
+                <thead>
+                    <tr>
+                        <th>Limit</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Seats in first</td>
+                        <td>{{ limits.first }}</td>
+                    </tr>
+                    <tr>
+                        <td>Seats in standard</td>
+                        <td>{{ limits.standard }}</td>
+                    </tr>
+                    <tr>
+                        <td>Single seat supplements</td>
+                        <td>{{ limits.firstsingles }}
+                    </td>
+                    <tr>
+                        <td><b>Meal A:</b> {{ service.formattedmealaname }}</td>
+                        <td>{{ limits.meala }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Meal B:</b> {{ service.formattedmealbname }}</td>
+                        <td>{{ limits.mealb }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Meal C:</b> {{ service.formattedmealcname }}</td>
+                        <td>{{ limits.mealc }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Meal D:</b> {{ service.formattedmealdname }}</td>
+                        <td>{{ limits.meald }}</td>
+                    </tr>
+                    <tr>
+                        <td>Maximum party (standard)</td>
+                        <td>{{ limits.maxparty }}</td>
+                    </tr>
+                    <tr>
+                        <td>Maximum party (first)</td>
+                        <td>{{ limits.maxpartyfirst }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div> <!-- accordion wrapper -->
+
+        <div>
+            <a class="btn btn-success" href="{{# path }}service/index{{/ path }}">
+                Back to the list
+            </a>
+        </div>
     </div>
-
+</div>
 {{> footer }}

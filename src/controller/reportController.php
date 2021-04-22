@@ -29,7 +29,9 @@ class reportController extends coreController {
         $service = $this->adminlib->getService($serviceid);;
 
         // Clear session and delete expired purchases
-        $this->adminlib->cleanPurchases();
+        if (Admin::cleanPurchases()) {
+            $this->View('booking/timeout');
+        }
 
         // get the purchases for this service
         $purchases = $this->adminlib->getPurchases($serviceid, true, true);

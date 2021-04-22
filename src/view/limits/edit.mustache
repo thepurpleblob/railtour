@@ -2,9 +2,11 @@
 
 {{> adminmenu }}
 
+<div class="container-fluid px-4">
+
     <h3 class="adminpage_title">Booking limits edit <i>"{{ service.name }}"</i></h3>
 
-    <form id="limits-edit-form" class="form-horizontal" action="{{# path }}limits/edit{{/ path }}/{{ serviceid }}" method="post">
+    <form id="limits-edit-form" class="form-horizontal container border rounded shadow p-3" action="{{# path }}limits/edit{{/ path }}/{{ serviceid }}" method="post">
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -124,5 +126,6 @@
             <input type="submit" name="cancel" value="Cancel" class="btn btn-warning" />
         </div>
     </form>
+</div>
 
 {{> footer }}

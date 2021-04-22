@@ -7,6 +7,7 @@
 namespace thepurpleblob\railtour\controller;
 
 use thepurpleblob\core\coreController;
+use thepurpleblob\core\Form;
 
 /**
  * Joining controller.
@@ -115,15 +116,15 @@ class JoiningController extends coreController {
         $form = new \stdClass();
 
         // name='name' so CRS lookup works.
-        $form->crs = $this->form->text('crs', 'CRS', $joining->crs, true);
-        $form->station = $this->form->text('name', 'Station name', $joining->station, true);
+        $form->crs = Form::text('crs', 'CRS', $joining->crs, true);
+        $form->station = Form::text('name', 'Station name', $joining->station, true);
         $pricebandgroupoptions = $this->adminlib->pricebandgroupOptions($pricebandgroups);
-        $form->pricebandgroupid = $this->form->select('pricebandgroupid', 'Priceband', $joining->pricebandgroupid, $pricebandgroupoptions);
-        $form->meala = $this->form->yesno('meala', $service->mealaname . ' available from this station', $joining->meala);
-        $form->mealb = $this->form->yesno('mealb', $service->mealbname . ' available from this station', $joining->mealb);
-        $form->mealc = $this->form->yesno('mealc', $service->mealcname . ' available from this station', $joining->mealc);
-        $form->meald = $this->form->yesno('meald', $service->mealdname . ' available from this station', $joining->meald);
-        $form->ajaxpath = $this->form->hidden('ajaxpath', $this->Url('destination/ajax'));
+        $form->pricebandgroupid = Form::select('pricebandgroupid', 'Priceband', $joining->pricebandgroupid, $pricebandgroupoptions);
+        $form->meala = Form::yesno('meala', $service->mealaname . ' available from this station', $joining->meala);
+        $form->mealb = Form::yesno('mealb', $service->mealbname . ' available from this station', $joining->mealb);
+        $form->mealc = Form::yesno('mealc', $service->mealcname . ' available from this station', $joining->mealc);
+        $form->meald = Form::yesno('meald', $service->mealdname . ' available from this station', $joining->meald);
+        $form->ajaxpath = Form::hidden('ajaxpath', $this->Url('destination/ajax'));
 
         $this->View('joining/edit', array(
             'new' => empty($joiningid),

@@ -3,6 +3,7 @@
 namespace thepurpleblob\railtour\controller;
 
 use thepurpleblob\core\coreController;
+use thepurpleblob\core\Form;
 
 class BookingController extends coreController {
 
@@ -38,7 +39,9 @@ class BookingController extends coreController {
         $this->log('Booking started ' . $code);
 
         // Clear session and delete expired purchases
-        $this->bookinglib->cleanPurchases();
+        if (Admin::cleanPurchases()) {
+            $this->View('booking/timeout');
+        }
 
         // Get the service object
         $service = $this->bookinglib->serviceFromCode($code);
@@ -81,7 +84,9 @@ class BookingController extends coreController {
         $this->log('Booking started ' . $code);
 
         // Clear session and delete expired purchases
-        $this->bookinglib->cleanPurchases();
+        if (Admin::cleanPurchases()) {
+            $this->View('booking/timeout');
+        }
 
         // Get the service object
         $service = $this->bookinglib->serviceFromCode($code);
@@ -154,10 +159,10 @@ class BookingController extends coreController {
 
         // Create form
         $form = new \stdClass;
-        $form->title = $this->form->text('title', 'Title', $purchase->title);
-        $form->firstname = $this->form->text('firstname', 'First name', $purchase->firstname, FORM_REQUIRED);
-        $form->surname = $this->form->text('surname', 'Surname', $purchase->surname, FORM_REQUIRED);
-        $form->postcode = $this->form->text('postcode', 'Post code', $purchase->postcode, FORM_REQUIRED);
+        $form->title = Form::text('title', 'Title', $purchase->title);
+        $form->firstname = Form::text('firstname', 'First name', $purchase->firstname, FORM_REQUIRED);
+        $form->surname = Form::text('surname', 'Surname', $purchase->surname, FORM_REQUIRED);
+        $form->postcode = Form::text('postcode', 'Post code', $purchase->postcode, FORM_REQUIRED);
 
         $this->View('booking/telephone', array(
             'code' => $code,
@@ -285,8 +290,8 @@ class BookingController extends coreController {
 
         // Create form
         $form = new \stdClass();
-        $form->adults = $this->form->select('adults', 'Number of adults', $purchase->adults, $choices_adult);
-        $form->children = $this->form->select('children', 'Number of children (14 and under)', $purchase->children, $choices_children);
+        $form->adults = Form::select('adults', 'Number of adults', $purchase->adults, $choices_adult);
+        $form->children = Form::select('children', 'Number of children (14 and under)', $purchase->children, $choices_children);
 
 
         // display form
@@ -363,7 +368,7 @@ class BookingController extends coreController {
 
         // Create form
         $form = new \stdClass();
-        $form->joining = $this->form->radio('joining', '', $purchase->joining, $stations);
+        $form->joining = Form::radio('joining', '', $purchase->joining, $stations);
 
         // display form
         $this->View('booking/joining', array(
@@ -477,7 +482,7 @@ class BookingController extends coreController {
                 $gumprules[$meal->formname] = 'required|integer|min_numeric,0|max_numeric,' . $meal->maxmeals;
             }
             $fieldnames[$meal->formname] = $meal->name;
-            $meal->formselect = $this->form->select($meal->formname, $meal->label, $meal->purchase, $meal->choices);
+            $meal->formselect = Form::select($meal->formname, $meal->label, $meal->purchase, $meal->choices);
             $showingmeals = true;
         }
 
@@ -660,8 +665,8 @@ class BookingController extends coreController {
 
         // Create form
         $form = new \stdClass;
-        $form->comment = $this->form->text('comment', '', $purchase->comment, false, ['maxlength' => 37]);
-        $form->seatsupplement = $this->form->yesno('seatsupplement', 'Window seats in first class', $purchase->seatsupplement);
+        $form->comment = Form::text('comment', '', $purchase->comment, false, ['maxlength' => 37]);
+        $form->seatsupplement = Form::yesno('seatsupplement', 'Window seats in first class', $purchase->seatsupplement);
 
         // display form
         $this->View('booking/additional', array(
@@ -747,16 +752,16 @@ class BookingController extends coreController {
 
         // Create form
         $form = new \stdClass;
-        $form->title = $this->form->text('title', 'Title', $purchase->title);
-        $form->firstname = $this->form->text('firstname', 'First name', $purchase->firstname, FORM_REQUIRED);
-        $form->surname = $this->form->text('surname', 'Surname', $purchase->surname, FORM_REQUIRED);
-        $form->address1 = $this->form->text('address1', 'Address line 1', $purchase->address1, FORM_REQUIRED);
-        $form->address2 = $this->form->text('address2', 'Address line 2', $purchase->address2);
-        $form->city = $this->form->text('city', 'Town / city', $purchase->city, FORM_REQUIRED);
-        $form->county = $this->form->text('county', 'County', $purchase->county);
-        $form->postcode = $this->form->text('postcode', 'Post code', $purchase->postcode, FORM_REQUIRED);
-        $form->phone = $this->form->text('phone', 'Telephone', $purchase->phone, FORM_OPTIONAL, null, 'tel');
-        $form->email = $this->form->text('email', 'Email', $purchase->email, $purchase->bookedby ? FORM_OPTIONAL : FORM_REQUIRED, null, 'email');
+        $form->title = Form::text('title', 'Title', $purchase->title);
+        $form->firstname = Form::text('firstname', 'First name', $purchase->firstname, FORM_REQUIRED);
+        $form->surname = Form::text('surname', 'Surname', $purchase->surname, FORM_REQUIRED);
+        $form->address1 = Form::text('address1', 'Address line 1', $purchase->address1, FORM_REQUIRED);
+        $form->address2 = Form::text('address2', 'Address line 2', $purchase->address2);
+        $form->city = Form::text('city', 'Town / city', $purchase->city, FORM_REQUIRED);
+        $form->county = Form::text('county', 'County', $purchase->county);
+        $form->postcode = Form::text('postcode', 'Post code', $purchase->postcode, FORM_REQUIRED);
+        $form->phone = Form::text('phone', 'Telephone', $purchase->phone, FORM_OPTIONAL, null, 'tel');
+        $form->email = Form::text('email', 'Email', $purchase->email, $purchase->bookedby ? FORM_OPTIONAL : FORM_REQUIRED, null, 'email');
 
         // Do not show email field for telephone bookings if it is empty
         $showemail = (!$purchase->bookedby) || (!empty($purchase->email)); 

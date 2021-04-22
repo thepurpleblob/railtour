@@ -20,7 +20,6 @@ class Session {
 
         // Start the session
         $sessionlife = time() + SESSION_LIFE;
-        //setcookie(SESSION_COOKIE, $this->sessionid, time() + $sessionlife);
         setcookie(SESSION_COOKIE, $this->sessionid, [
             'expires' => $sessionlife,
             'path' => '/',
@@ -86,8 +85,9 @@ class Session {
      * Internal write to database function
      * @param string $name
      * @param mixed $value
+     * @param int $flash 0/1 (1 - flash)
      */
-    private function _write($name, $value) { 
+    private function _write($name, $value, $flash = 0) { 
         if (!$entry = \ORM::forTable('session')->where(['sessionid' => $this->sessionid, 'name' => $name])->findOne()) {
             $entry = \ORM::forTable('session')->create();
             $entry->sessionid = $this->sessionid;
@@ -96,6 +96,7 @@ class Session {
         $entry->name = $name;
         $entry->ip = Session::getIp();
         $entry->access = time();
+        $entry->flash = $flash;
         $entry->save();
     }
 
@@ -107,6 +108,17 @@ class Session {
     public static function write($name, $value) {
         $session = self::getInstance();
         $session->_write($name, $value);
+    }
+
+    /**
+     * Write flash entry
+     * (gets deleted as soon as it's read)
+     * @param string $name
+     * @param mixed $value
+     */
+    public static function writeFlash($name, $value) {
+        $session = self::getInstance();
+        $session->_write($name, $value, 1);
     }
 
     /** 
@@ -126,7 +138,13 @@ class Session {
         $entry->access = time();
         $entry->save();
 
-        return json_decode($entry->data);
+        $value =  json_decode($entry->data);
+
+        if ($entry->flash) {
+            $entry->delete();
+        }
+
+        return $value;
     }
 
     /**

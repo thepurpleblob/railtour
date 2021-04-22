@@ -3,6 +3,8 @@
 namespace thepurpleblob\railtour\controller;
 
 use thepurpleblob\core\coreController;
+use thepurpleblob\core\Form;
+use thepurpleblob\railtour\library\Admin;
 
 /**
  * Destination controller.
@@ -10,21 +12,6 @@ use thepurpleblob\core\coreController;
  */
 class DestinationController extends coreController
 {
-    protected $adminlib;
-
-    /**
-     * Constructor
-     */
-    public function __construct($exception = false)
-    {
-        parent::__construct($exception);
-
-        // Library
-        $this->adminlib = $this->getLibrary('Admin');
-
-        // Initialise station CRS codes
-        $this->adminlib->initialiseStations();
-    }
 
     /**
      * Lists all Service entities.
@@ -34,13 +21,13 @@ class DestinationController extends coreController
     {
         $this->require_login('ROLE_ADMIN', 'destination/index/' . $serviceid);
 
-        $service = $this->adminlib->getService($serviceid);
+        $service = Admin::getService($serviceid);
 
-        $destinations = $this->adminlib->getDestinations($serviceid);
+        $destinations = Admin::getDestinations($serviceid);
 
         // Check if used
         foreach ($destinations as $destination) {
-            $destination->used = $this->adminlib->isDestinationUsed($destination);
+            $destination->used = Admin::isDestinationUsed($destination);
         }
 
         $this->View('destination/index',
@@ -63,30 +50,30 @@ class DestinationController extends coreController
         $this->require_login('ROLE_ADMIN', 'destination/index/' . $serviceid . '/' . $destinationid);
 
         if ($destinationid) {
-            $destination = $this->adminlib->getDestination($destinationid);
+            $destination = Admin::getDestination($destinationid);
         } else {
-            $destination = $this->adminlib->createDestination($serviceid);
+            $destination = Admin::createDestination($serviceid);
         }
 
         // Service
         if ($destination->serviceid != $serviceid) {
             throw $this->Exception('Service ID mismatch');
         }
-        $service = $this->adminlib->getService($serviceid);
+        $service = Admin::getService($serviceid);
 
         // hopefully no errors
         $errors = null;
 
         // Create form
         $form = new \stdClass();
-        $form->crs = $this->form->text('crs', 'CRS', $destination->crs, true);
-        $form->name = $this->form->text('name', 'Name', $destination->name, true);
-        $form->description = $this->form->textarea('description', 'Description', $destination->description);
-        $form->meala = $this->form->yesno('meala', $service->mealaname . ' available for this destination', $destination->meala);
-        $form->mealb = $this->form->yesno('mealb', $service->mealbname . ' available for this destination', $destination->mealb);
-        $form->mealc = $this->form->yesno('mealc', $service->mealcname . ' available for this destination', $destination->mealc);
-        $form->meald = $this->form->yesno('meald', $service->mealdname . ' available for this destination', $destination->meald);
-        $form->ajaxpath = $this->form->hidden('ajaxpath', $this->Url('destination/ajax'));
+        $form->crs = Form::text('crs', 'CRS', $destination->crs, true);
+        $form->name = Form::text('name', 'Name', $destination->name, true);
+        $form->description = Form::textarea('description', 'Description', $destination->description);
+        $form->meala = Form::yesno('meala', $service->mealaname . ' available for this destination', $destination->meala);
+        $form->mealb = Form::yesno('mealb', $service->mealbname . ' available for this destination', $destination->mealb);
+        $form->mealc = Form::yesno('mealc', $service->mealcname . ' available for this destination', $destination->mealc);
+        $form->meald = Form::yesno('meald', $service->mealdname . ' available for this destination', $destination->meald);
+        $form->ajaxpath = Form::hidden('ajaxpath', $this->Url('destination/ajax'));
 
 
         // anything submitted?
@@ -144,7 +131,7 @@ class DestinationController extends coreController
     public function deleteAction($destinationid) {
         $this->require_login('ROLE_ADMIN', 'destination/delete/' . $destinationid);
 
-        $serviceid = $this->adminlib->deleteDestination($destinationid);
+        $serviceid = Admin::deleteDestination($destinationid);
 
         $this->redirect('destination/index/' . $serviceid);
     }
@@ -160,7 +147,7 @@ class DestinationController extends coreController
         //error_log('CRS TYPED - ' . $crs);
 
        // Attempt to find in db
-       if ($location = $this->adminlib->getCRSLocation($crs)) {
+       if ($location = Admin::getCRSLocation($crs)) {
            $station = $location->name;
        } else {
            $station = '';

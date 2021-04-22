@@ -3,25 +3,14 @@
 namespace thepurpleblob\railtour\controller;
 
 use thepurpleblob\core\coreController;
+use thepurpleblob\core\Form;
+use thepurpleblob\railtour\library\Admin;
 
 /**
  * Service controller.
  *
  */
 class PricebandController extends coreController {
-
-    protected $adminlib;
-
-    /**
-     * Constructor
-     */
-    public function __construct($exception = false)
-    {
-        parent::__construct($exception);
-
-        // Library
-        $this->adminlib = $this->getLibrary('Admin');
-    }
 
     /**
      * Lists all Priceband entities.
@@ -32,18 +21,18 @@ class PricebandController extends coreController {
     {
         $this->require_login('ROLE_ADMIN', 'priceband/index/' . $serviceid);
 
-        $service = $this->adminlib->getService($serviceid);
+        $service = Admin::getService($serviceid);
         
         // Get the Pricebandgroup
-        $pricebandgroups = $this->adminlib->getPricebandgroups($serviceid);
+        $pricebandgroups = Admin::getPricebandgroups($serviceid);
         
         // Get destinations mostly to check that there are some
-        $destinations = $this->adminlib->getDestinations($serviceid);
+        $destinations = Admin::getDestinations($serviceid);
         
         // Get the band info to go with bands
         foreach ($pricebandgroups as $group) {
-            $group->bandtable = $this->adminlib->getPricebands($serviceid, $group->id);
-            $group->used = $this->adminlib->isPricebandUsed($group);
+            $group->bandtable = Admin::getPricebands($serviceid, $group->id);
+            $group->used = Admin::isPricebandUsed($group);
         }
 
         $this->View('priceband/index',
@@ -52,7 +41,7 @@ class PricebandController extends coreController {
                 'destinations' => $destinations,
                 'service' => $service,
                 'serviceid' => $serviceid,
-                'setup' => $this->adminlib->isPricebandsConfigured($serviceid),
+                'setup' => Admin::isPricebandsConfigured($serviceid),
                 'pricebandgroupsdefined' => !empty($pricebandgroups)
                 ));
     }
@@ -83,11 +72,11 @@ class PricebandController extends coreController {
 
         // Get pricebandgroup and pricebands (new ones if no $id)
         if ($pricebandgroupid) {
-            $pricebandgroup = $this->adminlib->getPricebandgroup($pricebandgroupid);
-            $pricebands = $this->adminlib->getPricebands($serviceid, $pricebandgroupid);
+            $pricebandgroup = Admin::getPricebandgroup($pricebandgroupid);
+            $pricebands = Admin::getPricebands($serviceid, $pricebandgroupid);
         } else {
-            $pricebandgroup = $this->adminlib->createPricebandgroup($serviceid);
-            $pricebands = $this->adminlib->getPricebands($serviceid, $pricebandgroupid, false);
+            $pricebandgroup = Admin::createPricebandgroup($serviceid);
+            $pricebands = Admin::getPricebands($serviceid, $pricebandgroupid, false);
         }
         if (!$pricebandgroup) {
             throw new \Exception('Price band group not found for id ' . $pricebandgroupid);
@@ -97,7 +86,7 @@ class PricebandController extends coreController {
         if ($serviceid != $pricebandgroup->serviceid) {
             throw new \Exception('Service id mismatch');
         }
-        $service = $this->adminlib->getService($serviceid);
+        $service = Admin::getService($serviceid);
 
         // hopefully no errors
         $errors = null;
@@ -144,7 +133,7 @@ class PricebandController extends coreController {
 
         // Create form
         $form = new \stdClass();
-        $form->name = $this->form->text('name', 'Name', $pricebandgroup->name, true);
+        $form->name = Form::text('name', 'Name', $pricebandgroup->name, true);
         $count = 1;
         $form->pricebands = array();
         foreach ($pricebands as $priceband) {
@@ -178,7 +167,7 @@ class PricebandController extends coreController {
     public function deleteAction($pricebandgroupid) {
         $this->require_login('ROLE_ADMIN', 'priceband/delete/' . $pricebandgroupid);
         
-        $serviceid = $this->adminlib->deletePricebandgroup($pricebandgroupid);
+        $serviceid = Admin::deletePricebandgroup($pricebandgroupid);
 
         $this->redirect('priceband/index/' . $serviceid);
     }

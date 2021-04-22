@@ -2,10 +2,12 @@
 
 {{> adminmenu }}
 
-    <h3 class="adminpage_title">Price bands <i>"{{ service.name }}"</i></h3>
+<div class="container-fluid px-4">
+
+    <h1 class="display-6 text-center">{{ service.name }}</h1>
 
     {{^ setup }}
-        <div class="alert alert-block alert-error">
+        <div class="alert alert-warning">
             There are no pricebands. You need to create at least one priceband first.
         </div>
     {{/ setup }}
@@ -74,5 +76,6 @@
             &nbsp;
             <a class="btn btn-warning" href="{{# path }}service/show{{/ path }}/{{ service.id }}">Close</a>
         </div>
+    </div>
 
 {{> footer }}
