@@ -2,9 +2,16 @@
 
 {{> adminmenu }}
 
-<div class="container-fluid px-4">
+<div id="vapp" class="container-fluid px-4">
 
-    <h1 class="display-6 text-center">{{ service.name }}</h1>
+    <h1 class="display-6 text-center">
+        {{# service.id }}
+            {{ service.name }}
+        {{/ service.id }}
+        {{^ service.id }}
+            New service
+        {{/ service.id }}
+    </h1>
 
     {{> formerrors }}
 
@@ -12,6 +19,9 @@
         {{{ form.code }}}
         {{{ form.name  }}}
         {{{ form.description }}}
+        <div class="mb-3">
+            <vue-editor v-model="content"></vue-editor>
+        </div>
         {{{ form.visible }}}
         {{{ form.date }}}
         {{{ form.singlesupplement }}}
@@ -62,6 +72,31 @@
             <input type="submit" name="cancel" value="Cancel" formnovalidate="formnovalidate" class="btn btn-warning" />
         </div>
     </form>
+
+    
 </div>
+
+<script type="module">
+    
+    const vueApp = new Vue({
+        el: '#vapp',
+        data: { 
+            content: 'fred',
+            description: 'holding',
+        },
+        mounted: function() {
+            const v = this
+            axios.get('{{ apicall }}')
+            .then(function(response) {
+                const data = response.data
+                v.content = data.description
+                window.console.log(v.content)
+            })
+        },
+        methods: {
+        }
+    })
+</script>
+
 
 {{> footer }}

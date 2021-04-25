@@ -56,8 +56,8 @@ class ServiceController extends coreController {
 
         // Create form
         $form = new \stdClass();
-        $form->filter_year = Form::select('filter_year', 'Tour season', $filteryear, $years, '', 4, array(
-            'class' => 'select_autosubmit'
+        $form->filter_year = Form::select('filter_year', 'Tour season', $filteryear, $years, '', array(
+            '@change' => 'datechange()'
         ));
 
         $this->View('service/index', array(
@@ -160,7 +160,7 @@ class ServiceController extends coreController {
         $form = new \stdClass;
         $form->code = Form::text('code', 'Code', $service->code, FORM_REQUIRED );
         $form->name = Form::text('name', 'Name', $service->name, FORM_REQUIRED );
-        $form->description = Form::textarea('description', 'Description', $service->description, FORM_REQUIRED );
+        $form->description = Form::textarea('description', 'Description', $service->description, FORM_REQUIRED, ['v-model' => 'description'] );
         $form->visible = Form::yesno('visible', 'Visible', $service->visible);
         $form->date = Form::date('date', 'Date', $service->date, FORM_REQUIRED);
         $form->singlesupplement = Form::text('singlesupplement', 'Single supplement', $service->singlesupplement);
@@ -270,6 +270,7 @@ class ServiceController extends coreController {
             'etoptions' => $etoptions,
             'etselected' => $etselected,
             'errors' => $errors,
+            'apicall' => $this->Url('/service/jsonservice/' . $id),
         ));
     }
 
@@ -317,6 +318,18 @@ class ServiceController extends coreController {
             'service' => $service,
             'haspurchases' => $haspurchases,
         ));
+    }
+
+    /**
+     * API to get service as JSON
+     * @param service id
+     */
+    public function jsonserviceAction($serviceid) {
+        $this->require_login('ROLE_ADMIN');
+        $service = Admin::getService($serviceid);
+
+        header('Content-type:application/json;charset=utf-8');
+        echo json_encode($service->as_array());
     }
 
 }

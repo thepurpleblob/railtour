@@ -119,7 +119,7 @@ class Form {
         return $html;
     }   
     
-    public static function select($name, $label, $selected, $options, $choose='', $labelcol=4, $attrs=null) {
+    public static function select($name, $label, $selected, $options, $choose='', $attrs=[]) {
         $id = $name . 'Select';
         //$inputcol = 12 - $labelcol;
         $inputcol = 4;
@@ -131,7 +131,7 @@ class Form {
         if ($label) {
             $html .= '    <label for="' . $id . '" class="control-label">' . $label . '</label>';
         }
-        $html .= '    <select class="form-select" name="'.$name.'" id="' . $id . '" ' . Form::attributes($attrs) . '">';
+        $html .= '    <select class="form-select" name="'.$name.'" id="' . $id . '" ' . Form::attributes($attrs) . ' >';
         if ($choose) {
         	$html .= '<option selected disabled="disabled">'.$choose.'</option>';
         }

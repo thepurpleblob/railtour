@@ -2,47 +2,83 @@
 
 {{> adminmenu }}
 
+<div class="container-fluid px-4">
+
+
     {{# new }}
-        <h3 class="adminpage_title">Add new destination <i>"{{ service.name }}"</i></h3>
+        <h1 class="display-6 text-center">New destination - {{ service.name }}</h1>
     {{/ new }}
     {{^ new }}
-        <h3 class="adminpage_title">Destination edit <i>"{{ service.name }}"</i></h3>
+        <h1 class="display-6 text-center">{{ destination.name }}</h1>
     {{/ new }}
 
-    <div class="alert alert-info">
-        The description will be shown to the user to select their destination.
-        This can be a simple destination station or a destination station plus
-        an 'optional extra' (e.g. "Grange-over-Sands plus Windermere Cruise").
-        Please make sure you include all possible combinations as destinations.
+    <div id="vapp" class="container border shadow p-3">
+        <div class="alert alert-info">
+            The description will be shown to the user to select their destination.
+            This can be a simple destination station or a destination station plus
+            an 'optional extra' (e.g. "Grange-over-Sands plus Windermere Cruise").
+            Please make sure you include all possible combinations as destinations.
+        </div>
+
+        {{> form_errors }}
+
+        <form id="destination-edit-form" class="form-horizontal" action="{{# path }}destination/edit{{/ path }}/{{ service.id }}/{{ destination.id }}"
+            method="post" >
+            {{{ form.crs }}}
+            {{{ form.name }}}
+            {{{ form.description }}}
+
+            {{# service.mealavisible }}
+                <div class="row">
+                    <div class="col-4">
+                        {{{ form.meala }}}
+                    </div>
+                </div>
+            {{/ service.mealavisible }}
+            {{# service.mealbvisible }}
+                <div class="row">
+                    <div class="col-4">
+                        {{{ form.mealb }}}
+                    </div>
+                </div>
+            {{/ service.mealbvisible }}
+            {{# service.mealcvisible }}
+                <div class="row">
+                    <div class="col-4">
+                        {{{ form.mealc }}}
+                    </div>
+                </div>
+            {{/ service.mealcvisible }}
+            {{# service.mealdvisible }}
+                <div class="row">
+                    <div class="col-4">
+                        {{{ form.meald }}}
+                    </div>
+                </div>
+            {{/ service.mealdvisible }}
+
+            {{{ form.ajaxpath }}}
+
+            <div>
+                <input type="submit" name="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" name="cancel" value="Cancel" formnovalidate="formnovalidate" class="btn btn-warning" />
+            </div>
+        </form>
     </div>
 
-    {{> form_errors }}
+</div>
 
-    <form id="destination-edit-form" class="form-horizontal" action="{{# path }}destination/edit{{/ path }}/{{ service.id }}/{{ destination.id }}"
-          method="post" >
-        {{{ form.crs }}}
-        {{{ form.name }}}
-        {{{ form.description }}}
-
-        {{# service.mealavisible }}
-            {{{ form.meala }}}
-        {{/ service.mealavisible }}
-        {{# service.mealbvisible }}
-            {{{ form.mealb }}}
-        {{/ service.mealbvisible }}
-        {{# service.mealcvisible }}
-            {{{ form.mealc }}}
-        {{/ service.mealcvisible }}
-        {{# service.mealdvisible }}
-            {{{ form.meald }}}
-        {{/ service.mealdvisible }}
-
-        {{{ form.ajaxpath }}}
-
-        <div>
-            <input type="submit" name="submit" value="Save" class="btn btn-primary" />
-            <input type="submit" name="cancel" value="Cancel" formnovalidate="formnovalidate" class="btn btn-warning" />
-        </div>
-    </form>
-
+<script>
+    const vueApp = new Vue({
+        el: '#vapp',
+        data: { 
+            display: 'redbox' 
+        },
+        methods: {
+            crschange: function(event) {
+                const test = axios.get('blah')
+            }
+        }
+    })
+</sript>
 {{> footer }}

@@ -3,6 +3,7 @@
 namespace thepurpleblob\railtour\controller;
 
 use thepurpleblob\core\coreController;
+use thepurpleblob\core\Session;
 use thepurpleblob\core\Form;
 use thepurpleblob\railtour\library\Admin;
 
@@ -35,7 +36,8 @@ class DestinationController extends coreController
                 'nodestinations' => empty($destinations),
                 'destinations' => $destinations,
                 'service' => $service,
-                'serviceid' => $serviceid
+                'serviceid' => $serviceid,
+                'saved' => Session::read('save_destination', 0),
                 ));
     }
 
@@ -107,6 +109,7 @@ class DestinationController extends coreController
                     $destination->meald = $data['meald'];
                 }
                 $destination->save();
+                Session::writeFlash('save_destination', 1);
                 $this->redirect('destination/index/' . $serviceid);
                 return;
             } else {
