@@ -80,6 +80,7 @@ class LimitsController extends coreController {
                 'firstsingles' => 'required|integer',
                 'maxparty' => 'required|integer',
                 'maxpartyfirst' => 'required|integer',
+                'minpartyfirst' => 'required|integer'
             ));
             $this->gump->validation_rules($gump_rules);
             if ($data = $this->gump->run($data)) {
@@ -92,6 +93,7 @@ class LimitsController extends coreController {
                 $limits->firstsingles = $data['firstsingles'];
                 $limits->maxparty = $data['maxparty'];
                 $limits->maxpartyfirst = $data['maxpartyfirst'];
+                $limits->minpartyfirst = $data['minpartyfirst'];
                 foreach ($destinations as $destination) {
                     $fieldname = 'destination_' . $destination->crs;
                     $destination->bookinglimit = $data[$fieldname];

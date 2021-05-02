@@ -1,33 +1,42 @@
 {{> header }}
 
-    <h3 class="text-error">Telephone booking (customer not present)</h3>
+{{> usermenu }}
 
-    <div class="alert alert-warning">
-        The following purchases have matching details. Check if any match the customer. 
-    </div>
+<div class="container-fluid px-4">
 
-    {{# purchases }}
-        <div class="card purchase-card">
-            <div class="card-header">Booking completed on {{ formatteddate }}</div>
-            <div class="card-body">
-                <div class="card-text">
-                    <strong>Customer Name: </strong> {{ firstname }} {{ surname }}<br />
-                    <strong>Address: </strong>
-                    {{ address1 }}
-                    {{ address2 }}
-                    {{ city }}
-                    {{ county }}
-                    {{ postcode }}
-                    <br /><br />
-                    <a class="btn btn-primary" href="{{# path }}booking/telephone2{{/ path }}/{{ id }}">Matching customer</a>
+    <h1 class="display-6 text-center">Telephone booking (customer not present)</h1>
+
+    <div class="container border shadow p-3">
+
+        <div class="alert alert-warning">
+            The following purchases have matching details. Check if any match the customer. 
+        </div>
+
+        {{# purchases }}
+            <div class="card purchase-card">
+                <div class="card-header">Booking completed on {{ formatteddate }}</div>
+                <div class="card-body">
+                    <div class="card-text">
+                        <strong>Customer Name: </strong> {{ firstname }} {{ surname }}<br />
+                        <strong>Address: </strong>
+                        {{ address1 }}
+                        {{ address2 }}
+                        {{ city }}
+                        {{ county }}
+                        {{ postcode }}
+                        <br /><br />
+                        <a class="btn btn-primary" href="{{# path }}booking/telephone2{{/ path }}/{{ id }}">Matching customer</a>
+                    </div>
                 </div>
             </div>
-        </div>
-    {{/ purchases }}
+        {{/ purchases }}
 
-    <div class="rt-buttons">
-        <a class="btn btn-primary" href="{{# path }}booking/numbers{{/ path }}/{{ service.id }}">No matches</a>
+        <div class="rt-buttons">
+            <a class="btn btn-primary" href="{{# path }}booking/numbers{{/ path }}/{{ service.id }}">No matches</a>
+        </div>
+
     </div>
 
+</div>
 
 {{> footer }}    

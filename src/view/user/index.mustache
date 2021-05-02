@@ -2,42 +2,46 @@
 
 {{> adminmenu }}
 
-    <h3 class="adminpage_title">Railtour Admin Users</h3>
+<div class="container-fluid px-4">
 
-    {{# status }}
-        <div class="alert alert-success"><i>{{ status }}</i></div>
-    {{/status}}
+    <h1 class="display-6 text-center">Railtour Admin Users</h1>
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Username</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Role</th>
-                <th>Active?</th>
-                <th>&nbsp;</th>
-            </tr>
-        </thead>
-        <tbody>
-        {{# users }}
+    <div class="container border shadow p-3">
+
+        {{# status }}
+            <div class="alert alert-success"><i>{{ status }}</i></div>
+        {{/status}}
+
+        <table class="table table-striped">
+            <thead>
                 <tr>
-                    <td><strong>{{ username }}</strong></td>
-                    <td>{{ firstname }}</td>
-                    <td>{{ lastname }}</td>
-                    <td>{{ role }}</td>
-                    <td>{{# yesno }}{{ is_active }}{{/ yesno }}</td>
-                    <td>
-                        <a class="btn btn-primary btn-sm" href="{{# path }}user/edit/{{/ path }}/{{ username }}">Edit</a>
-                        {{^ editable }}
-                            <a class="btn btn-danger btn-sm disabled">Delete</a>
-                        {{/ editable }}
-                        {{# editable }}
-                            <a class="btn btn-danger btn-sm" href="{{# path }}user/delete{{/path}}/{{ username }}">Delete</a>
-                        {{/ editable }}
-                    </td>
+                    <th>Username</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Role</th>
+                    <th>Active?</th>
+                    <th>&nbsp;</th>
                 </tr>
-        {{/ users }}
+            </thead>
+            <tbody>
+            {{# users }}
+                    <tr>
+                        <td><strong>{{ username }}</strong></td>
+                        <td>{{ firstname }}</td>
+                        <td>{{ lastname }}</td>
+                        <td>{{ role }}</td>
+                        <td>{{# yesno }}{{ is_active }}{{/ yesno }}</td>
+                        <td>
+                            <a class="btn btn-primary btn-sm" href="{{# path }}user/edit/{{/ path }}/{{ username }}">Edit</a>
+                            {{^ editable }}
+                                <a class="btn btn-danger btn-sm disabled">Delete</a>
+                            {{/ editable }}
+                            {{# editable }}
+                                <a class="btn btn-danger btn-sm" href="{{# path }}user/delete{{/path}}/{{ username }}">Delete</a>
+                            {{/ editable }}
+                        </td>
+                    </tr>
+            {{/ users }}
             </tbody>
         </table>
 
@@ -46,5 +50,9 @@
                 Add a new user
             </a>
         </div>
+
+    </div>
+
+</div>
 
 {{> footer }}

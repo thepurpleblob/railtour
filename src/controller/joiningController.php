@@ -7,6 +7,8 @@
 namespace thepurpleblob\railtour\controller;
 
 use thepurpleblob\core\coreController;
+use thepurpleblob\core\Session;
+use thepurpleblob\railtour\library\Admin;
 use thepurpleblob\core\Form;
 
 /**
@@ -14,19 +16,6 @@ use thepurpleblob\core\Form;
  *
  */
 class JoiningController extends coreController {
-
-    protected $adminlib;
-
-    /**
-     * Constructor
-     */
-    public function __construct($exception = false)
-    {
-        parent::__construct($exception);
-
-        // Library
-        $this->adminlib = $this->getLibrary('Admin');
-    }
 
     /**
      * Lists all Joining entities.
@@ -37,16 +26,19 @@ class JoiningController extends coreController {
         $this->require_login('ROLE_ADMIN', 'joining/index/' . $serviceid);
 
         // Fetch basic data
-        $service = $this->adminlib->getService($serviceid);
-        $joinings = $this->adminlib->getJoinings($serviceid);
+        $service = Admin::getService($serviceid);
+        $joinings = Admin::getJoinings($serviceid);
 
         $this->View('joining/index',
-            array(
-                'joinings' => $this->adminlib->mungeJoinings($joinings),
+            [
+                'nojoinings' => empty($joinings),
+                'joinings' => Admin::mungeJoinings($joinings),
                 'service' => $service,
                 'serviceid' => $serviceid,
-                'setup' => $this->adminlib->isPricebandsConfigured($serviceid) && !empty($joinings),
-                ));
+                //'setup' => Admin::isPricebandsConfigured($serviceid) && !empty($joinings),
+                'setup' => Admin::isPricebandsConfigured($serviceid),
+                'saved' => Session::read('save_joining', 0),
+            ]);
     }
 
     /**
@@ -57,20 +49,20 @@ class JoiningController extends coreController {
         $this->require_login('ROLE_ADMIN', 'joining/index/' . $serviceid . '/' . $joiningid);
 
         // Fetch basic data
-        $service = $this->adminlib->getService($serviceid);
-        $pricebandgroups = $this->adminlib->getPricebandgroups($serviceid);
+        $service = Admin::getService($serviceid);
+        $pricebandgroups = Admin::getPricebandgroups($serviceid);
         if (!$pricebandgroups) {
             throw new \Exception('No pricebandgroups found for serviceid = ' . $serviceid);
         }
 
         // Find/create joining to edit
         if ($joiningid) {
-            $joining = $this->adminlib->getJoining($joiningid);
+            $joining = Admin::getJoining($joiningid);
             if ($joining->serviceid != $serviceid) {
                 throw new \Exception('Service ID mismatch for joining id = ' . $joiningid . ', service id = ' . $serviceid);
             }
         } else {
-            $joining = $this->adminlib->createJoining($serviceid, $pricebandgroups);
+            $joining = Admin::createJoining($serviceid, $pricebandgroups);
         }
 
         // hopefully no errors
@@ -106,6 +98,7 @@ class JoiningController extends coreController {
                     $joining->meald = $data['meald'];
                 }
                 $joining->save();
+                Session::writeFlash('save_joining', 1);
                 $this->redirect('joining/index/' . $serviceid);
             }  else {
                 $errors = $this->gump->get_readable_errors();
@@ -116,9 +109,14 @@ class JoiningController extends coreController {
         $form = new \stdClass();
 
         // name='name' so CRS lookup works.
-        $form->crs = Form::text('crs', 'CRS', $joining->crs, true);
-        $form->station = Form::text('name', 'Station name', $joining->station, true);
-        $pricebandgroupoptions = $this->adminlib->pricebandgroupOptions($pricebandgroups);
+        $form->crs = Form::text('crs', 'CRS', $joining->crs, true, [
+            'v-model' => 'crs',
+            '@change' => 'crschange'
+        ]);
+        $form->station = Form::text('name', 'Station name', $joining->station, true, [
+            'v-model' => 'name'
+        ]);
+        $pricebandgroupoptions = Admin::pricebandgroupOptions($pricebandgroups);
         $form->pricebandgroupid = Form::select('pricebandgroupid', 'Priceband', $joining->pricebandgroupid, $pricebandgroupoptions);
         $form->meala = Form::yesno('meala', $service->mealaname . ' available from this station', $joining->meala);
         $form->mealb = Form::yesno('mealb', $service->mealbname . ' available from this station', $joining->mealb);
@@ -145,7 +143,7 @@ class JoiningController extends coreController {
 
         $this->require_login('ROLE_ADMIN', 'joining/delete/' . $joiningid);
 
-        $serviceid = $this->adminlib->deleteJoining($joiningid);
+        $serviceid = Admin::deleteJoining($joiningid);
 
         $this->redirect('joining/index/' . $serviceid);
     }

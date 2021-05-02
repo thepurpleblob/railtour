@@ -2,46 +2,48 @@
 
 {{> adminmenu }}
 
-    <h3 class="adminpage_title">Railtour Reports</h3>
+<div class="container-fluid px-4">
 
-    <h3 class="adminpage_title">{{ service.name }}</h3>
+    <h1 class="display-6 text-center">{{ service.name }}</h1>
+
+    <div class="container border rounded shadow p-3">
     
-    <div class="alert alert-danger">
-        Any lines shaded like this did <b>NOT</b> complete payment successfully and must not
-        be allocated seats.
-    </div>
+        <div class="alert alert-danger">
+            Any lines shaded like this did <b>NOT</b> complete payment successfully and must not
+            be allocated seats.
+        </div>
 
-    <table id="purchaselist" class="table table-hover table-condensed">
-        <thead>
-            <tr>
-                <th>Ref</th>
-                <th>Status</th>
-                <th>Date</th>
-                <th><a href="{{# path }}report/list{{/ path }}/{{ service.id }}/name">Name</a></th>
-                <th>Postcode</th>
-                <th>Adults</th>
-                <th>Children</th>
-                <th>Payment</th>
-                <th>&nbsp;</th>
-            </tr>
-        </thead>
-        <tbody>
-        {{# purchases }}
-                <tr {{# statusclass }}class="alert alert-{{ . }}"{{/ statusclass }} >
-                    <td>{{ bookingref }} {{# bookedby }}<i class="fas fa-phone"></i>{{/ bookedby }}</td>
-                    <td>{{ status }}</td>
-                    <td>{{ formatteddate }}</td>
-                    <td>{{ firstname }} {{ surname }}</td>
-                    <td>{{ postcode }}</td>
-                    <td>{{ adults }}</td>
-                    <td>{{ children }}</td>
-                    <td>{{ payment }}</td>
-                    <td>
-                        <a class="btn btn-sm btn-success" href="{{# path }}report/view{{/ path }}/{{ id }}">
-                            <i class="fas fa-camera-retro"></i> View</a>
-                    </td>
+        <table id="purchaselist" class="table table-hover table-condensed">
+            <thead>
+                <tr>
+                    <th>Ref</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th><a href="{{# path }}report/list{{/ path }}/{{ service.id }}/name">Name</a></th>
+                    <th>Postcode</th>
+                    <th>Adults</th>
+                    <th>Children</th>
+                    <th>Payment</th>
+                    <th>&nbsp;</th>
                 </tr>
-        {{/ purchases }}
+            </thead>
+            <tbody>
+                {{# purchases }}
+                    <tr {{# statusclass }}class="alert alert-{{ . }}"{{/ statusclass }} >
+                        <td>{{ bookingref }} {{# bookedby }}<i class="fas fa-phone"></i>{{/ bookedby }}</td>
+                        <td>{{ status }}</td>
+                        <td>{{ formatteddate }}</td>
+                        <td>{{ firstname }} {{ surname }}</td>
+                        <td>{{ postcode }}</td>
+                        <td>{{ adults }}</td>
+                        <td>{{ children }}</td>
+                        <td>{{ payment }}</td>
+                        <td>
+                            <a class="btn btn-sm btn-success" href="{{# path }}report/view{{/ path }}/{{ id }}">
+                                <i class="fas fa-camera-retro"></i> View</a>
+                        </td>
+                    </tr>
+                {{/ purchases }}
             </tbody>
         </table>
 
@@ -50,5 +52,7 @@
                 <i class="fas fa-home"></i> Back to list
             </a>
         </div>
+    </div>
+</div>
 
 {{> footer }}

@@ -15,7 +15,7 @@
 
     {{> formerrors }}
 
-    <form id="service-edit-form" class="validate-form form-horizontal container border shadow p-3" action="{{# path }}service/edit{{/ path }}/{{ service.id }}" method="post" >
+    <form @submit="submit" id="service-edit-form" class="validate-form form-horizontal container border shadow p-3" action="{{# path }}service/edit{{/ path }}/{{ service.id }}" method="post" >
         {{{ form.code }}}
         {{{ form.name  }}}
         {{{ form.description }}}
@@ -72,31 +72,9 @@
             <input type="submit" name="cancel" value="Cancel" formnovalidate="formnovalidate" class="btn btn-warning" />
         </div>
     </form>
-
     
 </div>
 
-<script type="module">
-    
-    const vueApp = new Vue({
-        el: '#vapp',
-        data: { 
-            content: 'fred',
-            description: 'holding',
-        },
-        mounted: function() {
-            const v = this
-            axios.get('{{ apicall }}')
-            .then(function(response) {
-                const data = response.data
-                v.content = data.description
-                window.console.log(v.content)
-            })
-        },
-        methods: {
-        }
-    })
-</script>
-
+<script src="{{ config.www }}/src/assets/js/service.js" type="module"></script>
 
 {{> footer }}

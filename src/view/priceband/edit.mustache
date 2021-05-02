@@ -2,47 +2,51 @@
 
 {{> adminmenu }}
 
+<div class="container-fluid px-4">
+
     {{# new }}
-        <h3 class="adminpage_title">Create new price band <i>"{{ service.name }}"</i></h3>
+        <h1 class="display-6 text-center">New price band - {{ service.name }}</h1>
     {{/ new }}
     {{^ new }}
-        <h3 class="adminpage_title">Edit price band <i>"{{ service.name }}"</i></h3>
+        <h1 class="display-6 text-center">{{ priceband.name }}</h1>
     {{/ new }}
 
-    {{> form_errors }}
+    <div id="vapp" class="container border shadow p-3">
+        {{> form_errors }}
 
-    <form id="priceband-edit-form" class="form-horizontal" action="{{# path }}priceband/edit{{/ path }}/{{ serviceid }}/{{ pricebandgroup.id}}" method="post">
-        
-        <div>
-            {{{ form.name }}}
-        </div>        
-        
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Destination</th>
-                    <th>First</th>
-                    <th>Standard</th>
-                    <th>Child</th>
-                </tr>
-            </thead>
-            <tbody>
-            {{# form.pricebands }}
-                <tr class="pricebandrow">
-                    <td><b>{{ name }}</b></td>
-                    <td><i class="fas fa-pound-sign" aria-hidden="true"></i>{{{ first }}}</td>
-                    <td><i class="fas fa-pound-sign" aria-hidden="true"></i>{{{ standard }}}</td>
-                    <td><i class="fas fa-pound-sign" aria-hidden="true"></i>{{{ child }}}</td>
-                </tr>
-            {{/ form.pricebands }}
-            </tbody>
-        </table>
+        <form id="priceband-edit-form" class="form-horizontal" action="{{# path }}priceband/edit{{/ path }}/{{ serviceid }}/{{ pricebandgroup.id}}" method="post">
+            
+            <div>
+                {{{ form.name }}}
+            </div>        
+            
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Destination</th>
+                        <th>First</th>
+                        <th>Standard</th>
+                        <th>Child</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {{# form.pricebands }}
+                    <tr class="pricebandrow">
+                        <td><b>{{ name }}</b></td>
+                        <td><i class="fas fa-pound-sign" aria-hidden="true"></i>{{{ first }}}</td>
+                        <td><i class="fas fa-pound-sign" aria-hidden="true"></i>{{{ standard }}}</td>
+                        <td><i class="fas fa-pound-sign" aria-hidden="true"></i>{{{ child }}}</td>
+                    </tr>
+                {{/ form.pricebands }}
+                </tbody>
+            </table>
 
-        <div>
-            <input type="submit" name="submit" value="Save" class="btn btn-primary" />
-            <input type="submit" name="cancel" value="Cancel" formnovalidate="formnovalidate" class="btn btn-warning" />
-        </div>
-    </form>
-
+            <div>
+                <input type="submit" name="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" name="cancel" value="Cancel" formnovalidate="formnovalidate" class="btn btn-warning" />
+            </div>
+        </form>
+    </div>
+</div>
 {{> footer }}
  

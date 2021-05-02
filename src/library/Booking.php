@@ -3,18 +3,20 @@
 namespace thepurpleblob\railtour\library;
 
 use Exception;
+use thepurpleblob\railtour\library\Admin;
+use thepurpleblob\core\Session;
 
 /**
  * Class Booking
  * @package thepurpleblob\railtour\library
  */
-class Booking extends Admin {
+class Booking  {
 
     /**
      * Get services available to book
      * @return array zero-indexed for mustache
      */
-    public function availableServices() {
+    public static function availableServices() {
 
         // Get 'likely' candidates
         $potentialservices = \ORM::for_table('service')->where('visible', true)->order_by_asc('date')->findMany();
@@ -22,8 +24,8 @@ class Booking extends Admin {
         // We need to do more checks to see if it is really available
         $services = array();
         foreach ($potentialservices as $service) {
-            $count = $this->countStuff($service->id);
-            if ($this->canProceedWithBooking($service, $count, true)) {
+            $count = Booking::countStuff($service->id);
+            if (Booking::canProceedWithBooking($service, $count, true)) {
                 $services[$service->id] = $service;
             }
         }
@@ -37,7 +39,7 @@ class Booking extends Admin {
      * @return mixed
      * @throws Exception
      */
-    public function serviceFromCode($code) {
+    public static function serviceFromCode($code) {
         $services = \ORM::forTable('service')->where('code', $code)->findMany();
 
         if (!$services) {
@@ -58,7 +60,7 @@ class Booking extends Admin {
      * @param $limits object
      * @return int
      */
-    public function getMaxparty($limits) {
+    public static function getMaxparty($limits) {
         $maxparty = $limits->maxparty;
         if ($limits->maxpartyfirst and ($limits->maxpartyfirst > $maxparty)) {
             $maxparty = $limits->maxpartyfirst;
@@ -73,7 +75,7 @@ class Booking extends Admin {
      * @param mixed $value int or null
      * @return int
      */
-    protected function zero($value) {
+    protected static function zero($value) {
         $result = ($value) ? $value : 0;
         return $result;
     }
@@ -86,7 +88,7 @@ class Booking extends Admin {
      * TODO: Fix the date shit so it works!
      * @return bool
      */
-    public function canProceedWithBooking($service, $count, $showempty = false) {
+    public static function canProceedWithBooking($service, $count, $showempty = false) {
         $today = date('Y-m-d');
         if ($showempty) {
             $seatsavailable = true;
@@ -106,13 +108,13 @@ class Booking extends Admin {
      * @param object $currentpurchase (purchase in progress)
      * @return object various counts
      */
-    public function countStuff($serviceid, $currentpurchase=null) {
+    public static function countStuff($serviceid, $currentpurchase=null) {
 
         // get incomplete purchases
-        $this->deleteOldPurchases();
+        Admin::deleteOldPurchases();
 
         // Always a chance the limits don't exist yet
-        $limits = $this->getLimits($serviceid);
+        $limits = Admin::getLimits($serviceid);
 
         // Create counts entity
         $count = new \stdClass();
@@ -127,7 +129,7 @@ class Booking extends Admin {
                 'serviceid' => $serviceid,
             ))
             ->findOne();
-        $count->bookedfirst = $this->zero($fbtotal->fb);
+        $count->bookedfirst = Booking::zero($fbtotal->fb);
 
         // get first class in progress
         $fptotal = \ORM::forTable('purchase')
@@ -139,7 +141,7 @@ class Booking extends Admin {
                 'serviceid' => $serviceid,
             ))
             ->findOne();
-        $count->pendingfirst = $this->zero($fptotal->fp);
+        $count->pendingfirst = Booking::zero($fptotal->fp);
 
         // if we have a purchase in progress, adjust current pending count
         if ($currentpurchase) {
@@ -164,7 +166,7 @@ class Booking extends Admin {
                 'serviceid' => $serviceid,
             ))
             ->findOne();
-        $count->bookedstandard = $this->zero($sbtotal->sb);
+        $count->bookedstandard = Booking::zero($sbtotal->sb);
 
         // get standard class in progress
         $sptotal = \ORM::forTable('purchase')
@@ -176,7 +178,7 @@ class Booking extends Admin {
                 'serviceid' => $serviceid,
             ))
             ->findOne();
-        $count->pendingstandard = $this->zero($sptotal->sp);
+        $count->pendingstandard = Booking::zero($sptotal->sp);
 
         // if we have a purchase object then remove any current count from pending
         if ($currentpurchase) {
@@ -203,7 +205,7 @@ class Booking extends Admin {
             ))
             ->where_gt('seatsupplement', 0)
             ->findOne();
-        $count->bookedfirstsingles = $this->zero($suptotal->sup);
+        $count->bookedfirstsingles = Booking::zero($suptotal->sup);
 
         // get first supplements in progress. Note field is a boolean and applies to
         // all persons in booking (which is only asked for parties of one or two)
@@ -217,7 +219,7 @@ class Booking extends Admin {
             ))
             ->where_gt('seatsupplement', 0)
             ->findOne();
-        $count->pendingfirstsingles = $this->zero($supptotal->supp);
+        $count->pendingfirstsingles = Booking::zero($supptotal->supp);
 
         // First suppliements remainder
         $count->remainingfirstsingles = $limits->firstsingles - $count->bookedfirstsingles - $count->pendingfirstsingles;
@@ -234,10 +236,10 @@ class Booking extends Admin {
                 'serviceid' => $serviceid,
             ))
             ->findOne();
-        $count->bookedmeala = $this->zero($bmeals->suma);
-        $count->bookedmealb = $this->zero($bmeals->sumb);
-        $count->bookedmealc = $this->zero($bmeals->sumc);
-        $count->bookedmeald = $this->zero($bmeals->sumd);
+        $count->bookedmeala = Booking::zero($bmeals->suma);
+        $count->bookedmealb = Booking::zero($bmeals->sumb);
+        $count->bookedmealc = Booking::zero($bmeals->sumc);
+        $count->bookedmeald = Booking::zero($bmeals->sumd);
 
         // Get pending meals
         $pmeals = \ORM::forTable('purchase')
@@ -251,10 +253,10 @@ class Booking extends Admin {
                 'serviceid' => $serviceid,
             ))
             ->findOne();
-        $count->pendingmeala = $this->zero($pmeals->suma);
-        $count->pendingmealb = $this->zero($pmeals->sumb);
-        $count->pendingmealc = $this->zero($pmeals->sumc);
-        $count->pendingmeald = $this->zero($pmeals->sumd);
+        $count->pendingmeala = Booking::zero($pmeals->suma);
+        $count->pendingmealb = Booking::zero($pmeals->sumb);
+        $count->pendingmealc = Booking::zero($pmeals->sumc);
+        $count->pendingmeald = Booking::zero($pmeals->sumd);
 
         // Get remaining meals
         $count->remainingmeala = $limits->meala - $count->bookedmeala - $count->pendingmeala;
@@ -281,7 +283,7 @@ class Booking extends Admin {
                     'serviceid' => $serviceid,
                 ))
                 ->findOne();
-            $destinationcount->booked = $this->zero($dtotal->dt);
+            $destinationcount->booked = Booking::zero($dtotal->dt);
 
             // pending bookings for this destination
             $ptotal = \ORM::forTable('purchase')
@@ -293,7 +295,7 @@ class Booking extends Admin {
                     'serviceid' => $serviceid,
                 ))
                 ->findOne();
-            $dpcount = $this->zero($ptotal->pt);
+            $dpcount = Booking::zero($ptotal->pt);
 
             // if we have a purchase object then remove any current count from pending
             if ($currentpurchase) {
@@ -325,9 +327,9 @@ class Booking extends Admin {
      * @param int $serviceid
      * @param int percentage
      */
-    public function getProgress($serviceid) {
+    public static function getProgress($serviceid) {
 
-        $count = $this->countStuff($serviceid);
+        $count = Booking::countStuff($serviceid);
 
         $total = $count->bookedfirst + $count->remainingfirst + $count->bookedstandard + $count->remainingstandard;
         $booked = $count->bookedfirst + $count->bookedstandard;
@@ -340,28 +342,28 @@ class Booking extends Admin {
      * @param int $serviceid
      * @return bool
      */
-    public function anySeatsRemaining($serviceid) {
-        $count = $this->countStuff($serviceid);
+    public static function anySeatsRemaining($serviceid) {
+        $count = Booking::countStuff($serviceid);
         return $count->remainingfirst || $count->remainingstandard;
     }
 
     /**
      * Find the current (session) purchase record and/or create a new one if
      * needed
+     * @param object $controller 
      * @param int $serviceid - needed to create new purchase record only
      * @return object
      * @throws Exception
      */
-    public function getSessionPurchase($serviceid = 0) {
-        global $CFG;
+    public static function getSessionPurchase($controller, $serviceid = 0) {
 
-        if (isset($_SESSION['key'])) {
-            $key = $_SESSION['key'];
+        if (Session::exists('key')) {
+            $key = Session::read('key');
 
             // then we should have the record id and they should match
-            if (isset($_SESSION['purchaseid'])) {
-                $purchaseid = $_SESSION['purchaseid'];
-                $purchase = $this->getPurchaseRecord($purchaseid);
+            if (Session::exists('purchaseid')) {
+                $purchaseid = Session::read('purchaseid');
+                $purchase = Booking::getPurchaseRecord($purchaseid);
 
                 // if it exists then the key must match (security I think)
                 if ($purchase->seskey != $key) {
@@ -390,26 +392,26 @@ class Booking extends Admin {
         // if no code or serviceid was supplied then we are not allowed a new one
         // ...so display expired message
         if (!$serviceid) {
-            $this->controller->View('booking/timeout');
+            $controller->View('booking/timeout');
         }
 
         // Get the service
-        $service = $this->getService($serviceid);
+        $service = Admin::getService($serviceid);
 
         // create a random new key
         $key = sha1(microtime(true).mt_rand(10000,90000));
 
         // create the new purchase object
-        $purchase = $this->getPurchaseRecord(0, $service);
+        $purchase = Booking::getPurchaseRecord(0, $service);
 
         // id should be set automagically
         $id = $purchase->id();
-        $_SESSION['key'] = $key;
-        $_SESSION['purchaseid'] = $id;
+        Session::write('key', $key);
+        Session::write('purchaseid', $id);
 
         // we can add the booking ref (generated from id) and key
         $purchase->seskey = $key;
-        $purchase->bookingref = $CFG->sage_prefix . $id;
+        $purchase->bookingref = $_ENV['sage_prefix'] . $id;
         $purchase->save();
 
         return $purchase;
@@ -422,7 +424,7 @@ class Booking extends Admin {
      * @return object purchase - existing or new
      * @throws Exception
      */
-    private function getPurchaseRecord($purchaseid, $service = null) {
+    private static function getPurchaseRecord($purchaseid, $service = null) {
         if (!$purchaseid) {
             if (!$service) {
                 throw new Exception('A service object must be supplied to create new purchase');
@@ -487,7 +489,7 @@ class Booking extends Admin {
      * @param bool $none if true add 'None' in 0th place
      * @return array
      */
-    public function choices($max, $none) {
+    public static function choices($max, $none) {
         if ($none) {
             $choices = array(0 => 'None');
         } else {
@@ -506,7 +508,7 @@ class Booking extends Admin {
      * @return array stations
      * @throws Exception
      */
-    public function getJoiningStations($serviceid) {
+    public static function getJoiningStations($serviceid) {
         $joinings = \ORM::forTable('joining')->where('serviceid', $serviceid)->findMany();
         if (!$joinings) {
             throw new Exception('No joining stations found for service id = ' . $serviceid);
@@ -525,7 +527,7 @@ class Booking extends Admin {
      * @return array stations
      * @throws Exception
      */
-    public function getDestinationStations($serviceid) {
+    public static function getDestinationStations($serviceid) {
         $destinations = \ORM::forTable('destination')->where('serviceid', $serviceid)->findMany();
         if (!$destinations) {
             throw new Exception('No destination stations found for service id = ' . $serviceid);
@@ -546,10 +548,10 @@ class Booking extends Admin {
      * @return array complicated destination objects
      * @throws Exception
      */
-    public function getDestinationsExtra($purchase, $service) {
+    public static function getDestinationsExtra($purchase, $service) {
 
         // Get counts info
-        $numbers = $this->countStuff($service->id, $purchase);
+        $numbers = Booking::countStuff($service->id, $purchase);
         $destinationcounts = $numbers->destinations;
         $passengercount = $purchase->adults + $purchase->children;
 
@@ -597,13 +599,12 @@ class Booking extends Admin {
      * detect if any meals are available
      * @return boolean
      */
-    public function mealsAvailable($service) {
+    public static function mealsAvailable($service) {
         return
             $service->mealavisible ||
             $service->mealbvisible ||
             $service->mealcvisible ||
-            $service->mealdvisible
-            ;
+            $service->mealdvisible;
     }
 
     /**
@@ -613,19 +614,19 @@ class Booking extends Admin {
      * @param $purchase
      * @return array
      */
-    public function mealsForm($service, $purchase) {
+    public static function mealsForm($service, $purchase) {
 
         // we need to know about the number
-        $numbers = $this->countStuff($service->id);
+        $numbers = Booking::countStuff($service->id);
 
         // Get the passenger count
         $maxpassengers = $purchase->adults + $purchase->children;
 
         // get the joining station (to see what meals available)
-        $station = $this->getJoiningCRS($service->id, $purchase->joining);
+        $station = Booking::getJoiningCRS($service->id, $purchase->joining);
 
         // Get the destination station (to see what meals available)
-        $destination = $this->getDestinationCRS($service->id, $purchase->destination);
+        $destination = Booking::getDestinationCRS($service->id, $purchase->destination);
 
         $letters = array('a', 'b', 'c', 'd');
         $meals = array();
@@ -650,12 +651,10 @@ class Booking extends Admin {
 
                 // precaution
                 $meal->maxmeals = $meal->maxmeals < 0 ? 0 : $meal->maxmeals;
-                $meal->choices = $this->choices($meal->maxmeals, true);
+                $meal->choices = Booking::choices($meal->maxmeals, true);
                 $meals[$letter] = $meal;
             }
         }
-
-        //echo "<pre>"; var_dump($meals); var_dump($station); var_dump($destination); die;
 
         return array_values($meals);
     }
@@ -668,7 +667,7 @@ class Booking extends Admin {
      * @param string $class (F or S)
      * @throws Exception
      */
-    public function calculateFare($service, $purchase, $class) {
+    public static function calculateFare($service, $purchase, $class) {
 
         // Need to drag everything out of the database
         $serviceid = $service->id;
@@ -686,8 +685,8 @@ class Booking extends Admin {
         $destcrs = $purchase->destination;
 
         // get the db records for above
-        $joining = $this->getJoiningCRS($serviceid, $joincrs);
-        $destination = $this->getDestinationCRS($serviceid, $destcrs);
+        $joining = Booking::getJoiningCRS($serviceid, $joincrs);
+        $destination = Booking::getDestinationCRS($serviceid, $destcrs);
         $pricebandgroupid = $joining->pricebandgroupid;
         $destinationid = $destination->id;
         $priceband = \ORM::forTable('priceband')->where(array(
@@ -740,7 +739,7 @@ class Booking extends Admin {
      * @return object
      * @throws Exception
      */
-    public function getJoiningCRS($serviceid, $crs) {
+    public static function getJoiningCRS($serviceid, $crs) {
         $joining = \ORM::forTable('joining')->where(array(
             'serviceid' => $serviceid,
             'crs' => $crs,
@@ -759,7 +758,7 @@ class Booking extends Admin {
      * @return object
      * @throws Exception
      */
-    public function getDestinationCRS($serviceid, $crs) {
+    public static function getDestinationCRS($serviceid, $crs) {
         $destination = \ORM::forTable('destination')->where(array(
             'serviceid' => $serviceid,
             'crs' => $crs,
@@ -777,7 +776,7 @@ class Booking extends Admin {
      * @param string $VendorTxCode
      * @return mixed Purchase record of false if not found
      */
-    public function getPurchaseFromVendorTxCode($VendorTxCode) {
+    public static function getPurchaseFromVendorTxCode($VendorTxCode) {
         $purchase = \ORM::forTable('purchase')->where('bookingref', $VendorTxCode)->findOne();
 
         return $purchase;
@@ -788,7 +787,7 @@ class Booking extends Admin {
      * @param object $purchase
      * @return array of purchases
      */
-    public function findOldPurchase($purchase) {
+    public static function findOldPurchase($purchase) {
         if (!$purchase) {
             return false;
         }
@@ -826,7 +825,7 @@ class Booking extends Admin {
      * @return mixed selected purchase
      * @throws \Exception
      */
-    public function checkPurchaseID($purchaseid, $purchases) {
+    public static function checkPurchaseID($purchaseid, $purchases) {
         foreach ($purchases as $purchase) {
             if ($purchase->id == $purchaseid) {
                 return $purchase;
@@ -842,7 +841,7 @@ class Booking extends Admin {
      * @param array $data
      * @return purchase
      */
-    public function updatePurchase($purchase, $data) {
+    public static function updatePurchase($purchase, $data) {
         $purchase->status = $data['Status'];
         $purchase->statusdetail = $data['StatusDetail'];
         $purchase->cardtype = $data['CardType'];

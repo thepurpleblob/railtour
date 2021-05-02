@@ -131,7 +131,7 @@ class ServiceController extends coreController {
      * @param int $id service id
      * @throws \Exception
      */
-    public function editAction($id=null)
+    public function editAction($id = 0)
     {
         $this->require_login('ROLE_ADMIN', 'service/edit/' . $id);
 
@@ -140,6 +140,7 @@ class ServiceController extends coreController {
             $service = Admin::getService($id);
         } else {
             $service = Admin::createService();
+            $id = 0;
         }
 
         // ETicket options
@@ -160,7 +161,9 @@ class ServiceController extends coreController {
         $form = new \stdClass;
         $form->code = Form::text('code', 'Code', $service->code, FORM_REQUIRED );
         $form->name = Form::text('name', 'Name', $service->name, FORM_REQUIRED );
-        $form->description = Form::textarea('description', 'Description', $service->description, FORM_REQUIRED, ['v-model' => 'description'] );
+        $form->description = Form::textarea('description', 'Description', $service->description, false, [
+            'v-model' => 'description'
+        ]);
         $form->visible = Form::yesno('visible', 'Visible', $service->visible);
         $form->date = Form::date('date', 'Date', $service->date, FORM_REQUIRED);
         $form->singlesupplement = Form::text('singlesupplement', 'Single supplement', $service->singlesupplement);
@@ -320,16 +323,6 @@ class ServiceController extends coreController {
         ));
     }
 
-    /**
-     * API to get service as JSON
-     * @param service id
-     */
-    public function jsonserviceAction($serviceid) {
-        $this->require_login('ROLE_ADMIN');
-        $service = Admin::getService($serviceid);
 
-        header('Content-type:application/json;charset=utf-8');
-        echo json_encode($service->as_array());
-    }
 
 }

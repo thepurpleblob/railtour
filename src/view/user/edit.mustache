@@ -2,23 +2,31 @@
 
 {{> adminmenu }}
 
-<h3 class="adminpage_title">User edit</h3>
+<div class="container-fluid px-4">
 
-    {{> formerrors }}
+    <h1 class="display-6 text-center">User edit</h1>
 
-    <form id="user-edit-form" class="form-validate form-horizontal" action="{{# path }}user/edit{{/path}}/{{ username }}" method="post">
-        {{{ form.username }}}
-        {{{ form.firstname }}}
-        {{{ form.lastname }}}
-        {{{ form.password }}}
-        {{{ form.role }}}
-        {{{ form.is_active }}}
+    <div class="container border shadow p-3">
 
-        <div>
-            <input type="submit" name="submit" value="Save" class="btn btn-primary" />
-            <input type="submit" name="cancel" value="Cancel" formnovalidate="formnovalidate" class="btn btn-warning" />
-        </div>
-    </form>
+        {{> formerrors }}
+
+        <form id="user-edit-form" class="form-validate form-horizontal" action="{{# path }}user/edit{{/path}}/{{ username }}" method="post">
+            {{{ form.username }}}
+            {{{ form.firstname }}}
+            {{{ form.lastname }}}
+            {{{ form.password }}}
+            {{{ form.role }}}
+            {{{ form.is_active }}}
+
+            <div>
+                <input type="submit" name="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" name="cancel" value="Cancel" formnovalidate="formnovalidate" class="btn btn-warning" />
+            </div>
+        </form>
+
+    </div>
+
+</div>
 
 {{> footer }}
     

@@ -2,41 +2,48 @@
 
 {{> adminmenu }}
 
+<div id="vapp" class="container-fluid px-4">
+
     {{^ new }}
-        <h3 class="adminpage_title">Edit joining station <i>"{{ service.name }}"</i></h3>
+        <h1 class="display-6 text-center">{{ joining.station }}</h1>
     {{/ new }}
     {{# new }}
-        <h3 class="adminpage_title">Add new joining station <i>"{{ service.name }}"</i></h3>
+        <h1 class="display-6 text-center">New joining station - {{ service.name }}</h1>
     {{/ new }}
 
-{{> form_errors }}
+    <div class="container border shadow p-3">
+        {{> form_errors }}
 
-    <form id="joining-edit-form" class="form-horizontal" action="{{# path }}joining/edit{{/path}}/{{ serviceid }}/{{ joiningid }}"
-          method="post">
-        {{{ form.crs }}}
-        {{{ form.station }}}
-        {{{ form.pricebandgroupid }}}
+        <form id="joining-edit-form" class="form-horizontal" action="{{# path }}joining/edit{{/path}}/{{ serviceid }}/{{ joiningid }}"
+            method="post">
+            {{{ form.crs }}}
+            {{{ form.station }}}
+            {{{ form.pricebandgroupid }}}
 
-        {{# service.mealavisible }}
-            {{{ form.meala }}}
-        {{/ service.mealavisible }}
-        {{# service.mealbvisible }}
-            {{{ form.mealb }}}
-        {{/ service.mealbvisible }}
-        {{# service.mealcvisible }}
-            {{{ form.mealc }}}
-        {{/ service.mealcvisible }}
-        {{# service.mealdvisible }}
-            {{{ form.meald }}}
-        {{/ service.mealdvisible }}
+            {{# service.mealavisible }}
+                {{{ form.meala }}}
+            {{/ service.mealavisible }}
+            {{# service.mealbvisible }}
+                {{{ form.mealb }}}
+            {{/ service.mealbvisible }}
+            {{# service.mealcvisible }}
+                {{{ form.mealc }}}
+            {{/ service.mealcvisible }}
+            {{# service.mealdvisible }}
+                {{{ form.meald }}}
+            {{/ service.mealdvisible }}
 
-        {{{ form.ajaxpath }}}
+            {{{ form.ajaxpath }}}
 
-        <div>
-            <input type="submit" name="submit" value="Save" class="btn btn-primary" />
-            <input type="submit" name="cancel" value="Cancel" formnovalidate="formnovalidate" class="btn btn-warning" />
-        </div>
-    </form>
+            <div>
+                <input type="submit" name="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" name="cancel" value="Cancel" formnovalidate="formnovalidate" class="btn btn-warning" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="{{ config.www }}/src/assets/js/joining.js" type="module"></script>
 
 {{> footer }}
 

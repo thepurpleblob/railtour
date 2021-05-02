@@ -4,7 +4,7 @@
 
 <div class="container-fluid px-4">
 
-    <h3 class="adminpage_title">Booking limits edit <i>"{{ service.name }}"</i></h3>
+    <h1 class="display-6 text-center">Limits - {{ service.name }}</h1>
 
     <form id="limits-edit-form" class="form-horizontal container border rounded shadow p-3" action="{{# path }}limits/edit{{/ path }}/{{ serviceid }}" method="post">
         <table class="table table-striped">
@@ -108,9 +108,18 @@
                     <td>&nbsp;</td>
                 </tr>
                 <tr>
-                    <td>Maximum party size in first<br /><small class="text-info">Only applied if non-zero</small></td>
+                    <td><b>Maximum</b> party size in first<br /><small class="text-info">Only applied if non-zero</small></td>
                     <td class="has-danger">
                         <input type="number" class="form-control" name="maxpartyfirst" value="{{ limits.maxpartyfirst }}" required="true">
+                    </td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td><b>Minimum</b> party size in first<br /><small class="text-info">Only applied if non-zero</small></td>
+                    <td class="has-danger">
+                        <input type="number" class="form-control" name="minpartyfirst" value="{{ limits.minpartyfirst }}" required="true">
                     </td>
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>

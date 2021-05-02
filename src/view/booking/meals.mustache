@@ -1,40 +1,50 @@
 {{> header }}
 
+{{> usermenu }}
+
+<div class="container-fluid px-4">
+
     {{> booking/telephonestatus }}
 
-    <h3 class="text-error">Meals...</h3>
+    <h1 class="display-6 text-center">Meals...</h1>
 
-    <p>
-        Tell us which meals you would like. Please select the number of each available
-        meal that you require.
-    </p>
+    <div class="container border shadow p-3">
 
-    {{> form_errors }}
+        <p>
+            Tell us which meals you would like. Please select the number of each available
+            meal that you require.
+        </p>
 
-    <form id="meals-form" class="form-horizontal" action="{{# path }}booking/meals{{/ path }}" method="post" >
-        {{# showingmeals }}
-            {{# meals }}
-                {{# maxmeals }}
-                    {{{ formselect }}}
-                {{/ maxmeals }}
-                {{^ maxmeals }}
-                    <div class="alert alert-warning">
-                        Meal '{{ name }}' is sold out.
-                    </div>    
-                {{/ maxmeals }}
-            {{/ meals }}
-        {{/ showingmeals }}
-        {{^ showingmeals }}
-            <div class="alert alert-warning">
-                No meals are available. This is because they are not available to passengers boarding
-                at your chosen joining station and/or travelling to the selected destination. 
+        {{> form_errors }}
+
+        <form id="meals-form" class="form-horizontal" action="{{# path }}booking/meals{{/ path }}" method="post" >
+            {{# showingmeals }}
+                {{# meals }}
+                    {{# maxmeals }}
+                        {{{ formselect }}}
+                    {{/ maxmeals }}
+                    {{^ maxmeals }}
+                        <div class="alert alert-warning">
+                            Meal '{{ name }}' is sold out.
+                        </div>    
+                    {{/ maxmeals }}
+                {{/ meals }}
+            {{/ showingmeals }}
+            {{^ showingmeals }}
+                <div class="alert alert-warning">
+                    No meals are available. This is because they are not available to passengers boarding
+                    at your chosen joining station and/or travelling to the selected destination. 
+                </div>
+            {{/ showingmeals }}
+
+            <div>
+                <input type="submit" name="next" value="Next step" class="btn btn-primary" />
+                <input type="submit" name="back" value="Back" class="btn btn-warning" formnovalidate />
             </div>
-        {{/ showingmeals }}
+        </form>
 
-        <div>
-            <input type="submit" name="next" value="Next step" class="btn btn-primary" />
-            <input type="submit" name="back" value="Back" class="btn btn-warning" formnovalidate />
-        </div>
-    </form>
+    </div>
+
+</div>
 
 {{> footer }}

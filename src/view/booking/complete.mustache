@@ -1,57 +1,67 @@
 {{> header }}
 
-    <h3 class="text-error">Booking completed successfuly</h3>
+{{> usermenu }}
 
-    <p>Thank you for booking with SRPS Railtours.</p>
+<div class="container-fluid px-4">
 
-    <p>
-        {{# purchase.emailsent }}
-            Please find the details of your transaction. You should receive an
-            email shortly.
-        {{/ purchase.emailsent }}
-        {{^ purchase.emailsent }}
-            Please find the details of your transaction. An email has already
-            been sent to you.
-        {{/ purchase.emailsent }}
-    </p>
+    <h1 class="display-6 text-center">Booking completed successfuly</h1>
 
-    <p>
-        {{# purchase.eticket }}
-            Final timings and your electronic ticket will be emailed to you approximately <b>ONE WEEK</b> before the
-            tour date. Please make sure you check your "spam" or junk mail folders before contacting us if you do not
-            receive this.
-        {{/ purchase.eticket }}
-        {{^ purchase.eticket }}
-            Final timings and tickets will be sent <b>ONE WEEK</b> before the tour.
-        {{/ purchase.eticket }}
-    </p>
+    <div class="container border shadow p-3">
 
-    <dl class="dl-horizontal">
-        <dt>Booking ref</dt>
-        <dd>{{ purchase.bookingref }}</dd>
+        <p>Thank you for booking with SRPS Railtours.</p>
 
-        <dt>Tour name</dt>
-        <dd>{{ service.name }}</dd>
+        <p>
+            {{# purchase.emailsent }}
+                Please find the details of your transaction. You should receive an
+                email shortly.
+            {{/ purchase.emailsent }}
+            {{^ purchase.emailsent }}
+                Please find the details of your transaction. An email has already
+                been sent to you.
+            {{/ purchase.emailsent }}
+        </p>
 
-        <dt>Tour date</dt>
-        <dd>{{ service.date }}</dd>
+        <p>
+            {{# purchase.eticket }}
+                Final timings and your electronic ticket will be emailed to you approximately <b>ONE WEEK</b> before the
+                tour date. Please make sure you check your "spam" or junk mail folders before contacting us if you do not
+                receive this.
+            {{/ purchase.eticket }}
+            {{^ purchase.eticket }}
+                Final timings and tickets will be sent <b>ONE WEEK</b> before the tour.
+            {{/ purchase.eticket }}
+        </p>
 
-        <dt>Payment status</dt>
-        <dd>{{ sage.StatusDetail }}</dd>
+        <dl class="dl-horizontal">
+            <dt>Booking ref</dt>
+            <dd>{{ purchase.bookingref }}</dd>
 
-        <dt>Total price</dt>
-        <dd>&pound;{{ purchase.payment }}</dd>
-    </dl>
+            <dt>Tour name</dt>
+            <dd>{{ service.name }}</dd>
 
-    <div>
-        {{# purchase.bookedby }}
-            <a class="btn btn-primary" href="{{ config.www }}">Continue</a>
-        {{/ purchase.bookedby }}
-        {{^ purchase.bookedby }}
-        <a class="btn btn-primary" href="http://www.srps.org.uk/">
-            Return to the SRPS site
-        </a>
-        {{/ purchase.bookedby }}
+            <dt>Tour date</dt>
+            <dd>{{ service.date }}</dd>
+
+            <dt>Payment status</dt>
+            <dd>{{ sage.StatusDetail }}</dd>
+
+            <dt>Total price</dt>
+            <dd>&pound;{{ purchase.payment }}</dd>
+        </dl>
+
+        <div>
+            {{# purchase.bookedby }}
+                <a class="btn btn-primary" href="{{ config.www }}">Continue</a>
+            {{/ purchase.bookedby }}
+            {{^ purchase.bookedby }}
+            <a class="btn btn-primary" href="http://www.srps.org.uk/">
+                Return to the SRPS site
+            </a>
+            {{/ purchase.bookedby }}
+        </div>
+
     </div>
+
+</div>
 
 {{> footer }}

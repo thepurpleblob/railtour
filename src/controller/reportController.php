@@ -3,20 +3,11 @@
 namespace thepurpleblob\railtour\controller;
 
 use thepurpleblob\core\coreController;
+use thepurpleblob\core\Session;
+use thepurpleblob\core\Form;
+use thepurpleblob\railtour\library\Admin;
 
 class reportController extends coreController {
-
-    protected $adminlib;
-
-    /**
-     * Constructor
-     */
-    public function __construct($exception = false) {
-        parent::__construct($exception);
-
-        // Library
-        $this->adminlib = $this->getLibrary('Admin');
-    }
 
     /**
      * List all purchases
@@ -26,7 +17,7 @@ class reportController extends coreController {
     public function listAction($serviceid, $sort = '') {
         $this->require_login('ROLE_ORGANISER', 'report/list/' . $serviceid);
 
-        $service = $this->adminlib->getService($serviceid);;
+        $service = Admin::getService($serviceid);;
 
         // Clear session and delete expired purchases
         if (Admin::cleanPurchases()) {
@@ -34,11 +25,11 @@ class reportController extends coreController {
         }
 
         // get the purchases for this service
-        $purchases = $this->adminlib->getPurchases($serviceid, true, true);
+        $purchases = Admin::getPurchases($serviceid, true, true);
 
         $this->View('report/list', array(
             'service' => $service,
-            'purchases' => $this->adminlib->formatPurchases($purchases),
+            'purchases' => Admin::formatPurchases($purchases),
         ));
     }
 
@@ -47,14 +38,14 @@ class reportController extends coreController {
         $this->require_login('ROLE_ORGANISER', 'report/view/' . $purchaseid);
 
         // Get the purchase record
-        $purchase = $this->adminlib->getPurchase($purchaseid);
+        $purchase = Admin::getPurchase($purchaseid);
 
         // ...and the service record
         $service = $this->adminlib->getService($purchase->serviceid);
 
         $this->View('report/view', array(
             'service' => $service,
-            'purchase' => $this->adminlib->formatPurchase($purchase),
+            'purchase' => Admin::formatPurchase($purchase),
         ));
     }
     
@@ -66,10 +57,10 @@ class reportController extends coreController {
         $this->require_login('ROLE_ORGANISER', 'report/export/' . $serviceid);
         
         // Get the service object
-        $service = $this->adminlib->getService($serviceid);
+        $service = Admin::getService($serviceid);
         
         // Get the purchases
-        $purchases = $this->adminlib->getPurchases($serviceid, true);
+        $purchases = Admin::getPurchases($serviceid, true);
         
         // if there are none, then nothing to do
         if (!$purchases) {
@@ -83,7 +74,7 @@ class reportController extends coreController {
         header('Content-Type: application/octet-stream');
         header("Content-Transfer-Encoding: Binary");
         header("Content-disposition: attachment; filename=\"$filename\"");
-        echo $this->adminlib->getExport($purchases);
+        echo Admin::getExport($purchases);
         die;
     }
 
@@ -96,10 +87,10 @@ class reportController extends coreController {
         $this->require_login('ROLE_ORGANISER', 'report/resend/' . $purchaseid);
 
         // Get the purchase
-        $purchase = $this->adminlib->getPurchase($purchaseid);
+        $purchase = Admin::getPurchase($purchaseid);
 
         // ...and the service record
-        $service = $this->adminlib->getService($purchase->serviceid);
+        $service = Admin::getService($purchase->serviceid);
 
         // Set up mailer
         $mail = $this->getLibrary('Mail');
@@ -120,7 +111,7 @@ class reportController extends coreController {
 
         $this->View('report/view', array(
             'service' => $service,
-            'purchase' => $this->adminlib->formatPurchase($purchase),
+            'purchase' => Admin::formatPurchase($purchase),
             'resend' => $resend,
         ));
     }

@@ -43,6 +43,10 @@ class SagepayServer {
         $this->fare = $fare;
     }
 
+    public function getError() {
+        return $this->error;
+    }
+
     /**
      * The data sent to sage, some basic checks
      * @param string $data
@@ -133,12 +137,11 @@ class SagepayServer {
      * Build associative array of registration data
      */
     private function buildRegistrationData() {
-        global $CFG;
 
         $data = [
             'VPSProtocol' => '3.00',
             'TxType' => 'PAYMENT',
-            'Vendor' => $CFG->sage_vendor,
+            'Vendor' => $_ENV['sage_vendor'],
             'VendorTxCode' => $this->purchase->bookingref,
             'Amount' => number_format($this->purchase->payment,2),
             'Currency' => 'GBP',
@@ -178,13 +181,12 @@ class SagepayServer {
      * Register Purchase with Sagepay
      */
     public function register() {
-        global $CFG;
 
         // get the POST data
         $data = $this->buildRegistrationData();
 
         // send it off to SagePay
-        $curl = curl_init($CFG->sage_url);
+        $curl = curl_init($_ENV['sage_url']);
         curl_setopt($curl, CURLOPT_POST, 1);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -271,7 +273,6 @@ class SagepayServer {
      *
      */
     public function checkVPSSignature($purchase, $nvals) {
-        global $CFG;
 
         // concatenate various fields
         $values = [
@@ -279,7 +280,7 @@ class SagepayServer {
             $nvals['VendorTxCode'],
             $nvals['Status'],
             isset($nvals['TxAuthNo']) ? $nvals['TxAuthNo'] : '',
-            $CFG->sage_vendor,
+            $_ENV['sage_vendor'],
             $nvals['AVSCV2'],
             $purchase->securitykey,
             $nvals['AddressResult'],

@@ -1,6 +1,12 @@
 {{> header }}
 
-    <h2 class="attention_heading"><span><i class="fas fa-exclamation-triangle"></i> Please read first...</span></h2>
+{{> usermenu }}
+
+<div class="container-fluid px-4">
+
+    <h1 class="display-6 text-center"><span><i class="fas fa-exclamation-triangle"></i> Please read first...</span></h1>
+
+    <div class="container border shadow p-3">
 
             <p>
                 Only use this service if all members of your party are taking the same
@@ -29,11 +35,13 @@
 
     <div>
         <a class="btn btn-primary" href="{{# path }}booking/numbers{{/ path }}/{{ service.id }}">
-            Book tour '{{ service.name }}'
+            Start your booking - {{ service.name }}
         </a>
         <a class="btn btn-warning" href="http://www.srps.org.uk/railtours">
             Cancel
         </a>
     </div>
+    </div>
+</div>
 
 {{> footer }}

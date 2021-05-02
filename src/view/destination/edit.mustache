@@ -22,11 +22,14 @@
 
         {{> form_errors }}
 
-        <form id="destination-edit-form" class="form-horizontal" action="{{# path }}destination/edit{{/ path }}/{{ service.id }}/{{ destination.id }}"
+        <form @submit="submit" id="destination-edit-form" class="form-horizontal" action="{{# path }}destination/edit{{/ path }}/{{ service.id }}/{{ destination.id }}"
             method="post" >
             {{{ form.crs }}}
             {{{ form.name }}}
             {{{ form.description }}}
+            <div class="mb-3">
+                <vue-editor v-model="content"></vue-editor>
+            </div>
 
             {{# service.mealavisible }}
                 <div class="row">
@@ -68,17 +71,6 @@
 
 </div>
 
-<script>
-    const vueApp = new Vue({
-        el: '#vapp',
-        data: { 
-            display: 'redbox' 
-        },
-        methods: {
-            crschange: function(event) {
-                const test = axios.get('blah')
-            }
-        }
-    })
-</sript>
+<script src="{{ config.www }}/src/assets/js/destination.js" type="module"></script>
+
 {{> footer }}

@@ -1,25 +1,35 @@
 {{> header }}
 
-    <h3 class="text-error">Payment failure</h3>
+{{> usermenu }}
 
-    <div class="panel panel-danger">
-        <div class="panel-body">
-            <p>Something has gone wrong communicating with our payment service.</p>
-            <p>Please try again later. If you're still having problems contact
-            webmaster@srps.org.uk with the following information:</p>
-            <p><i>(Diagnostic status: {{ status }}, message: '{{ diagnostic }}')</i></p>
+<div class="container-fluid px-4">
+
+    <h1 class="display-6 text-center">Payment failure</h1>
+
+    <div class="container border shadow p-3">
+
+        <div class="panel panel-danger">
+            <div class="panel-body">
+                <p>Something has gone wrong communicating with our payment service.</p>
+                <p>Please try again later. If you're still having problems contact
+                webmaster@srps.org.uk with the following information:</p>
+                <p><i>(Diagnostic status: {{ status }}, message: '{{ diagnostic }}')</i></p>
+            </div>
         </div>
+
+        <div>
+            {{# purchase.bookedby }}
+                <a class="btn btn-primary" href="{{ config.www }}">Continue</a>
+            {{/ purchase.bookedby }}
+            {{^ purchase.bookedby }}
+            <a class="btn btn-primary" href="http://www.srps.org.uk/">
+                Return to the SRPS site
+            </a>
+            {{/ purchase.bookedby }}
+        </div>
+
     </div>
 
-    <div>
-        {{# purchase.bookedby }}
-            <a class="btn btn-primary" href="{{ config.www }}">Continue</a>
-        {{/ purchase.bookedby }}
-        {{^ purchase.bookedby }}
-        <a class="btn btn-primary" href="http://www.srps.org.uk/">
-            Return to the SRPS site
-        </a>
-        {{/ purchase.bookedby }}
-    </div>
+</div>
 
 {{> footer }}

@@ -3,6 +3,7 @@
 namespace thepurpleblob\railtour\controller;
 
 use thepurpleblob\core\coreController;
+use thepurpleblob\core\Session;
 use thepurpleblob\core\Form;
 use thepurpleblob\railtour\library\Admin;
 
@@ -42,7 +43,8 @@ class PricebandController extends coreController {
                 'service' => $service,
                 'serviceid' => $serviceid,
                 'setup' => Admin::isPricebandsConfigured($serviceid),
-                'pricebandgroupsdefined' => !empty($pricebandgroups)
+                'pricebandgroupsdefined' => !empty($pricebandgroups),
+                'saved' => Session::read('save_priceband', 0),
                 ));
     }
 
@@ -125,6 +127,7 @@ class PricebandController extends coreController {
                     $priceband->save();
                     $count++;
                 }
+                Session::writeFlash('save_priceband', 1);
                 $this->redirect('priceband/index/' . $serviceid);
             } else {
                 $errors = $this->gump->get_readable_errors(false);

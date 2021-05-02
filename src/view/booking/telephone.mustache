@@ -1,29 +1,39 @@
 {{> header }}
 
-    <h3 class="text-error">Telephone booking (customer not present)</h3>
+{{> usermenu }}
 
-    <div class="alert alert-warning">
-        Please ensure that all members of the customer's party are all taking the same
-        trip in the same class.
+<div class="container-fluid px-4">
+
+    <h1 class="display-6 text-center">Telephone booking (customer not present)</h1>
+
+    <div class="container border shadow p-3">
+
+        <div class="alert alert-warning">
+            Please ensure that all members of the customer's party are all taking the same
+            trip in the same class.
+        </div>
+
+        <p>
+            Please request the customer's name and postcode. We'll try to match this with old purchases. 
+            Please confirm name spelling if unsure.  
+        </p>
+
+        {{> form_errors }}
+
+        <form id="telephone-form" class="form-horizontal" action="{{# path }}booking/telephone{{/ path }}/{{ code }}" method="post">
+            {{{ form.title }}}
+            {{{ form.firstname }}}
+            {{{ form.surname }}}
+            {{{ form.postcode }}}
+
+            <div>
+                <input type="submit" name="next" value="Next" class="btn btn-primary" />
+                <input type="submit" name="cancel" value="Cancel" class="btn btn-warning" formnovalidate />
+            </div>
+        </form>
+
     </div>
 
-    <p>
-        Please request the customer's name and postcode. We'll try to match this with old purchases. 
-        Please confirm name spelling if unsure.  
-    </p>
-
-    {{> form_errors }}
-
-    <form id="telephone-form" class="form-horizontal" action="{{# path }}booking/telephone{{/ path }}/{{ code }}" method="post">
-        {{{ form.title }}}
-        {{{ form.firstname }}}
-        {{{ form.surname }}}
-        {{{ form.postcode }}}
-
-        <div>
-            <input type="submit" name="next" value="Next" class="btn btn-primary" />
-            <input type="submit" name="cancel" value="Cancel" class="btn btn-warning" formnovalidate />
-        </div>
-    </form>
+</div>
 
 {{> footer }}    

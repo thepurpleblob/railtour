@@ -5,6 +5,7 @@ namespace thepurpleblob\railtour\controller;
 use thepurpleblob\core\coreController;
 use thepurpleblob\core\Session;
 use thepurpleblob\railtour\library\User;
+use thepurpleblob\core\Form;
 
 class userController extends coreController {
 

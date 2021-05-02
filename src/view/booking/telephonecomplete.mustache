@@ -1,46 +1,56 @@
 {{> header }}
 
-    <h3 class="text-error">Booking completed successfuly</h3>
+{{> usermenu }}
 
-    <p>The booking has completed successfully.</p>
+<div class="container-fluid px-4">
 
-    <p>
-        {{# purchase.emailsent }}
-            A confirmation email has been sent to the customer.
-        {{/ purchase.emailsent }}
-    </p>
+    <h1 class="display-6 text-center">Booking completed successfuly</h1>
 
-    <p>
-        {{# purchase.eticket }}
-            Final timings and the electronic ticket will be emailed to the customer approximately <b>ONE WEEK</b> before the
-            tour date. Remind them to first check their spam and junk folders before contacting us if the tickets do not arrive.
-        {{/ purchase.eticket }}
-        {{^ purchase.eticket }}
-            Final timings and tickets will be sent <b>ONE WEEK</b> before the tour.
-        {{/ purchase.eticket }}
-    </p>
+    <div class="container border shadow p-3">
 
-    <dl class="dl-horizontal">
-        <dt>Booking ref</dt>
-        <dd>{{ purchase.bookingref }}</dd>
+        <p>The booking has completed successfully.</p>
 
-        <dt>Tour name</dt>
-        <dd>{{ service.name }}</dd>
+        <p>
+            {{# purchase.emailsent }}
+                A confirmation email has been sent to the customer.
+            {{/ purchase.emailsent }}
+        </p>
 
-        <dt>Tour date</dt>
-        <dd>{{ service.date }}</dd>
+        <p>
+            {{# purchase.eticket }}
+                Final timings and the electronic ticket will be emailed to the customer approximately <b>ONE WEEK</b> before the
+                tour date. Remind them to first check their spam and junk folders before contacting us if the tickets do not arrive.
+            {{/ purchase.eticket }}
+            {{^ purchase.eticket }}
+                Final timings and tickets will be sent <b>ONE WEEK</b> before the tour.
+            {{/ purchase.eticket }}
+        </p>
 
-        <dt>Payment status</dt>
-        <dd>{{ sage.StatusDetail }}</dd>
+        <dl class="dl-horizontal">
+            <dt>Booking ref</dt>
+            <dd>{{ purchase.bookingref }}</dd>
 
-        <dt>Total price</dt>
-        <dd>&pound;{{ purchase.payment }}</dd>
-    </dl>
+            <dt>Tour name</dt>
+            <dd>{{ service.name }}</dd>
 
-    <div>
-        <a class="btn btn-primary" href="{{ config.www }}">
-            Done
-        </a>
+            <dt>Tour date</dt>
+            <dd>{{ service.date }}</dd>
+
+            <dt>Payment status</dt>
+            <dd>{{ sage.StatusDetail }}</dd>
+
+            <dt>Total price</dt>
+            <dd>&pound;{{ purchase.payment }}</dd>
+        </dl>
+
+        <div>
+            <a class="btn btn-primary" href="{{ config.www }}">
+                Done
+            </a>
+        </div>
+
     </div>
+
+</div>
 
 {{> footer }}

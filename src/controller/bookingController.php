@@ -3,24 +3,13 @@
 namespace thepurpleblob\railtour\controller;
 
 use thepurpleblob\core\coreController;
+use thepurpleblob\railtour\library\Admin;
+use thepurpleblob\railtour\library\Booking;
 use thepurpleblob\core\Form;
 
 class BookingController extends coreController {
 
     public $controller;
-
-    private $bookinglib;
-
-    /**
-     * Constructor
-     * @param bool
-     */
-    public function __construct($exception = false) {
-        parent::__construct($exception);
-
-        // Library
-        $this->bookinglib = $this->getLibrary('Booking');
-    }
 
     /**
      * Show terms and conditions page
@@ -44,19 +33,19 @@ class BookingController extends coreController {
         }
 
         // Get the service object
-        $service = $this->bookinglib->serviceFromCode($code);
+        $service = Booking::serviceFromCode($code);
         $serviceid = $service->id;
 
         // count the seats left
-        $count = $this->bookinglib->countStuff($serviceid);
+        $count = Booking::countStuff($serviceid);
 
         // Get the limits for this service
-        $limits = $this->bookinglib->getLimits($serviceid);
+        $limits = Admin::getLimits($serviceid);
 
         // get acting maxparty (best estimate to display to punter)
-        $maxparty = $this->bookinglib->getMaxparty($limits);
+        $maxparty = Booking::getMaxparty($limits);
 
-        if ($this->bookinglib->canProceedWithBooking($service, $count)) {
+        if (Booking::canProceedWithBooking($service, $count)) {
             $this->View('booking/index', array(
                 'code' => $code,
                 'maxparty' => $maxparty,
@@ -89,20 +78,20 @@ class BookingController extends coreController {
         }
 
         // Get the service object
-        $service = $this->bookinglib->serviceFromCode($code);
+        $service = Booking::serviceFromCode($code);
         $serviceid = $service->id;
 
         // count the seats left
-        $count = $this->bookinglib->countStuff($serviceid);
+        $count = Booking::countStuff($serviceid);
 
         // Get the limits for this service
-        $limits = $this->bookinglib->getLimits($serviceid);
+        $limits = Admin::getLimits($serviceid);
 
         // get acting maxparty (best estimate to display to punter)
-        $maxparty = $this->bookinglib->getMaxparty($limits);
+        $maxparty = Booking::getMaxparty($limits);
 
         // Bail out if this service is unavailable
-        if (!$this->bookinglib->canProceedWithBooking($service, $count)) {
+        if (!Booking::canProceedWithBooking($service, $count)) {
             $this->View('booking/closed', array(
                 'code' => $code,
                 'service' => $service
@@ -110,7 +99,7 @@ class BookingController extends coreController {
         }
 
         // Grab current purchase
-        $purchase = $this->bookinglib->getSessionPurchase($serviceid);
+        $purchase = Booking::getSessionPurchase($this, $serviceid);
 
         // hopefully no errors
         $errors = null;
@@ -181,17 +170,17 @@ class BookingController extends coreController {
     public function telephone2Action($purchaseid = 0) {
 
         // Basics
-        $purchase = $this->bookinglib->getSessionPurchase();
+        $purchase = Booking::getSessionPurchase($this);
         $serviceid = $purchase->serviceid;
-        $service = $this->bookinglib->getService($serviceid);
+        $service = Admin::getService($serviceid);
         $this->require_login('ROLE_TELEPHONE', 'booking/telephone2');
 
         // Search for old purchases
-        $oldpurchases = $this->bookinglib->findOldPurchase($purchase);
+        $oldpurchases = Booking::findOldPurchase($purchase);
 
         // If purchase id provided, make sure it is valid
         if ($purchaseid) {
-            $oldpurchase = $this->bookinglib->checkPurchaseID($purchaseid, $oldpurchases);
+            $oldpurchase = Booking::checkPurchaseID($purchaseid, $oldpurchases);
 
             // Copy address data
             if (empty($purchase->title)) {
@@ -208,7 +197,7 @@ class BookingController extends coreController {
         }
 
         // Should have a postcode
-        if ($oldpurchases = $this->bookinglib->findOldPurchase($purchase)) {
+        if ($oldpurchases = Booking::findOldPurchase($purchase)) {
             $this->View('booking/telephone2', array(
                 'purchases' => $oldpurchases,
                 'service' => $service,
@@ -228,23 +217,23 @@ class BookingController extends coreController {
      */
     public function numbersAction($serviceid) {
         // Basics
-        $service = $this->bookinglib->getService($serviceid);
+        $service = Admin::getService($serviceid);
 
         // Get the limits for this service:
-        $limits = $this->bookinglib->getLimits($serviceid);
+        $limits = Admin::getLimits($serviceid);
 
         // Grab current purchase
-        $purchase = $this->bookinglib->getSessionPurchase($serviceid);
+        $purchase = Booking::getSessionPurchase($this, $serviceid);
         if ($purchase->bookedby) {
             $this->require_login('ROLE_TELEPHONE', 'booking/numbers/' . $serviceid);
         }
 
         // get acting maxparty
-        $maxparty = $this->bookinglib->getMaxparty($limits);
+        $maxparty = Booking::getMaxparty($limits);
 
         // Choices
-        $choices_adult = $this->bookinglib->choices($maxparty, false);
-        $choices_children = $this->bookinglib->choices($maxparty, true);
+        $choices_adult = Booking::choices($maxparty, false);
+        $choices_children = Booking::choices($maxparty, true);
 
         // hopefully no errors
         $errors = null;
@@ -311,16 +300,16 @@ class BookingController extends coreController {
     public function joiningAction() {
 
         // Basics
-        $purchase = $this->bookinglib->getSessionPurchase();
+        $purchase = Booking::getSessionPurchase($this);
         $serviceid = $purchase->serviceid;
-        $service = $this->bookinglib->getService($serviceid);
+        $service = Admin::getService($serviceid);
 
         if ($purchase->bookedby) {
             $this->require_login('ROLE_TELEPHONE', 'booking/joining');
         }
 
         // get the joining stations
-        $stations = $this->bookinglib->getJoiningStations($serviceid);
+        $stations = Booking::getJoiningStations($serviceid);
 
         // If there is only one then there is nothing to do
         if (count($stations)==1) {
@@ -387,16 +376,16 @@ class BookingController extends coreController {
     public function destinationAction($crs = '')
     {
         // Basics
-        $purchase = $this->bookinglib->getSessionPurchase();
+        $purchase = Booking::getSessionPurchase($this);
         $serviceid = $purchase->serviceid;
-        $service = $this->bookinglib->getService($serviceid);
+        $service = Admin::getService($serviceid);
 
         if ($purchase->bookedby) {
             $this->require_login('ROLE_TELEPHONE', 'booking/destination');
         }
 
         // get the destinations
-        $stations = $this->bookinglib->getDestinationStations($serviceid);
+        $stations = Booking::getDestinationStations($serviceid);
 
         // If there is only one then there is nothing to do
         if (count($stations)==1) {
@@ -412,7 +401,7 @@ class BookingController extends coreController {
         }
 
         // Get destinations with extra pricing information
-        $destinations = $this->bookinglib->getDestinationsExtra($purchase, $service);
+        $destinations = Booking::getDestinationsExtra($purchase, $service);
 
         // anything submitted?
         // Will only apply to back in this case
@@ -450,16 +439,16 @@ class BookingController extends coreController {
     public function mealsAction() {
 
         // Basics
-        $purchase = $this->bookinglib->getSessionPurchase();
+        $purchase = Booking::getSessionPurchase($this);
         $serviceid = $purchase->serviceid;
-        $service = $this->bookinglib->getService($serviceid);
+        $service = Admin::getService($serviceid);
 
         if ($purchase->bookedby) {
             $this->require_login('ROLE_TELEPHONE', 'booking/meals');
         }
 
         // If there are no meals on this service just bail
-        if (!$this->bookinglib->mealsAvailable($service)) {
+        if (!Booking::mealsAvailable($service)) {
             if ($this->back) {
                 $this->redirect('booking/destination', true);
             } else {
@@ -468,7 +457,7 @@ class BookingController extends coreController {
         }
 
         // Array of meal options for forms
-        $meals = $this->bookinglib->mealsForm($service, $purchase);
+        $meals = Booking::mealsForm($service, $purchase);
 
         // Create validation
         $gumprules = array();
@@ -497,7 +486,7 @@ class BookingController extends coreController {
             if (!empty($data['back'])) {
 
                 // We need to know if Destinations would have been displayed
-                $stations = $this->bookinglib->getDestinationStations($serviceid);
+                $stations = Booking::getDestinationStations($serviceid);
                 if (count($stations) > 1) {
                     $this->redirect('booking/destination', true);
                 } else {
@@ -538,19 +527,19 @@ class BookingController extends coreController {
    public function classAction($class = '') {
 
         // Basics
-        $purchase = $this->bookinglib->getSessionPurchase();
+        $purchase = Booking::getSessionPurchase($this);
         $serviceid = $purchase->serviceid;
-        $service = $this->bookinglib->getService($serviceid);
+        $service = Admin::getService($serviceid);
 
         if ($purchase->bookedby) {
             $this->require_login('ROLE_TELEPHONE', 'booking/class');
         }
 
         // Get the limits for this service:
-        $limits = $this->bookinglib->getLimits($serviceid);
+        $limits = Admin::getLimits($serviceid);
 
         // get acting maxparty
-        $maxpartystandard = $this->bookinglib->getMaxparty($limits);
+        $maxpartystandard = Booking::getMaxparty($limits);
 
         // get first and standard maximum parties
         $maxpartyfirst = $limits->maxpartyfirst ? $limits->maxpartyfirst : $maxpartystandard;
@@ -559,12 +548,12 @@ class BookingController extends coreController {
         $passengercount = $purchase->adults + $purchase->children;
 
         // get first and standard fares
-        $farestandard = $this->bookinglib->calculateFare($service, $purchase, 'S');
-        $farefirst = $this->bookinglib->calculateFare($service, $purchase, 'F');
+        $farestandard = Booking::calculateFare($service, $purchase, 'S');
+        $farefirst = Booking::calculateFare($service, $purchase, 'F');
 
         // we need to know about the number
         // it's a bodge - but if the choice is made then skip this check
-        $numbers = $this->bookinglib->countStuff($serviceid, $purchase);
+        $numbers = Booking::countStuff($serviceid, $purchase);
         $availablefirst = $numbers->remainingfirst >= $passengercount;
         $availablestandard = $numbers->remainingstandard >= $passengercount;
 
@@ -615,16 +604,16 @@ class BookingController extends coreController {
     public function additionalAction() {
 
         // Basics
-        $purchase = $this->bookinglib->getSessionPurchase();
+        $purchase = Booking::getSessionPurchase($this);
         $serviceid = $purchase->serviceid;
-        $service = $this->bookinglib->getService($serviceid);
+        $service = Admin::getService($serviceid);
 
         if ($purchase->bookedby) {
             $this->require_login('ROLE_TELEPHONE', 'booking/additional');
         }
 
         // current counts
-        $numbers = $this->bookinglib->countStuff($serviceid, $purchase);
+        $numbers = Booking::countStuff($serviceid, $purchase);
 
         // Get the passenger count
         $passengercount = $purchase->adults + $purchase->children;
@@ -683,9 +672,9 @@ class BookingController extends coreController {
     */
     public function personalAction() {
         // Basics
-        $purchase = $this->bookinglib->getSessionPurchase();
+        $purchase = Booking::getSessionPurchase($this);
         $serviceid = $purchase->serviceid;
-        $service = $this->bookinglib->getService($serviceid);
+        $service = Admin::getService($serviceid);
 
         if ($purchase->bookedby) {
             $this->require_login('ROLE_TELEPHONE', 'booking/personal');
@@ -781,24 +770,24 @@ class BookingController extends coreController {
     public function reviewAction() {
 
         // Basics
-        $purchase = $this->bookinglib->getSessionPurchase();
+        $purchase = Booking::getSessionPurchase($this);
         $serviceid = $purchase->serviceid;
-        $service = $this->bookinglib->getService($serviceid);
+        $service = Admin::getService($serviceid);
 
         if ($purchase->bookedby) {
             $this->require_login('ROLE_TELEPHONE', 'booking/review');
         }
 
         // work out final fare
-        $fare = $this->bookinglib->calculateFare($service, $purchase, $purchase->class);
+        $fare = Booking::calculateFare($service, $purchase, $purchase->class);
         $purchase->payment = $fare->total;
         $purchase->save();
 
         // get the destination
-        $destination = $this->bookinglib->getDestinationCRS($serviceid, $purchase->destination);
+        $destination = Booking::getDestinationCRS($serviceid, $purchase->destination);
 
         // get the joining station
-        $joining = $this->bookinglib->getJoiningCRS($serviceid, $purchase->joining);
+        $joining = Booking::getJoiningCRS($serviceid, $purchase->joining);
 
         // display form
         $this->View('booking/review', array(
@@ -820,16 +809,16 @@ class BookingController extends coreController {
     public function paymentAction() {
 
         // Basics
-        $purchase = $this->bookinglib->getSessionPurchase();
+        $purchase = Booking::getSessionPurchase($this);
         $serviceid = $purchase->serviceid;
-        $service = $this->bookinglib->getService($serviceid);
+        $service = Admin::getService($serviceid);
 
         if ($purchase->bookedby) {
            $this->require_login('ROLE_TELEPHONE', 'booking/payment');
         }
 
         // work out final fare
-        $fare = $this->bookinglib->calculateFare($service, $purchase, $purchase->class);
+        $fare = Booking::calculateFare($service, $purchase, $purchase->class);
 
         // Line up Sagepay class
         $sagepay = $this->getLibrary('SagepayServer');
@@ -853,7 +842,7 @@ class BookingController extends coreController {
             if ($sr === false) {
                 $this->View('booking/fail', array(
                     'status' => 'N/A',
-                    'diagnostic' => $sagepay->error,
+                    'diagnostic' => $sagepay->getError(),
                 ));
             }
 
@@ -905,7 +894,7 @@ class BookingController extends coreController {
 
         // Get the VendorTxCode and use it to look up the purchase
         $VendorTxCode = $data['VendorTxCode'];
-        if (!$purchase = $this->bookinglib->getPurchaseFromVendorTxCode($VendorTxCode)) {
+        if (!$purchase = Booking::getPurchaseFromVendorTxCode($VendorTxCode)) {
             $url = $this->Url('booking/fail') . '/' . $VendorTxCode . '/' . urlencode('Purchase record not found');
             $this->log('SagePay notification: Purchase not found - ' . $url);
             $sagepay->notificationreceipt('INVALID', $url, 'Purchase record not found');
@@ -913,7 +902,7 @@ class BookingController extends coreController {
         }
 
         // Now that we have the purchase object, we can save whatever we got back in it
-        $purchase = $this->bookinglib->updatePurchase($purchase, $data);
+        $purchase = Booking::updatePurchase($purchase, $data);
 
         // Mailer
         $mail = $this->getLibrary('Mail');
@@ -964,14 +953,14 @@ class BookingController extends coreController {
      */
     public function failAction($VendorTxCode, $message) {
         $message = urldecode($message);
-        if (!$purchase = $this->bookinglib->getPurchaseFromVendorTxCode($VendorTxCode)) {
+        if (!$purchase = Booking::getPurchaseFromVendorTxCode($VendorTxCode)) {
             $this->View('booking/fail', array(
                 'status' => 'N/A',
                 'diagnostic' => 'Purchase record could not be found for ' . $VendorTxCode . ' Plus ' . $message,
                 'servicename' => '',
             ));
         } else {
-            $service = $this->bookinglib->getService($purchase->serviceid);
+            $service = Admin::getService($purchase->serviceid);
             $this->View('booking/fail', array(
                 'status' => 'N/A',
                 'diagnostic' => $message,
@@ -986,7 +975,7 @@ class BookingController extends coreController {
      * @param string $VendorTxCode
      */
     public function completeAction($VendorTxCode) {
-        if (!$purchase = $this->bookinglib->getPurchaseFromVendorTxCode($VendorTxCode)) {
+        if (!$purchase = Booking::getPurchaseFromVendorTxCode($VendorTxCode)) {
             $this->View('booking/fail', array(
                 'status' => 'N/A',
                 'diagnostic' => 'Purchase record could not be found for ' . $VendorTxCode,
@@ -994,7 +983,7 @@ class BookingController extends coreController {
             ));
         } else {
             $path = $purchase->bookedby ? 'booking/telephonecomplete' : 'booking/complete';
-            $service = $this->bookinglib->getService($purchase->serviceid);
+            $service = Admin::getService($purchase->serviceid);
             $this->View($path, array(
                 'purchase' => $purchase,
                 'service' => $service,
@@ -1008,13 +997,13 @@ class BookingController extends coreController {
      * @param string $VendorTxCode
      */
     public function declineAction($VendorTxCode) {
-        if (!$purchase = $this->bookinglib->getPurchaseFromVendorTxCode($VendorTxCode)) {
+        if (!$purchase = Booking::getPurchaseFromVendorTxCode($VendorTxCode)) {
             $this->View('booking/fail', array(
                 'status' => 'N/A',
                 'diagnostic' => 'Purchase record could not be found for ' . $VendorTxCode,
             ));
         } else {
-            $service = $this->bookinglib->getService($purchase->serviceid);
+            $service = Admin::getService($purchase->serviceid);
             $this->View('booking/decline', array(
                 'purchase' => $purchase,
                 'service' => $service,

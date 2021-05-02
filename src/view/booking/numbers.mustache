@@ -1,29 +1,39 @@
 {{> header }}
 
+{{> usermenu }}
+
+<div class="container-fluid px-4">
+
     {{> booking/telephonestatus }}
 
-    <h3 class="text-error">People in your party...</h3>
+    <h1 class="display-6 text-center">People in your party...</h1>
 
-    <p>
-        Tell us how many adults and children (14 years old and under) are travelling in
-        your party. Do not include infants (under 5) who travel free but will not
-        be allocated a seat.
-    </p>
+    <div class="container border shadow p-3">
 
-    <p class="alert alert-info">
-        Your party can have a maximum of {{ maxparty }} persons.
-    </p>
+        <p>
+            Please tell us how many adults and children (14 years old and under) are travelling in
+            your party. Do not include infants (under 5) who travel free but will not
+            be allocated a seat.
+        </p>
 
-    {{> formerrors }}
+        <p class="alert alert-info">
+            Your party can have a maximum of {{ maxparty }} persons.
+        </p>
 
-    <form id="numbers-form" class="form-horizontal" action="{{# path }}booking/numbers{{/ path }}/{{ service.id }}" method="post">
-        {{{ form.adults }}}
-        {{{ form.children }}}
+        {{> formerrors }}
 
-        <div>
-            <input type="submit" name="next" value="Next step" class="btn btn-primary" />
-            <input type="submit" name="cancel" value="Cancel" class="btn btn-warning" formnovalidate />
-        </div>
-    </form>
+        <form id="numbers-form" class="form-horizontal" action="{{# path }}booking/numbers{{/ path }}/{{ service.id }}" method="post">
+            {{{ form.adults }}}
+            {{{ form.children }}}
+
+            <div>
+                <input type="submit" name="next" value="Next step" class="btn btn-primary" />
+                <input type="submit" name="cancel" value="Cancel" class="btn btn-warning" formnovalidate />
+            </div>
+        </form>
+
+    </div>
+
+</div>
 
 {{> footer }}

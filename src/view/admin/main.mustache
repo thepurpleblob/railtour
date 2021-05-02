@@ -1,51 +1,57 @@
 {{> header }}
 
-{{# system.adminpages }}
-    <a href="{{# path }}service/index{{/ path }}">
-        <div class="alert alert-primary">
-            <i class="fas fa-cog"></i> Click here for admin/organiser portal.
-        </div>    
-    </a>    
-{{/ system.adminpages }}
+{{> adminmenu }}
 
-<h3>Railtours available for booking now</h3>
+<div class="container-fluid px-4">
+    <div class="container border shadow p-3">
 
-{{^ anyservices }}
-    <div class="alert alert-warning">
-        <i class="fas fa-exclamation"></i> No services available to book at the moment
-    </div>
-{{/anyservices}}
+        {{# system.adminpages }}
+            <a href="{{# path }}service/index{{/ path }}">
+                <div class="alert alert-primary">
+                    <i class="fas fa-cog"></i> Click here for admin/organiser portal.
+                </div>    
+            </a>    
+        {{/ system.adminpages }}
 
-{{# services }}
-    <div class="alert alert-dark">
-        <div class="row">
-            <div class="col-2"><strong>{{ code }}</strong></div>
-            <div class="col-2">{{ formatteddate }}</div>
-            <div class="col-5">
-                {{ name }}<br />
-                <div class="progress">
-                    <div class="progress-bar {{progresscol}}" role="progressbar" style="width: {{ progress }}%" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
+        <h3>Railtours available for booking now</h3>
+
+        {{^ anyservices }}
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation"></i> No services available to book at the moment
+            </div>
+        {{/anyservices}}
+
+        {{# services }}
+            <div class="alert alert-dark">
+                <div class="row">
+                    <div class="col-2"><strong>{{ code }}</strong></div>
+                    <div class="col-2">{{ formatteddate }}</div>
+                    <div class="col-5">
+                        {{ name }}<br />
+                        <div class="progress">
+                            <div class="progress-bar {{progresscol}}" role="progressbar" style="width: {{ progress }}%" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
+                                {{# anyseatsremaining }}
+                                    {{ progress }}%
+                                {{/ anyseatsremaining }}
+                                {{^ anyseatsremaining }}
+                                    FULL
+                                {{/ anyseatsremaining }}
+                            </div>
+                        </div>    
+                    </div>
+                    <div class="col-2 align-right">
                         {{# anyseatsremaining }}
-                            {{ progress }}%
+                            <a class="btn btn-warning" href="{{# path }}booking/telephone{{/ path }}/{{ code }}">Telephone booking</a>
                         {{/ anyseatsremaining }}
                         {{^ anyseatsremaining }}
-                            FULL
+                            <button class="btn btn-secondary" disabled>Telephone Booking</button>
                         {{/ anyseatsremaining }}
-                    </div>
-                </div>    
-            </div>
-            <div class="col-2 align-right">
-                {{# anyseatsremaining }}
-                    <a class="btn btn-warning" href="{{# path }}booking/telephone{{/ path }}/{{ code }}">Telephone booking</a>
-                {{/ anyseatsremaining }}
-                {{^ anyseatsremaining }}
-                    <button class="btn btn-secondary" disabled>Telephone Booking</button>
-                {{/ anyseatsremaining }}
-            </div>        
-        </div>
-    </div>    
-{{/ services }}
+                    </div>        
+                </div>
+            </div>    
+        {{/ services }}
 
-
+    </div>
+</div>
 
 {{> footer }}

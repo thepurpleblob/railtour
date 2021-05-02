@@ -6,69 +6,76 @@
 
     <h1 class="display-6 text-center">{{ service.name }}</h1>
 
-    {{^ setup }}
-        <div class="alert alert-warning">
-            There are no pricebands. You need to create at least one priceband first.
-        </div>
-    {{/ setup }}
-    {{# setup }}
-
-        {{^ pricebandgroupsdefined  }}
-            <div class="alert alert-block alert-warning">
-                No price bands have been defined.
+    <div class="container border shadow p-3">
+        {{# saved }}
+            <div class="alert alert-success">
+                Priceband has been saved.
             </div>
-        {{/ pricebandgroupsdefined }}
+        {{/ saved }}
 
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>&nbsp;</th>
-                </tr>
-            </thead>
-            <tbody>
+        {{^ setup }}
+            <div class="alert alert-warning">
+                There are no pricebands. You need to create at least one priceband first.
+            </div>
+        {{/ setup }}
+        {{# setup }}
 
-            {{# pricebandgroups }}
+            {{^ pricebandgroupsdefined  }}
+                <div class="alert alert-block alert-warning">
+                    No price bands have been defined.
+                </div>
+            {{/ pricebandgroupsdefined }}
+
+            <table class="table table-striped">
+                <thead>
                     <tr>
-                        <td><b>{{ name }}</b></td>
-                        <td>
-                            <a class="btn btn-warning btn-sm" href="{{# path }}priceband/edit{{/ path }}/{{ service.id }}/{{ id }}">Edit</a>
-                            {{^ used }}
-                            <a class="btn btn-danger btn-sm" href="{{# path }}priceband/delete{{/ path }}/{{ id }}">Delete</a>
-                            {{/ used }}
-                            {{# used }}
-                                <a class="btn btn-danger btn-sm disabled">Delete</a>
-                            {{/ used }}
-                        </td>
+                        <th>Name</th>
+                        <th>&nbsp;</th>
                     </tr>
-                    <tr>
-                        <td colspan="3">
-                            <table class="table table-condensed table-priceband">
-                                <thead>
-                                    <tr>
-                                        <th>Destination</th>
-                                        <th>First</th>
-                                        <th>Standard</th>
-                                        <th>Child</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                {{# bandtable }}
-                                    <tr>
-                                        <td>{{ name }}</td>
-                                        <td>&pound;{{ first }}</td>
-                                        <td>&pound;{{ standard }}</td>
-                                        <td>&pound;{{ child }}</td>
-                                    </tr>
-                                {{/ bandtable }}
-                                </tbody>
-                            </table>
-                        </td>
-                    </tr>
-            {{/ pricebandgroups }}
-            </tbody>
-        </table>
-    {{/ setup }}
+                </thead>
+                <tbody>
+
+                {{# pricebandgroups }}
+                        <tr>
+                            <td><b>{{ name }}</b></td>
+                            <td>
+                                <a class="btn btn-warning btn-sm" href="{{# path }}priceband/edit{{/ path }}/{{ service.id }}/{{ id }}">Edit</a>
+                                {{^ used }}
+                                <a class="btn btn-danger btn-sm" href="{{# path }}priceband/delete{{/ path }}/{{ id }}">Delete</a>
+                                {{/ used }}
+                                {{# used }}
+                                    <a class="btn btn-danger btn-sm disabled">Delete</a>
+                                {{/ used }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <table class="table table-condensed table-priceband">
+                                    <thead>
+                                        <tr>
+                                            <th>Destination</th>
+                                            <th>First</th>
+                                            <th>Standard</th>
+                                            <th>Child</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {{# bandtable }}
+                                        <tr>
+                                            <td>{{ name }}</td>
+                                            <td>&pound;{{ first }}</td>
+                                            <td>&pound;{{ standard }}</td>
+                                            <td>&pound;{{ child }}</td>
+                                        </tr>
+                                    {{/ bandtable }}
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                {{/ pricebandgroups }}
+                </tbody>
+            </table>
+        {{/ setup }}
 
 
         <div>
@@ -77,5 +84,6 @@
             <a class="btn btn-warning" href="{{# path }}service/show{{/ path }}/{{ service.id }}">Close</a>
         </div>
     </div>
+</div>
 
 {{> footer }}

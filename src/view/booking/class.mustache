@@ -1,72 +1,82 @@
 {{> header }}
 
+{{> usermenu }}
+
+<div class="container-fluid px-4">
+
     {{> booking/telephonestatus }}
 
-    <h3 class="text-error">Choose First or Standard...</h3>
+    <h1 class="display-6 text-center">Choose First or Standard...</h1>
 
-    <p>
-        Choose whether you would like to travel in First or Standard Class. The
-        price breakdown is shown for your information.
-    </p>
+    <div class="container border shadow p-3">
 
-    {{# availablefirst }}
-        <div class="card class-card">
-            <div class="card-header"><b>FIRST CLASS &pound;{{ farefirst.total }}</b></div>
-            <div class="card-body">
-                <div class="card-text">
-                    <ul>
-                        <li><span class="classtotal">Total for First Class is &pound;{{ farefirst.total }}</span></li>
-                        <li>{{ purchase.adults }} {{ adultname }}
-                            at &pound;{{ farefirst.adultunit}}, total &pound;{{ farefirst.adultfare }}</li>
-                        {{# purchase.children }}
-                            <li>{{ purchase.children }} {{ childname }}
-                                at &pound;{{ farefirst.childunit}}, total &pound;{{ farefirst.childfare }}</li>
-                        {{/ purchase.children }}
-                        <li>Booked meals total &pound;{{ farefirst.meals }}</li>
-                    </ul>
-                    <a class="btn btn-primary" href="{{# path }}booking/class{{/ path }}/F" ) }}">Choose <b>FIRST CLASS</b></a>
+        <p>
+            Choose whether you would like to travel in First or Standard Class. The
+            price breakdown is shown for your information.
+        </p>
+
+        {{# availablefirst }}
+            <div class="card class-card">
+                <div class="card-header"><b>FIRST CLASS &pound;{{ farefirst.total }}</b></div>
+                <div class="card-body">
+                    <div class="card-text">
+                        <ul>
+                            <li><span class="classtotal">Total for First Class is &pound;{{ farefirst.total }}</span></li>
+                            <li>{{ purchase.adults }} {{ adultname }}
+                                at &pound;{{ farefirst.adultunit}}, total &pound;{{ farefirst.adultfare }}</li>
+                            {{# purchase.children }}
+                                <li>{{ purchase.children }} {{ childname }}
+                                    at &pound;{{ farefirst.childunit}}, total &pound;{{ farefirst.childfare }}</li>
+                            {{/ purchase.children }}
+                            <li>Booked meals total &pound;{{ farefirst.meals }}</li>
+                        </ul>
+                        <a class="btn btn-primary" href="{{# path }}booking/class{{/ path }}/F" ) }}">Choose <b>FIRST CLASS</b></a>
+                    </div>
                 </div>
             </div>
-        </div>
-    {{/ availablefirst }}
-    {{^ availablefirst }}
-        <div class="alert alert-danger">
-            We are sorry, there are not enough available seats to accomodate your party
-            in First Class.
-        </div>
-    {{/ availablefirst }}
+        {{/ availablefirst }}
+        {{^ availablefirst }}
+            <div class="alert alert-danger">
+                We are sorry, there are not enough available seats to accomodate your party
+                in First Class.
+            </div>
+        {{/ availablefirst }}
 
-    {{# availablestandard }}
-        <div class="card class-card">
-            <div class="card-header"><b>STANDARD CLASS &pound;{{ farestandard.total }}</b></div>
-            <div class="card-body">
-                <div class="card-text">
-                    <ul>
-                        <li><span class="classtotal">Total for Standard Class is &pound;{{ farestandard.total }}</span></li>
-                        <li>{{ purchase.adults }} {{ adultname }}
-                            at &pound;{{ farestandard.adultunit}}, total &pound;{{ farestandard.adultfare }}</li>
-                        {{# purchase.children }}
-                            <li>{{ purchase.children }} {{ childname }}
-                                at &pound;{{ farestandard.childunit}}, total &pound;{{ farestandard.childfare }}</li>
-                        {{/ purchase.children }}
-                        <li>Booked meals total &pound;{{ farestandard.meals }}</li>
-                    </ul>
-                    <a class="btn btn-primary" href="{{# path }}booking/class{{/ path }}/S">Choose <b>STANDARD CLASS</b></a>
+        {{# availablestandard }}
+            <div class="card class-card">
+                <div class="card-header"><b>STANDARD CLASS &pound;{{ farestandard.total }}</b></div>
+                <div class="card-body">
+                    <div class="card-text">
+                        <ul>
+                            <li><span class="classtotal">Total for Standard Class is &pound;{{ farestandard.total }}</span></li>
+                            <li>{{ purchase.adults }} {{ adultname }}
+                                at &pound;{{ farestandard.adultunit}}, total &pound;{{ farestandard.adultfare }}</li>
+                            {{# purchase.children }}
+                                <li>{{ purchase.children }} {{ childname }}
+                                    at &pound;{{ farestandard.childunit}}, total &pound;{{ farestandard.childfare }}</li>
+                            {{/ purchase.children }}
+                            <li>Booked meals total &pound;{{ farestandard.meals }}</li>
+                        </ul>
+                        <a class="btn btn-primary" href="{{# path }}booking/class{{/ path }}/S">Choose <b>STANDARD CLASS</b></a>
+                    </div>
                 </div>
             </div>
-        </div>
-    {{/ availablestandard }}
-    {{^ availablestandard }}
-        <div class="alert alert-warning">
-            We are sorry, there are not enough available seats to accomodate your party
-            in Standard Class.
-        </div>
-    {{/ availablestandard}}
+        {{/ availablestandard }}
+        {{^ availablestandard }}
+            <div class="alert alert-warning">
+                We are sorry, there are not enough available seats to accomodate your party
+                in Standard Class.
+            </div>
+        {{/ availablestandard}}
 
-    <div>
-        <form action="{{# path }}booking/class{{/ path }}" method="post">
-            <input type="submit" name="back" value="Back" class="btn btn-warning" />
-        </form>
+        <div>
+            <form action="{{# path }}booking/class{{/ path }}" method="post">
+                <input type="submit" name="back" value="Back" class="btn btn-warning" />
+            </form>
+        </div>
+
     </div>
+
+</div>
 
 {{> footer }}

@@ -108,6 +108,45 @@ class coreController {
     }
 
     /**
+     * Get jsenv JSON
+     * @param array $variables
+     * @return string
+     */
+    private function getJsenv($variables) {
+
+        // Is there a service defined
+        if (isset($variables['service']->id)) {
+            $serviceid = $variables['service']->id;
+        } else {
+            $serviceid = 0;
+        }
+
+        // Is there a destination defined
+        if (isset($variables['destination']->id)) {
+            $destinationid = $variables['destination']->id;
+        } else {
+            $destinationid = 0;
+        }
+
+        // Is there a joining station defined
+        if (isset($variables['joining']->id)) {
+            $joiningid = $variables['joining']->id;
+        } else {
+            $joiningid = 0;
+        }       
+
+        $jsenv = [
+            'www' => $_ENV['www'],
+            'dirroot' => $_ENV['dirroot'],
+            'serviceid' => $serviceid,
+            'destinationid' => $destinationid,
+            'joiningid' => $joiningid,
+        ];
+
+        return json_encode($jsenv);
+    }
+
+    /**
      * render a view
      * @param string $viewname name of view (minus extension)
      * @param array $variables array of variables to be passed
@@ -160,7 +199,7 @@ class coreController {
         $variables['config'] = (object)$_ENV;
         $variables['showlogin'] = (($viewname != 'user/login') && (strpos($viewname, 'booking') !== 0));
         $variables['haserrors'] = !empty($variables['errors']);
-
+        $variables['jsenv'] = $this->getJsenv($variables);
 
         // Get template
         $template = $mustache->loadTemplate($viewname . '.mustache');

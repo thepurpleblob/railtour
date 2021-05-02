@@ -68,9 +68,16 @@ class DestinationController extends coreController
 
         // Create form
         $form = new \stdClass();
-        $form->crs = Form::text('crs', 'CRS', $destination->crs, true);
-        $form->name = Form::text('name', 'Name', $destination->name, true);
-        $form->description = Form::textarea('description', 'Description', $destination->description);
+        $form->crs = Form::text('crs', 'CRS', $destination->crs, true, [
+            '@change' => 'crschange',
+            'v-model' => 'crs',
+        ]);
+        $form->name = Form::text('name', 'Name', $destination->name, true, [
+            'v-model' => 'name',
+        ]);
+        $form->description = Form::textarea('description', 'Description', $destination->description, false, [
+            'v-model' => 'description'
+        ]);
         $form->meala = Form::yesno('meala', $service->mealaname . ' available for this destination', $destination->meala);
         $form->mealb = Form::yesno('mealb', $service->mealbname . ' available for this destination', $destination->mealb);
         $form->mealc = Form::yesno('mealc', $service->mealcname . ' available for this destination', $destination->mealc);

@@ -1,17 +1,27 @@
 {{> header }}
 
-    <h3 class="text-error">"{{ service.name }}" Booking is closed</h3>
+{{> usermenu }}
 
-    <p class="text-warning">
-        There are no seats available for this tour (the train may be full or booking closed). Please call our booking line
-        on <b>0131 202 1033</b> for up to date information.
-    </p>
+<div class="container-fluid px-4">
+
+    <h1 class="display-6 text-center">"{{ service.name }}" Booking is closed</h1>
+
+    <div class="container border shadow p-3">
+
+        <p class="text-warning">
+            There are no seats available for this tour (the train may be full or booking closed). Please call our booking line
+            on <b>0131 202 1033</b> for up to date information.
+        </p>
 
 
-    <div>
-        <a class="btn btn-warning" href="http://www.srps.org.uk/railtours">
-            Return to Railtours site
-        </a>
+        <div>
+            <a class="btn btn-warning" href="http://www.srps.org.uk/railtours">
+                Return to Railtours site
+            </a>
+        </div>
+
     </div>
+
+</div>
 
 {{> footer }}

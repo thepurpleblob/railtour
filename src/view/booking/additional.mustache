@@ -1,41 +1,51 @@
 {{> header }}
 
+{{> usermenu }}
+
+<div class="container-fluid px-4">
+
     {{> booking/telephonestatus }}
 
-    <h3 class="text-error">Additional options {{# iscomments }}and comments...{{/ iscomments }}</h3>
+    <h1 class="display-6 text-center">Additional options {{# iscomments }}and comments...{{/ iscomments }}</h1>
 
-    <form id="additional-form" class="form-horizontal" action="{{# path }}booking/additional{{/ path }}" method="post">
-        {{# iscomments }}
-            {{# purchase.bookedby }}
-                <div class="alert alert-block">
-                    Add any comment regarding the booking here (max 39 characters).  
-                </div>  
-            {{/ purchase.bookedby }}
-            {{^ purchase.bookedby }}
-                <div class="alert alert-block">
-                    You may add a short comment or request here and we will do our best
-                    to accommodate you. Please <b>DO NOT</b> use this to ask a question
-                    or request special meals - please call us. 
-                </div>  
-            {{/ purchase.bookedby }}
-            {{{ form.comment }}}
-        {{/ iscomments }}
-                    
-        {{# issupplement }}
-            <div class="alert alert-block">
-                You may specially request the single seats by the window in our
-                'First Open' coaches. These are available in limited numbers to
-                First Class passengers at
-                a charge of &pound;{{ service.singlesupplement }}
-                per person<br />
-            </div>  
-            {{{ form.seatsupplement }}}
-        {{/ issupplement }}
+    <div class="container border shadow p-3">
 
-        <div>
-            <input type="submit" name="next" value="Next step" class="btn btn-primary" />
-            <input type="submit" name="back" value="Back" class="btn btn-warning"  />
-        </div>
-    </form>
+        <form id="additional-form" class="form-horizontal" action="{{# path }}booking/additional{{/ path }}" method="post">
+            {{# iscomments }}
+                {{# purchase.bookedby }}
+                    <div class="alert alert-block">
+                        Add any comment regarding the booking here (max 39 characters).  
+                    </div>  
+                {{/ purchase.bookedby }}
+                {{^ purchase.bookedby }}
+                    <div class="alert alert-block">
+                        You may add a short comment or request here and we will do our best
+                        to accommodate you. Please <b>DO NOT</b> use this to ask a question
+                        or request special meals - please call us. 
+                    </div>  
+                {{/ purchase.bookedby }}
+                {{{ form.comment }}}
+            {{/ iscomments }}
+                        
+            {{# issupplement }}
+                <div class="alert alert-block">
+                    You may specially request the single seats by the window in our
+                    'First Open' coaches. These are available in limited numbers to
+                    First Class passengers at
+                    a charge of &pound;{{ service.singlesupplement }}
+                    per person<br />
+                </div>  
+                {{{ form.seatsupplement }}}
+            {{/ issupplement }}
+
+            <div>
+                <input type="submit" name="next" value="Next step" class="btn btn-primary" />
+                <input type="submit" name="back" value="Back" class="btn btn-warning"  />
+            </div>
+        </form>
+
+    </div>
+
+</div>
 
 {{> footer }}

@@ -1,49 +1,59 @@
 {{> header }}
 
+{{> usermenu }}
+
+<div class="container-fluid px-4">
+
     {{> booking/telephonestatus }}
 
-    <h3 class="text-error">Your personal details</h3>
+    <h1 class="display-6 text-center">Your personal details</h1>
 
-    <p>
-        Please provide your contact details and address for delivery of
-        your Railtour tickets. Make sure you provide a working email and/or
-        telephone contact so we can get in touch with you if we need to.
-    </p>
+    <div class="container border shadow p-3">
 
-    {{> form_errors }}
+        <p>
+            Please provide your contact details and address for delivery of
+            your Railtour tickets. <b>Make sure you provide a working email and/or
+            telephone contact so we can get in touch with you if we need to.</b>
+        </p>
 
-    <form id="personal-form" class="form-horizontal" action="{{# path }}booking/personal{{/ path }}" method="post">
-        {{{ form.title }}}
-        {{{ form.firstname }}}
-        {{{ form.surname }}}
-        {{{ form.address1 }}}
-        {{{ form.address2 }}}
-        {{{ form.city }}}
-        {{{ form.county }}}
-        {{{ form.postcode }}}
-        {{{ form.phone }}}
-        {{# showemail }}
-            {{{ form.email }}}
-        {{/ showemail }}    
+        {{> form_errors }}
 
-        {{# service.eticketenabled }}
-            {{# service.eticketoptional }}
-                <div class="panel panel-info">
-                    <div class="panel-heading">eTicket (Ticket by email)</div>
-                    <div class="panel-body">
-                        Please let us know if you would like an 'eTicket' send by email? This will be send approximately
-                        one week before the tour. You will need access to a printer to print your own ticket.
-                        {{ form_yesno('eticket', 'Send eTicket by email', purchase.eticket) }}
+        <form id="personal-form" class="form-horizontal" action="{{# path }}booking/personal{{/ path }}" method="post">
+            {{{ form.title }}}
+            {{{ form.firstname }}}
+            {{{ form.surname }}}
+            {{{ form.address1 }}}
+            {{{ form.address2 }}}
+            {{{ form.city }}}
+            {{{ form.county }}}
+            {{{ form.postcode }}}
+            {{{ form.phone }}}
+            {{# showemail }}
+                {{{ form.email }}}
+            {{/ showemail }}    
+
+            {{# service.eticketenabled }}
+                {{# service.eticketoptional }}
+                    <div class="panel panel-info">
+                        <div class="panel-heading">eTicket (Ticket by email)</div>
+                        <div class="panel-body">
+                            Please let us know if you would like an 'eTicket' send by email? This will be send approximately
+                            one week before the tour. You will need access to a printer to print your own ticket.
+                            {{ form_yesno('eticket', 'Send eTicket by email', purchase.eticket) }}
+                        </div>
                     </div>
-                </div>
-            {{/ service.eticketoptional }}    
-        {{/ service.eticketenabled }}
+                {{/ service.eticketoptional }}    
+            {{/ service.eticketenabled }}
 
-        <div>
-            <input type="submit" name="next" value="Final step" class="btn btn-primary" />
-            <input type="submit" name="back" value="Back" class="btn btn-warning" formnovalidate />
-        </div>
-    </form>
+            <div>
+                <input type="submit" name="next" value="Final step" class="btn btn-primary" />
+                <input type="submit" name="back" value="Back" class="btn btn-warning" formnovalidate />
+            </div>
+        </form>
+
+    </div>
+
+</div>
 
 {{> footer }}
 
