@@ -2,143 +2,151 @@
 
 {{> adminmenu }}
 
-<h3 class="adminpage_title">Railtour Reports <i>"{{ service.name }}"</i></h3>
+<div class="container-fluid px-4">
 
-    {{# resend }}
-        <div class="alert alert-success">{{ resend }}</div>
-    {{/ resend}}
-    
-    {{# purchase.statusclass }}
-        <div class="alert alert-block alert-{{ purchase.statusclass }}">
-            This payment was not completed or failed. No seats should be allocated
-        </div>
-    {{/purchase.statusclass}}
+    <h1 class="display-6 text-center">{{ service.name }}</h1>  
 
-    <table class="table table-striped table-condensed">
-        <tbody>
-               {{# purchase.bookedby}}                
-                   <tr>
-                        <td colspan="2" class="alert alert-success"><i class="fas fa-phone"></i> TELEPHONE BOOKING</td>
+    <div class="container border rounded shadow p-3"> 
+
+        {{# resend }}
+            <div class="alert alert-success">{{ resend }}</div>
+        {{/ resend}}
+        
+        {{# purchase.statusclass }}
+            <div class="alert alert-block alert-{{ purchase.statusclass }}">
+                This payment was not completed or failed. No seats should be allocated
+            </div>
+        {{/purchase.statusclass}}
+
+        <table class="table table-striped table-condensed">
+            <tbody>
+                {{# purchase.bookedby}}                
+                    <tr>
+                            <td colspan="2" class="alert alert-success"><i class="fas fa-phone"></i> TELEPHONE BOOKING</td>
+                        </tr>
+                    {{/ purchase.bookedby }}
+                    <tr>
+                        <th>Booking Ref</th>
+                        <td>{{ purchase.bookingref }}</td>
                     </tr>
-                {{/ purchase.bookedby }}
-                <tr>
-                    <th>Booking Ref</th>
-                    <td>{{ purchase.bookingref }}</td>
-                </tr>
-                <tr>
-                    <th>Payment status</th>
-                    <td>{{ purchase.status }} {{# purchase.statusdetail }}<i>"{{ purchase.statusdetail }}"</i>{{/ purchase.statusdetail }}
-                        {{^ purchase.status }}<span class="alert alert-danger">No status returned from SagePay!</span>{{/purchase.status}}
-                    </td>
-                </tr>
-                <tr>
-                    <th>Booking date</th>
-                    <td>{{ purchase.formatteddate }}</td>
-                </tr>
-                <tr>
-                    <th>Payment made</th>
-                    <td>&pound;{{ purchase.payment }}</td>
-                </tr>
-                <tr>
-                    <th>Customer</th>
-                    <td>{{ purchase.title }} {{ purchase.firstname }} {{ purchase.surname }}</td>
-                </tr>
-                <tr>
-                    <th>Address</th>
-                    <td>
-                        <address>
-                            {{ purchase.address1 }}<br />{{ purchase.address2 }}<br />
-                            {{ purchase.city }}<br />{{ purchase.county }}<br />
-                            {{ purchase.postcode }}
-                        </address>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Telephone</th>
-                    <td>{{ purchase.phone }}</td>
-                </tr>
-                <tr>
-                    <th>Email</th>
-                    <td><a href="mailto:{{ purchase.email }}">{{ purchase.email }}</a>
-                        {{# purchase.email }}
-                            &nbsp;<a href="{{# path }}report/resend{{/ path }}/{{ purchase.id }}" data-toggle="tooltip" title="Re-send email"><i class="far fa-envelope fa-2x"></i></a>
-                        {{/ purchase.email }}    
-                    </td>
-                </tr>
-                <tr>
-                    <th>Joining station</th>
-                    <td>{{ purchase.joining }}</td>
-                </tr>
-                <tr>
-                    <th>Destination</th>
-                    <td>{{ purchase.destination }}</td>
-                </tr>
-                <tr>
-                    <th>Travel class</th>
-                    <td>{{ purchase.formattedclass }}</td>
-                </tr>
-                <tr>
-                    <th>Number of Adults</th>
-                    <td>{{ purchase.adults }}</td>
-                </tr>
-                <tr>
-                    <th>Number of children</th>
-                    <td>{{ purchase.children }}</td>
-                </tr>
-                <tr>
-                    <th>Booked Meal A ({{ service.mealaname }})</th>
-                    <td>{{ purchase.meala }}</td>
-                </tr>
-                <tr>
-                    <th>Booked Meal B ({{ service.mealbname }})</th>
-                    <td>{{ purchase.mealb }}</td>
-                </tr>
-                <tr>
-                    <th>Booked Meal C ({{ service.mealcname }})</th>
-                    <td>{{ purchase.mealc }}</td>
-                </tr>
-                <tr>
-                    <th>Booked Meal D ({{ service.mealdname }})</th>
-                    <td>{{ purchase.meald }}</td>
-                </tr>
-                <tr>
-                    <th>First window/single requested?</th>
-                    <td>
-                        {{ purchase.formattedseatsupplement }}
-                        {{# purchase.seatsupplement }}
-                            (&pound;{{ service.singlesupplement }} each)
-                        {{/ purchase.seatsupplement }}
-                    </td>
-                </tr>
-                <tr>
-                    <th>Comment</th>
-                    <td>{{ purchase.comment }}</td>
-                </tr>
-                <tr>
-                    <th>Card &amp; last 4 digits</th>
-                    <td>{{ purchase.cardtype }}  {{ purchase.last4digits }}</td>
-                </tr>
-                <tr>
-                    <th>Bank auth code</th>
-                    <td>{{ purchase.bankauthcode }}</td>
-                </tr>
-                <tr>
-                    <th>eTicket selected?</th>
-                    <td>{{ purchase.formattedeticket }}</td>
-                </tr> 
-                <tr>
-                    <th>eInfo selected?</th>
-                    <td>{{ purchase.formattedeinfo }}</td>
-                </tr> 
-                <tr>
-                    <th>Booked by (telephone booking only)</th>
-                    <td>{{ purchase.bookedby }}</td>
-                </tr>
-        </tbody>
-    </table>
+                    <tr>
+                        <th>Payment status</th>
+                        <td>{{ purchase.status }} {{# purchase.statusdetail }}<i>"{{ purchase.statusdetail }}"</i>{{/ purchase.statusdetail }}
+                            {{^ purchase.status }}<span class="alert alert-danger">No status returned from SagePay!</span>{{/purchase.status}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Booking date</th>
+                        <td>{{ purchase.formatteddate }}</td>
+                    </tr>
+                    <tr>
+                        <th>Payment made</th>
+                        <td>&pound;{{ purchase.payment }}</td>
+                    </tr>
+                    <tr>
+                        <th>Customer</th>
+                        <td>{{ purchase.title }} {{ purchase.firstname }} {{ purchase.surname }}</td>
+                    </tr>
+                    <tr>
+                        <th>Address</th>
+                        <td>
+                            <address>
+                                {{ purchase.address1 }}<br />{{ purchase.address2 }}<br />
+                                {{ purchase.city }}<br />{{ purchase.county }}<br />
+                                {{ purchase.postcode }}
+                            </address>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Telephone</th>
+                        <td>{{ purchase.phone }}</td>
+                    </tr>
+                    <tr>
+                        <th>Email</th>
+                        <td><a href="mailto:{{ purchase.email }}">{{ purchase.email }}</a>
+                            {{# purchase.email }}
+                                &nbsp;<a href="{{# path }}report/resend{{/ path }}/{{ purchase.id }}" data-toggle="tooltip" title="Re-send email"><i class="far fa-envelope fa-2x"></i></a>
+                            {{/ purchase.email }}    
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Joining station</th>
+                        <td>{{ purchase.joining }}</td>
+                    </tr>
+                    <tr>
+                        <th>Destination</th>
+                        <td>{{ purchase.destination }}</td>
+                    </tr>
+                    <tr>
+                        <th>Travel class</th>
+                        <td>{{ purchase.formattedclass }}</td>
+                    </tr>
+                    <tr>
+                        <th>Number of Adults</th>
+                        <td>{{ purchase.adults }}</td>
+                    </tr>
+                    <tr>
+                        <th>Number of children</th>
+                        <td>{{ purchase.children }}</td>
+                    </tr>
+                    <tr>
+                        <th>Booked Meal A ({{ service.mealaname }})</th>
+                        <td>{{ purchase.meala }}</td>
+                    </tr>
+                    <tr>
+                        <th>Booked Meal B ({{ service.mealbname }})</th>
+                        <td>{{ purchase.mealb }}</td>
+                    </tr>
+                    <tr>
+                        <th>Booked Meal C ({{ service.mealcname }})</th>
+                        <td>{{ purchase.mealc }}</td>
+                    </tr>
+                    <tr>
+                        <th>Booked Meal D ({{ service.mealdname }})</th>
+                        <td>{{ purchase.meald }}</td>
+                    </tr>
+                    <tr>
+                        <th>First window/single requested?</th>
+                        <td>
+                            {{ purchase.formattedseatsupplement }}
+                            {{# purchase.seatsupplement }}
+                                (&pound;{{ service.singlesupplement }} each)
+                            {{/ purchase.seatsupplement }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Comment</th>
+                        <td>{{ purchase.comment }}</td>
+                    </tr>
+                    <tr>
+                        <th>Card &amp; last 4 digits</th>
+                        <td>{{ purchase.cardtype }}  {{ purchase.last4digits }}</td>
+                    </tr>
+                    <tr>
+                        <th>Bank auth code</th>
+                        <td>{{ purchase.bankauthcode }}</td>
+                    </tr>
+                    <tr>
+                        <th>eTicket selected?</th>
+                        <td>{{ purchase.formattedeticket }}</td>
+                    </tr> 
+                    <tr>
+                        <th>eInfo selected?</th>
+                        <td>{{ purchase.formattedeinfo }}</td>
+                    </tr> 
+                    <tr>
+                        <th>Booked by (telephone booking only)</th>
+                        <td>{{ purchase.bookedby }}</td>
+                    </tr>
+            </tbody>
+        </table>
 
-    <div class="btn-group">
-        <a class="btn btn-primary" href="{{# path }}report/list{{/ path }}/{{ service.id }}">Back to list</a>
+        <div class="btn-group">
+            <a class="btn btn-primary" href="{{# path }}report/list{{/ path }}/{{ service.id }}">Back to list</a>
+        </div>
+
     </div>
+
+</div>
 
 {{> footer }}

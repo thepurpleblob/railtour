@@ -41,7 +41,7 @@ class reportController extends coreController {
         $purchase = Admin::getPurchase($purchaseid);
 
         // ...and the service record
-        $service = $this->adminlib->getService($purchase->serviceid);
+        $service = Admin::getService($purchase->serviceid);
 
         $this->View('report/view', array(
             'service' => $service,

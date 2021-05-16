@@ -1,0 +1,80 @@
+{{> header }}
+
+{{> usermenu }}
+
+<div class="container-fluid px-4">
+
+    {{> booking/telephonestatus }}
+
+    <h1 class="display-6 text-center">Your booking</h1>
+
+    <div id="vapp" class="container border shadow p-3">
+
+        <div v-if="loading">
+            Loading....
+        </div>
+
+        <div v-else>
+            <form>
+
+                <h4>
+                    Select Travel class
+                </h4>
+                <div>
+                    Click the class you would like your party to travel in. <i>Availability of other options may depend on the class selected</i>
+                </div>
+                <div>
+                    <div>
+                        <div id="class" class="d-flex flex-row p-5">
+                            <div @click="classClick('first')" :class="{ 'bg-primary': isClassFirst }" class="p-2 m-2 border rounded">
+                                First
+                            </div>
+                            <div @click="classClick('standard')" :class="{ 'bg-primary': isClassStandard }" class="p-2 m-2 border rounded">
+                                Standard
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h4>
+                    Choose Passenger numbers
+                </h4>
+                <div class="text-muted mb-3">
+                    <i class="bi bi-info-circle text-info"></i> Total party size must be between <% numbers.minparty %> and <% numbers.maxparty %> persons. 
+                </div>
+                <div class="mb-3">
+                    <label for="form_passengers" class="form-label">Total number of passengers (adults and children)</label>
+                    <select id="form_passengers" class="form-select" v-model="form.passengers" @change="passengersChange">
+                        <option value="0" disabled>Select...</option>
+                        <option v-for="value in getNumbers(numbers.minparty, numbers.maxparty)" v-bind:value="value">
+                            <% value %>
+                        </option>
+                    </select>
+                    <div class="form-text">
+                        <i class="bi bi-info-circle text-info"></i> All passengers age 5 and above (infants travel free)
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="form_children" class="form-label">Number of children in party</label>
+                    <select id="form_children" class="form-select" v-model="form.children" :disabled="!passengersselected" @change="childrenChange">
+                        <option value="0">None</option>
+                        <option v-for="value in getNumbers(1, numbers.maxchildren)" v-bind:value="value">
+                            <% value %>
+                        </option>
+                    </select>
+                    <div class="form-text">
+                        <i class="bi bi-info-circle text-info"></i> 14 years old and under. Do not include infants (under 5) who travel free but will not
+                        be allocated a seat.
+                    </div>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="{{ config.www }}/src/assets/js/single.js" type="module"></script>
+
+{{> footer }}

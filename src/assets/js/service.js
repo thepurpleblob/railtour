@@ -15,6 +15,12 @@ const vueApp = new Vue({
             const data = response.data
             v.content = data.description
         })
+        .catch(error => {
+            iziToast.error({
+                'title': 'Error',
+                'message': 'Link to server has failed - ' +error.message,
+            })
+        })
     },
     methods: {
         submit() {

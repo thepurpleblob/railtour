@@ -17,6 +17,12 @@ const vueApp = new Vue({
                 v.crs = data.crs
                 v.name = data.station
             })
+            .catch(error => {
+                iziToast.error({
+                    'title': 'Error',
+                    'message': 'Link to server has failed - ' + error.message,
+                })
+            })
         }
     },
     methods: {
@@ -29,6 +35,12 @@ const vueApp = new Vue({
                 if (name) {
                     v.name = name
                 }
+            })
+            .catch(error => {
+                iziToast.error({
+                    'title': 'Error',
+                    'message': 'Link to server has failed - ' + error.message,
+                })
             })
         }
     }

@@ -3,6 +3,8 @@
 namespace thepurpleblob\railtour\controller;
 
 use thepurpleblob\core\coreController;
+use thepurpleblob\railtour\library\Admin;
+use thepurpleblob\railtour\library\Booking;
 
 /**
  * Limits controller.
@@ -10,37 +12,21 @@ use thepurpleblob\core\coreController;
  */
 class LimitsController extends coreController {
 
-    protected $adminlib;
-
-    protected $bookinglib;
-
-    /**
-     * Constructor
-     */
-    public function __construct($exception = false)
-    {
-        parent::__construct($exception);
-
-        // Library
-        $this->adminlib = $this->getLibrary('Admin');
-        $this->bookinglib = $this->getLibrary('Booking');
-    }
-
     /**
      * Edits the existing Limits entity.
      */
     public function editAction($serviceid)
     {
-        $service = $this->adminlib->getService($serviceid);
+        $service = Admin::getService($serviceid);
         $this->require_login('ROLE_ORGANISER', 'limits/edit/' . $serviceid);
 
-        $limits = $this->adminlib->getLimits($serviceid);
+        $limits = Admin::getLimits($serviceid);
 
         // Get destinations (for destination limits)
-        $destinations = $this->adminlib->getDestinations($serviceid);
+        $destinations = Admin::getDestinations($serviceid);
 
         // Get the current counts of everything
-        $count = $this->bookinglib->countStuff($serviceid);
+        $count = Booking::countStuff($serviceid);
 
         // Create array of destinations limits
         $destinationlimits = array();

@@ -1011,5 +1011,17 @@ class BookingController extends coreController {
         }
     }
 
+    /**
+     * "Singlepage" take on booking
+     * @param int $serviceid
+     */
+    public function singleAction($serviceid) {
+        $service = Admin::getService($serviceid);
+
+        $this->View('booking/single', [
+            'service' => $service,
+        ]);
+    }
+
 }
 

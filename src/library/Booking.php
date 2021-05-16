@@ -6,6 +6,9 @@ use Exception;
 use thepurpleblob\railtour\library\Admin;
 use thepurpleblob\core\Session;
 
+define('CLASS_STANDARD', 'S');
+define('CLASS_FIRST', 'F');
+
 /**
  * Class Booking
  * @package thepurpleblob\railtour\library
@@ -323,6 +326,65 @@ class Booking  {
     }
 
     /**
+     * Get Vue form info
+     * Rambling set of data to describe possible limits and options for
+     * Vue driven input forms. 
+     * @param int purchaseid
+     * @return object
+     */
+    public static function getSingleFormLimits($purchaseid) {
+        $single = new \stdClass();
+
+        // Anything that requires limited availability warning
+        $limited = false;
+
+        // Basic data
+        $purchase = Booking::getPurchaseRecord($purchaseid);
+        $serviceid = $purchase->serviceid;
+        $service = Admin::getService($serviceid);
+        $limits = Admin::getLimits($serviceid);
+        $maxparty = Booking::getMaxparty($limits);
+        $count = Booking::countStuff($serviceid, $purchase);
+
+        // Booking numbers (work out booking numbers)
+        $single->maxparty = (int)$maxparty;
+        if ($limits->minparty) {
+            $single->minparty = $limits->minparty;
+        } else {
+            $single->minparty = 1;
+        }
+        $single->minparty = 1;
+
+        // Travel class may not be defined (yet)
+        if ($purchase->class == CLASS_FIRST) {
+            if ($limits->minpartyfirst) {
+                $single->minparty = $limits->minpartyfirst;
+            }
+            if ($limits->maxpartfirst) {
+                $single->maxparty = $limits->maxpartyfirst;
+            }
+            if ($count->remainingfirst < $single->maxparty) {
+                $single->maxparty = $count->remainingfirst;
+                $limited = true;
+            }
+        } else if ($purchase->class == CLASS_STANDARD) {
+            if ($count->remainingstandard < $single->maxparty) {
+                $single->maxparty = $count->remainingstandard;
+                $limit = true;
+            }
+        }
+        $single->maxchildren = $single->maxparty - $purchase->adults;
+        if ($single->maxchildren < 0) {
+            $single->maxchildren = 0;
+        }
+        $single->noseats = $single->maxparty <= 0;
+
+        $single->limited = $limited;
+
+        return $single;
+    }
+
+    /**
      * Use count to get an idea of the progress of the bookings
      * @param int $serviceid
      * @param int percentage
@@ -487,16 +549,18 @@ class Booking  {
      * Create array of choices for numeric drop-down
      * @param int $max maximum value of numeric choices
      * @param bool $none if true add 'None' in 0th place
+     * @param int $min minumum value of numeric choices
      * @return array
      */
-    public static function choices($max, $none) {
+    public static function choices($max, $none, $min=1) {
         if ($none) {
-            $choices = array(0 => 'None');
+            $choices = [0 => 'None'];
         } else {
-            $choices = array();
+            $choices = [];
         }
-        for ($i=1; $i <= $max; $i++) {
-            $choices[$i] = "$i";
+        for ($i=$min; $i <= $max; $i++) {
+            //$choices[$i] = "$i";
+            $choices[$i] = $i;
         }
 
         return $choices;

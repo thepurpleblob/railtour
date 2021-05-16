@@ -6,6 +6,7 @@ use thepurpleblob\core\coreController;
 use thepurpleblob\core\Session;
 use thepurpleblob\core\Form;
 use thepurpleblob\railtour\library\Admin;
+use thepurpleblob\railtour\library\Booking;
 
 /**
  * Destination controller.
@@ -77,5 +78,79 @@ class ApiController extends coreController {
 
         echo $name;
     }
+
+    /**
+     * Get current purchase
+     * @param int $serviceid
+     */
+    public function getpurchaseAction($serviceid) {
+        $service = Admin::getService($serviceid);
+        $purchase = Booking::getSessionPurchase($this, $serviceid);
+        if ($purchase->bookedby) {
+            $this->require_login('ROLE_TELEPHONE', 'booking/numbers/' . $serviceid);
+        }
+
+        header('Content-type:application/json;charset=utf-8');
+        echo json_encode($purchase->as_array(), JSON_NUMERIC_CHECK);        
+    }
+
+    /**
+     * Update class
+     * @param string class (F or S)
+     */
+    public function setclassAction($class) {
+        if (($class != 'S') && ($class != 'F')) {
+            throw new \Exception('Class must be S or F');
+        }
+        $purchase = Booking::getSessionPurchase($this);
+        if ($purchase->bookedby) {
+            $this->require_login('ROLE_TELEPHONE', 'booking/joining');
+        }
+        $purchase->class = $class;
+        $purchase->save();
+    }
+
+    /**
+     * Update passenger numbers
+     * @param int $adults
+     * @param int $children
+     */
+    public function setpassengersAction($adults, $children) {
+        $purchase = Booking::getSessionPurchase($this);
+        if ($purchase->bookedby) {
+            $this->require_login('ROLE_TELEPHONE', 'booking/joining');
+        }
+        $formlimits = Booking::getSingleFormLimits($purchase->id);
+
+        // validation
+        if (!is_numeric($adults) || !is_numeric($children)) {
+            throw new \Exception('Passenger numbers are invalid parameters');
+        }
+        $passengers = $adults + $children;
+        if (($passengers < $formlimits->minparty) || ($passengers > $formlimits->maxparty)) {
+            throw new \Exception('Number of passengers out of permitted range');
+        }
+
+        $purchase->adults = $adults;
+        $purchase->children = $children;
+        $purchase->save();
+    }
+
+    /**
+     * Get party limits for booking form
+     */
+    public function getbookingnumbersAction() {
+        $purchase = Booking::getSessionPurchase($this);
+        $serviceid = $purchase->serviceid;
+        $service = Admin::getService($serviceid);
+        if ($purchase->bookedby) {
+            $this->require_login('ROLE_TELEPHONE', 'booking/joining');
+        }
+        $limits = Booking::getSingleFormLimits($purchase->id);
+  
+        header('Content-type:application/json;charset=utf-8');
+        echo json_encode($limits); 
+    }
+
 
 }
