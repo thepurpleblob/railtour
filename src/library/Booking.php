@@ -373,13 +373,18 @@ class Booking  {
                 $limit = true;
             }
         }
-        $single->maxchildren = $single->maxparty - $purchase->adults;
-        if ($single->maxchildren < 0) {
+        if ($purchase->adults) {
+            $single->maxchildren = $purchase->adults + $purchase->children - 1;
+            $single->showchildren = true;
+        } else {
             $single->maxchildren = 0;
+            $single->showchildren = false;
         }
         $single->noseats = $single->maxparty <= 0;
 
         $single->limited = $limited;
+        $single->minparty = (int)$single->minparty;
+        $single->maxparty = (int)$single->maxparty;
 
         return $single;
     }
@@ -661,9 +666,17 @@ class Booking  {
 
     /**
      * detect if any meals are available
+     * @param object $service
+     * @param object $purchase
      * @return boolean
      */
-    public static function mealsAvailable($service) {
+    public static function mealsAvailable($service, $purchase) {
+        if ($purchase->class = 'F' && !$service->mealsinfirst) {
+            return false;
+        }
+        if ($purchase->class = 'S' && !$service->mealsinstandard) {
+            return false;
+        }
         return
             $service->mealavisible ||
             $service->mealbvisible ||
@@ -758,7 +771,7 @@ class Booking  {
             'destinationid' => $destinationid,
         ))->findOne();
         if (!$priceband) {
-            throw new Exception('No priceband found for pricebandgroup id = ' . $pricebandgroupid . ' destinationid = ' . $destinationid);
+            throw new Exception('No priceband found for pricebandgroupid = ' . $pricebandgroupid . ' destinationid = ' . $destinationid);
         }
 
         // we return an object with various info

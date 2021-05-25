@@ -17,62 +17,179 @@
         <div v-else>
             <form>
 
-                <h4>
-                    Select Travel class
-                </h4>
                 <div>
-                    Click the class you would like your party to travel in. <i>Availability of other options may depend on the class selected</i>
+                    <ul>
+                        <li v-for="(name, index) in stepinfo.steps"><a @click.prevent="stepChange(index)"><% name %></a></li>
+                    </ul>
                 </div>
-                <div>
-                    <div>
-                        <div id="class" class="d-flex flex-row p-5">
-                            <div @click="classClick('first')" :class="{ 'bg-primary': isClassFirst }" class="p-2 m-2 border rounded">
-                                First
+
+                <div v-show="step == 1" class="container px-4">
+                    <h4>
+                        Select Destination or Option
+                    </h4>
+
+                    <div class="mb-3">
+                        There is more than one destination or option for this tour. Please choose
+                        the one you would like.
+                    </div>
+                    <div class="row gx-5 gy-4 mb-5">
+                        {{# destinations }}
+                            <div class="col-sm-12 col-md-6">
+                                <div class="card border border-3 rounded-3" :class="{ 'border-primary': destinationselected == '{{ crs }}' }">
+                                    <div class="card-header">
+                                        <h5 class="card-title">{{ name }}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">{{{ description }}}</p>
+                                        <p class="card-text"><button 
+                                            @click.prevent="destinationClick('{{ crs }}', '{{ name }}')"
+                                            class="btn"
+                                            :class="{ 'btn-primary' : destinationselected == '{{ crs }}', 'btn-secondary': destinationselected != '{{ crs }}' }">Select</button></p>
+                                    </div>
+                                </div>
                             </div>
-                            <div @click="classClick('standard')" :class="{ 'bg-primary': isClassStandard }" class="p-2 m-2 border rounded">
-                                Standard
+                        {{/ destinations }}
+                    </div>
+                </div>
+ 
+                <div v-show="step == 2" id="joinings" class="container px-4">
+                    <h4>
+                        Select Joining Station
+                    </h4>
+                    <div class="mb-3">
+                        Please click the station you will be joining the train at.
+                    </div>
+                    <div class="row gx-5 gy-1 mb-5">
+                        {{# joinings }}
+                            <div class="col-sm-12 col-md-6 col-lg-4">
+                                <div @click="joiningClick('{{ crs }}', '{{ station }}')" class="btn" :class="{ 'btn-primary': joiningselected == '{{ crs }}', 'btn-secondary': joiningselected != '{{ crs }}' }">
+                                    {{ station }}
+                                </div>
+                            </div>
+                        {{/ joinings }}
+                    </div>
+                </div>
+
+                <div v-show="step == 3" id="travelclass" class="container px-4">
+                    <h4>
+                        Select Travel Class
+                    </h4>
+                    <div class="mb-3">
+                        Click the class you would like your party to travel in. <i>Availability of other options may depend on the class selected</i>
+                    </div>
+                    <div id="class" class="row gx-5 gy-4 mb-5">
+                        <div class="col-sm-12 col-md-6">
+                            <div :class="{ 'border-primary': classselected == 'F' }" class="card border border-3 rounded-3">
+                                <div class="card-header">
+                                    <h5 class="card-title">First Class</h5>
+                                </div>
+                                <div class="card-body">
+                                    <ul v-if="supp.valid" class="list-unstyled">
+                                        <li>First class ticket prices</li>
+                                        <li>Adult £<% supp.firstadult %></li>
+                                        <li>Child £<% supp.firstchild %></li>
+                                    </ul>
+                                    <p v-if="supp.availablefirst" class="card-text"><button @click.prevent="classClick('F', 'First')" class="btn btn-primary">Select</button></p>
+                                    <p v-else class="card-text text-danger">There are no seats left in First</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-6">
+                            <div  :class="{ 'border-primary': classselected == 'S' }" class="card border border-3 rounded-3">
+                                <div class="card-header">
+                                    <h5 class="card-title">Standard Class</h5>
+                                </div>
+                                <div class="card-body">
+                                    <ul v-if="supp.valid" class="list-unstyled">
+                                        <li>Standard class ticket prices</li>
+                                        <li>Adult £<% supp.standardadult %></li>
+                                        <li>Child £<% supp.standardchild %></li>
+                                    </ul>
+                                    <p v-if="supp.availablestandard" class="card-text"><button @click.prevent="classClick('S', 'Standard')" class="btn btn-primary">Select</button></p>
+                                    <p v-else class="card-text text-danger">There are no seats left in Standard</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <h4>
-                    Choose Passenger numbers
-                </h4>
-                <div class="text-muted mb-3">
-                    <i class="bi bi-info-circle text-info"></i> Total party size must be between <% numbers.minparty %> and <% numbers.maxparty %> persons. 
-                </div>
-                <div class="mb-3">
-                    <label for="form_passengers" class="form-label">Total number of passengers (adults and children)</label>
-                    <select id="form_passengers" class="form-select" v-model="form.passengers" @change="passengersChange">
-                        <option value="0" disabled>Select...</option>
-                        <option v-for="value in getNumbers(numbers.minparty, numbers.maxparty)" v-bind:value="value">
-                            <% value %>
-                        </option>
-                    </select>
-                    <div class="form-text">
-                        <i class="bi bi-info-circle text-info"></i> All passengers age 5 and above (infants travel free)
+                <div v-show="step == 4" id="numbers" class="container px-4">
+                    <h4>
+                        Choose Passenger numbers
+                    </h4>
+                    <div class="text-muted mb-3">
+                        <i class="bi bi-info-circle text-info"></i> Total party size must be between <% numbers.minparty %> and <% numbers.maxparty %> persons. 
+                    </div>
+                    <div class="row gx-5 gy-4 mb-3">
+                        <div class="col-sm-12 col-md-6">
+                            <div class="border rounded p-4">
+                                <label for="form_passengers" class="form-label"><b>Total number of passengers (adults and children)</b></label>
+                                <select id="form_passengers" class="form-select mb-3" v-model="form.passengers" @change="passengersChange">
+                                    <option value="0" disabled>Select...</option>
+                                    <option v-for="value in getNumbers(numbers.minparty, numbers.maxparty)" v-bind:value="value">
+                                        <% value %>
+                                    </option>
+                                </select>
+                                <div class="form-text">
+                                    <div class="d-flex flex-row">
+                                        <div class="pe-2"><i class="bi bi-info-circle text-info"></i></div><div>All passengers age 5 and above (infants travel free)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-6">
+                            <div v-show="passengersselected && numbers.showchildren" class="border rounded p-4">
+                                <label v-show="passengersselected && numbers.showchildren" for="form_children" class="form-label"><b>Number of children in party</b></label>
+                                <select id="form_children" class="form-select mb-3" v-model="form.children" :disabled="!passengersselected" @change="childrenChange">
+                                    <option value="0">None</option>
+                                    <option v-for="value in getNumbers(1, numbers.maxchildren)" v-bind:value="value">
+                                        <% value %>
+                                    </option>
+                                </select>
+                                <div class="form-text">
+                                    <div class="d-flex flex-row">
+                                        <div class="pe-2"><i class="bi bi-info-circle text-info"></i></div><div>14 years old and under. Do not include infants (under 5) who travel free but will not
+                                    be allocated a seat.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button @click.prevent="numbersNext" class="btn btn-primary">Next</button>
                     </div>
                 </div>
-                <div class="mb-3">
-                    <label for="form_children" class="form-label">Number of children in party</label>
-                    <select id="form_children" class="form-select" v-model="form.children" :disabled="!passengersselected" @change="childrenChange">
-                        <option value="0">None</option>
-                        <option v-for="value in getNumbers(1, numbers.maxchildren)" v-bind:value="value">
-                            <% value %>
-                        </option>
-                    </select>
-                    <div class="form-text">
-                        <i class="bi bi-info-circle text-info"></i> 14 years old and under. Do not include infants (under 5) who travel free but will not
-                        be allocated a seat.
-                    </div>
+
+                <div v-show="step == 4" id="numbers" class="container px-4">
+                    <h4>
+                        Choose meals
+                    </h4>
                 </div>
+
 
             </form>
         </div>
 
     </div>
+</div>
 
+<!-- Modal -->
+<div class="modal fade" id="passengerModal" tabindex="-1" aria-labelledby="passengerModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="passengerModalLabel">Passenger numbers changed</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Changing the number of passengers has forced the number of children in the party to be reduced. Please check
+        your passenger numbers are correct. 
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="{{ config.www }}/src/assets/js/single.js" type="module"></script>

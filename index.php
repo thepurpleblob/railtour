@@ -15,11 +15,6 @@ function dd($message, ...$values) {
     die;
 }
 
-// Error handling
-$whoops = new \Whoops\Run;
-$whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
-$whoops->register();
-
 // Use classes
 use thepurpleblob\core\setup;
 use thepurpleblob\core\install;
@@ -55,12 +50,19 @@ if ($info) {
 }
 
 // get controller and action
-$controller_name = $paths[1];
+$controller_name = trim($paths[1]);
 if (!$controller_name) {
     throw new Exception("No controller specified for '$controller_name'");
 }
 if (!$action_name = $paths[2]) {
     throw new Exception("No action specified for controller '$controller_name'");
+}
+
+// Set error handling but not for api calls
+if ($controller_name != 'api') {
+    $whoops = new \Whoops\Run;
+    $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
+    $whoops->register();
 }
 
 // try to load controller

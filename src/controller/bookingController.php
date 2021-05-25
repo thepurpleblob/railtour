@@ -448,7 +448,7 @@ class BookingController extends coreController {
         }
 
         // If there are no meals on this service just bail
-        if (!Booking::mealsAvailable($service)) {
+        if (!Booking::mealsAvailable($service, $purchase)) {
             if ($this->back) {
                 $this->redirect('booking/destination', true);
             } else {
@@ -1017,9 +1017,48 @@ class BookingController extends coreController {
      */
     public function singleAction($serviceid) {
         $service = Admin::getService($serviceid);
+        $purchase = Booking::getSessionPurchase($this, $serviceid);
+
+        // get the destinations
+        $stations = Booking::getDestinationStations($serviceid);
+
+        // If there is only one then there is nothing to do
+        if (count($stations)==1) {
+            $purchase->destination = key($stations);
+            $purchase->save();
+            $destinations = [];
+            $isdestinations = false;   
+        } else {
+            $destinations = Admin::getDestinations($serviceid);
+            $isdestinations = true;
+        }
+
+        // get the joining stations
+        $joining = Booking::getJoiningStations($serviceid);
+
+        // If there is only one then there is nothing to do
+        if (count($joining)==1) {
+            reset($joining);
+            $purchase->joining = key($joining);
+            $purchase->save();
+            $joinings = [];
+            $isjoinings = false;   
+        } else {
+            $joinings = Admin::getJoinings($serviceid);
+            $isjoinings = true;
+        }
+        
+        // Starting step
+        $step = 1;
 
         $this->View('booking/single', [
             'service' => $service,
+            'isdestinations' => $isdestinations,
+            'destinations' => $destinations,
+            'isjoinings' => $isjoinings,
+            'joinings' => $joinings,
+            'ismeals' => Booking::mealsAvailable($service, $purchase),
+            'meals' => Booking::mealsForm($service, $purchase),
         ]);
     }
 
