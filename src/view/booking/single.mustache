@@ -15,6 +15,9 @@
         </div>
 
         <div v-else>
+
+            {{> booking/telephonestatus }}
+
             <form>
 
                 <div>
@@ -50,6 +53,9 @@
                             </div>
                         {{/ destinations }}
                     </div>
+                    <div>
+                        <button :disabled="!destinationselected" @click.prevent="pageNext(2)" class="btn btn-primary">Next</button>
+                    </div>
                 </div>
  
                 <div v-show="step == 2" id="joinings" class="container px-4">
@@ -67,6 +73,9 @@
                                 </div>
                             </div>
                         {{/ joinings }}
+                    </div>
+                    <div>
+                        <button :disabled="!joiningselected" @click.prevent="pageNext(3)" class="btn btn-primary">Next</button>
                     </div>
                 </div>
 
@@ -89,7 +98,8 @@
                                         <li>Adult £<% supp.firstadult %></li>
                                         <li>Child £<% supp.firstchild %></li>
                                     </ul>
-                                    <p v-if="supp.availablefirst" class="card-text"><button @click.prevent="classClick('F', 'First')" class="btn btn-primary">Select</button></p>
+                                    <p v-if="supp.availablefirst" class="card-text"><button @click.prevent="classClick('F', 'First')" class="btn"
+                                        :class="{ 'btn-primary': classselected == 'F', 'btn-secondary': classselected != 'F' }">Select</button></p>
                                     <p v-else class="card-text text-danger">There are no seats left in First</p>
                                 </div>
                             </div>
@@ -105,11 +115,15 @@
                                         <li>Adult £<% supp.standardadult %></li>
                                         <li>Child £<% supp.standardchild %></li>
                                     </ul>
-                                    <p v-if="supp.availablestandard" class="card-text"><button @click.prevent="classClick('S', 'Standard')" class="btn btn-primary">Select</button></p>
+                                    <p v-if="supp.availablestandard" class="card-text"><button @click.prevent="classClick('S', 'Standard')" class="btn "
+                                        :class="{ 'btn-primary': classselected == 'S', 'btn-secondary': classselected != 'S' }">Select</button></p>
                                     <p v-else class="card-text text-danger">There are no seats left in Standard</p>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div>
+                        <button :disabled="!classselected" @click.prevent="pageNext(4)" class="btn btn-primary">Next</button>
                     </div>
                 </div>
 
@@ -138,8 +152,8 @@
                             </div>
                         </div>
                         <div class="col-sm-12 col-md-6">
-                            <div v-show="passengersselected && numbers.showchildren" class="border rounded p-4">
-                                <label v-show="passengersselected && numbers.showchildren" for="form_children" class="form-label"><b>Number of children in party</b></label>
+                            <div v-show="passengersselected" class="border rounded p-4">
+                                <label v-show="passengersselected" for="form_children" class="form-label"><b>Number of children in party</b></label>
                                 <select id="form_children" class="form-select mb-3" v-model="form.children" :disabled="!passengersselected" @change="childrenChange">
                                     <option value="0">None</option>
                                     <option v-for="value in getNumbers(1, numbers.maxchildren)" v-bind:value="value">
@@ -156,16 +170,42 @@
                         </div>
                     </div>
                     <div>
-                        <button @click.prevent="numbersNext" class="btn btn-primary">Next</button>
+                        <button :disabled="!passengersselected" @click.prevent="pageNext(5)" class="btn btn-primary">Next</button>
                     </div>
                 </div>
 
-                <div v-show="step == 4" id="numbers" class="container px-4">
+                <div v-show="step == 5" id="meals" class="container px-4">
                     <h4>
                         Choose meals
                     </h4>
-                </div>
 
+                    <div class="mb-3">
+                        Tell us which meals you would like. Please select the number of each available
+                        meal that you require.
+                    </div>
+
+                    <div v-for="(meal, i) in meals">
+                        <div class="row gx-5 gy-4 mb-3">
+                            <div class="col-sm-12 col-md-6">
+                                <div class="card border rounded">
+                                    <div class="card-header"><% meal.name %></div>
+                                    <div class="card-body">
+                                        <p class="card-text">Price each £<% meal.price %></p>
+                                        <p class="card-text">Choose number required</p>
+                                        <select :id="'meal_' + meal.name" @change="mealChange(i)" class="form-select" v-model="meal.purchase">
+                                            <option v-for="(name, value) in meal.choices" :value="value">
+                                                <% name %>
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button @click.prevent="pageNext(6)" class="btn btn-primary">Next</button>
+                    </div>
+                </div>
 
             </form>
         </div>
@@ -173,7 +213,7 @@
     </div>
 </div>
 
-<!-- Modal -->
+<!-- Modal for passengers change -->
 <div class="modal fade" id="passengerModal" tabindex="-1" aria-labelledby="passengerModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -184,6 +224,25 @@
       <div class="modal-body">
         Changing the number of passengers has forced the number of children in the party to be reduced. Please check
         your passenger numbers are correct. 
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for class change -->
+<div class="modal fade" id="classModal" tabindex="-1" aria-labelledby="classModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="classModalLabel">Travel class changed</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Changing the travel class clears following selections. Availability and choice depends on the travel class.
+        Please visit and complete the following pages again.  
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

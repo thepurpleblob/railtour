@@ -203,7 +203,7 @@ class BookingController extends coreController {
                 'service' => $service,
             ));
         } else {
-            $this->redirect('booking/numbers/' . $serviceid);
+            $this->redirect('booking/single/' . $serviceid);
         }
 
     }
@@ -1014,10 +1014,12 @@ class BookingController extends coreController {
     /**
      * "Singlepage" take on booking
      * @param int $serviceid
+     * @param string $submit == 'submit' on page submission
      */
-    public function singleAction($serviceid) {
+    public function singleAction($serviceid, $submit = '') {
         $service = Admin::getService($serviceid);
         $purchase = Booking::getSessionPurchase($this, $serviceid);
+        $numbers = Booking::countStuff($serviceid, $purchase);
 
         // get the destinations
         $stations = Booking::getDestinationStations($serviceid);
@@ -1051,14 +1053,30 @@ class BookingController extends coreController {
         // Starting step
         $step = 1;
 
+        // we can't show meals unless we already know some stuff
+        $displaymeals = $purchase->class && $purchase->joining && $purchase->destination;
+
+        // ...in which case we can create the form data
+        if ($displaymeals) {
+            $mealsform = Booking::mealsForm($service, $purchase);
+        } else {
+            $mealsform = [];
+        }
+
+        // has the page been submitted
+        if ($submit == 'submit') {
+            $this->redirect('booking/additional');
+        }
+
         $this->View('booking/single', [
             'service' => $service,
             'isdestinations' => $isdestinations,
             'destinations' => $destinations,
             'isjoinings' => $isjoinings,
             'joinings' => $joinings,
+            'displaymeals' => $displaymeals,
             'ismeals' => Booking::mealsAvailable($service, $purchase),
-            'meals' => Booking::mealsForm($service, $purchase),
+            'meals' => $mealsform,
         ]);
     }
 

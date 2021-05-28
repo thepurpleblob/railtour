@@ -98,9 +98,10 @@ class ApiController extends coreController {
 
     /**
      * Update class
-     * @param string class (F or S)
+     * @param string $class (F or S)
+     * @param int $reset (1 = clear down other stuff on class change)
      */
-    public function setclassAction($class) {
+    public function setclassAction($class, $reset = 0) {
         if (($class != 'S') && ($class != 'F')) {
             throw new \Exception('Class must be S or F');
         }
@@ -109,6 +110,16 @@ class ApiController extends coreController {
             $this->require_login('ROLE_TELEPHONE', 'booking/joining');
         }
         $purchase->class = $class;
+
+        // reset stuff that changing the class might screw up
+        if ($reset) {
+            $purchase->adults = 0;
+            $purchase->children = 0;
+            $purchase->meala = 0;
+            $purchase->mealb = 0;
+            $purchase->mealc = 0;
+            $purchase->meald = 0;
+        }
         $purchase->save();
     }
 
@@ -269,6 +280,61 @@ class ApiController extends coreController {
 
         header('Content-type:application/json;charset=utf-8');
         echo json_encode($stepinfo);        
+    }
+
+    /**
+     * Get meals form info
+     */
+    public function getmealsAction() {
+        $purchase = Booking::getSessionPurchase($this);
+        $serviceid = $purchase->serviceid;
+        $service = Admin::getService($serviceid);
+
+        // we can't show meals unless we already know some stuff
+        $displaymeals = $purchase->class && $purchase->joining && $purchase->destination;
+
+        // ...in which case we can create the form data
+        if ($displaymeals) {
+            $mealsform = Booking::mealsForm($service, $purchase);
+        } else {
+            $mealsform = [];
+        }
+
+        header('Content-type:application/json;charset=utf-8');
+        echo json_encode($mealsform);
+    }
+
+    /**
+     * Set meal
+     * @param string $letter
+     * @param int $number
+     */
+    public function setmealAction($letter, $number) {
+        if (strpos('abcd', $letter) === false) {
+            throw new \Exception('Meal letter is invalid - ' . $letter);
+        }
+        $purchase = Booking::getSessionPurchase($this);
+        $serviceid = $purchase->serviceid;
+        $service = Admin::getService($serviceid);
+        $mealsform = Booking::mealsForm($service, $purchase);
+
+        // validation
+        $verified = false;
+        foreach ($mealsform as $meal) {
+            if ($meal->letter = $letter) {
+                if (($number < 0) || ($number > $meal->maxmeals)) {
+                    throw new \Exception('Meal quantity out of range - ' . $letter . ' ' . $number);
+                }
+                $verified = true;
+                break;
+            }
+        }
+        if (!$verified) {
+            throw new \Exception('Meal letter not found for this service - ' . $letter);
+        }
+        $field = 'meal' . $letter;
+        $purchase->$field = $number;
+        $purchase->save();
     }
 
     /**

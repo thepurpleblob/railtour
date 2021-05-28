@@ -1,5 +1,4 @@
 
-
 // Allowance for fixed header
 const offsetHeader = 100
 
@@ -29,6 +28,8 @@ const vueApp = new Vue({
             children: 0,
         },
         childrenchanged: false,
+        meals: {},
+        comment: '',
     },
     mounted: function() {
         const testrange = this.getNumbers(1,16)
@@ -44,12 +45,13 @@ const vueApp = new Vue({
             const purchase = response.data
 
             // Populate form
-            //v.form.adults = purchase.adults ? purchase.adults : 1
+            //v.purchase = purchase
             v.form.passengers = purchase.adults + purchase.children
             v.form.children = purchase.children
             v.destinationselected = purchase.destination
             v.joiningselected = purchase.joining
             v.classselected = purchase.class
+            v.comment = purchase.comment
             if (v.form.passengers) {
                 v.passengersselected = true
             }
@@ -80,7 +82,13 @@ const vueApp = new Vue({
             v.furtheststep = v.step
             window.console.log('GOT STEPS')
             window.console.log(v.stepinfo)
-            v.loading = false
+            return axios.get(this.config.www + '/index.php/api/getmeals')
+        })
+        .then(response => {
+            v.meals = response.data
+            window.console.log('GOT MEALS')
+            window.console.log(v.meals)
+            v.loading = false;
         })
         .catch(error => {
             iziToast.error({
@@ -95,9 +103,23 @@ const vueApp = new Vue({
         // Process class options
         classClick(c, name) {
             window.console.log('CLICKED ' + c)
+
+            // Has previously selected been changed?
+            let reset = 0
+            if (this.classselected && (this.classselected != c))  {
+                this.form.passengers = 0
+                this.form.children = 0
+                this.passengersselected = false
+                this.meals.forEach(meal => {
+                    meal.purchase = 0;
+                })
+                reset = 1
+                const classModal = new bootstrap.Modal(document.getElementById('classModal'))
+                classModal.show()
+            }
             this.classselected = c
             const v = this
-            axios.get(this.config.www + '/index.php/api/setclass/' + c)
+            axios.get(this.config.www + '/index.php/api/setclass/' + c + '/' + reset)
             .then(() => {
                 return axios.get(this.config.www + '/index.php/api/getbookingnumbers')
             })
@@ -105,10 +127,6 @@ const vueApp = new Vue({
                 window.console.log('GOT CLICK NUMBERS')
                 window.console.log(response.data)
                 v.numbers = response.data
-                v.step = 4
-                if (v.furtheststep > 4) {
-                    v.furtheststep = 4
-                }
                 iziToast.success({
                     title: 'Travel class selected, ' + name
                 })
@@ -131,11 +149,6 @@ const vueApp = new Vue({
                 return axios.get(this.config.www + '/index.php/api/getclasssupplemental')
             })
             .then(response => {
-                v.supp = response.data
-                v.step = 2
-                if (v.furtheststep < 2) {
-                    v.furtheststep = 2
-                }
                 iziToast.success({
                     title: 'Destination selected ' + name
                 })
@@ -157,11 +170,9 @@ const vueApp = new Vue({
                 return axios.get(this.config.www + '/index.php/api/getclasssupplemental')
             })
             .then(response => {
-                v.supp = response.data
-                v.step = 3
-                if (v.furtheststep < 3) {
-                    v.furtheststep = 3
-                }
+                const supp = response.data
+                window.console.log('GOT CLASS SUPP')
+                window.console.log(supp)
                 iziToast.success({
                     title: 'Selected, joining at ' + name
                 })
@@ -235,9 +246,15 @@ const vueApp = new Vue({
             })
         },
 
-        // next button on numbers
-        numbersNext: function() {
-            window.console.log('NUMBERS NEXT')
+        mealChange: function(i) {
+            window.console.log('MEAL CHANGE ' + i + ' ' + this.meals[i].purchase)
+            axios.get(this.config.www + '/index.php/api/setmeal/' + this.meals[i].letter + '/' + this.meals[i].purchase)
+            .catch(error => {
+                iziToast.error({
+                    'title': 'Error',
+                    'message': 'Link to server has failed - ' + error.message,
+                })
+            })
         },
 
         // Click steps breadcrumb
@@ -246,8 +263,52 @@ const vueApp = new Vue({
             if ((step in this.stepinfo.steps) && (step <= this.furtheststep)) {
                 this.step = step
             }
+        },
+
+        submitPage: function() {
+            window.location.href = this.config.www + '/index.php/booking/single/' + this.config.serviceid + '/submit'
+        },
+
+        pageNext: function(page) {
+            // MAGIC NUMBER: change this if pages change
+            const maxpage = 6
+            window.console.log('PAGE NEXT ' + page)
+            while (!(page in this.stepinfo.steps) && (page < maxpage)) {
+                page++
+            }
+            this.step = page
+            if (this.furtheststep > page) {
+                this.furtheststep = page
+            }
+
+            if (page == maxpage) {
+                this.submitPage()
+            }
+        }
+    },
+
+    watch: {
+        step: {
+            immediate: true,
+            handler(newStep, oldStep) {
+                const v = this
+                window.console.log('STEP WATCH ' + newStep + ' ' + oldStep)
+                if (newStep == 5) {
+                    axios.get(this.config.www + '/index.php/api/getmeals')
+                    .then(response => {
+                        v.meals = response.data
+                        window.console.log('GOT MEALS IN WATCH')
+                        window.console.log(v.meals)
+                    })
+                    .catch(error => {
+                        iziToast.error({
+                            'title': 'Error',
+                            'message': 'Link to server has failed - ' + error.message,
+                        })
+                    })
+                }
+            }
         }
     }
-
 
 })
