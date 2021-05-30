@@ -18,8 +18,9 @@
     <form @submit="submit" id="service-edit-form" class="validate-form form-horizontal container border shadow p-3" action="{{# path }}service/edit{{/ path }}/{{ service.id }}" method="post" >
         {{{ form.code }}}
         {{{ form.name  }}}
-        {{{ form.description }}}
+        <div v-show="false">{{{ form.description }}}</div>
         <div class="mb-3">
+            <label class="form-label">Description</label>
             <vue-editor v-model="content"></vue-editor>
         </div>
         {{{ form.visible }}}

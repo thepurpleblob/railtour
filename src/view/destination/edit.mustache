@@ -26,8 +26,9 @@
             method="post" >
             {{{ form.crs }}}
             {{{ form.name }}}
-            {{{ form.description }}}
+            <div v-show="false">{{{ form.description }}}</div>
             <div class="mb-3">
+                <label class="form-label">Description</label>
                 <vue-editor v-model="content"></vue-editor>
             </div>
 

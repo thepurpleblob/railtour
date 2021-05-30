@@ -1,0 +1,41 @@
+{{# purchase.bookedby }}
+	<div class="card telephonestatus container text-white bg-danger mb-4 shadow">
+	    <div class="card-header">
+	        TELEPHONE BOOKING 
+	        {{# purchase.bookingref }} (Reference: <strong>{{ purchase.bookingref }}</strong>){{/ purchase.bookingref}}
+	    </div>	
+	    <div class="card-body">
+	        <div class="row card-text">
+                <div class="col">
+                    <strong><u>Customer</u></strong></strong><br/>
+                    <ul class="list-unstyled">
+                        <li v-if="purchase.title"><% purchase.title %></li>
+                        <li><% purchase.firstname %> <% purchase.surname %></li>
+                        <li v-if="purchase.address1"><% purchase.address1 %></li>
+                        <li v-if="purchase.address2"><% purchase.address2 </li>
+                        <li v-if="purchase.city"><% purchase.city %></li>
+                        <li v-if="purchase.county || purchase.postcode"><% purchase.county %> <% purchase.postcode %></li>
+                        <li v-if="purchase.phone"><i class="bi bi-telephone-fill"></i><% purchase.phone %></li>
+                        <li v-if="purchase.email"><i class="bi bi-envelope"></i><% purchase.email %></li>
+                    </ul>
+                </div>
+                <div class="col">
+                    <strong><u>Booking</u></strong><br />
+                    <ul class="list=unstyled">
+                        <li v-if="passengersselected">Number of adults: <% form.passengers - form.children %></li>
+                        <li v-if="passengersselected">Number of children: <% form.children %></li>
+                        <li v-if="joiningselected">Joining at: <% joiningselected %></li>
+                        <li v-if="destinationselected">Destination: <% destinationselected %></li>
+                        <li v-if="classselected">Class: <% classselected %></li>
+                    </ul>
+                </div> 
+                <div class="col">
+                    <strong><u>Meals &amp; supplements</u></strong><br />
+                    <ul  class="list-unstyled">
+                        <li v-for="letter in ['a','b','c','d']" v-if="letter in mealquantities">Quantity <% mealquantities[letter].name %>: <% mealquantities[letter].quantity %></li>
+                    </li>
+                </div>   
+	        </div>	
+	    </div>	
+	</div>	
+{{/ purchase.bookedby }}

@@ -38,29 +38,29 @@
                     <td>{{ name }}</td>
                     <td>
                         {{# visible }}
-                            <a class="badge badge-success" data-toggle="tooltip" title="Click to hide"
+                            <a class="badge bg-success" data-toggle="tooltip" title="Click to hide"
                             href="{{# path }}service/visible{{/ path }}/{{ id }}/0">Yes</a>
                         {{/ visible }}
                         {{^ visible }}
-                            <a class="badge badge-dark" data-toggle="tooltip" title="Click to show"
+                            <a class="badge bg-dark" data-toggle="tooltip" title="Click to show"
                             href="{{# path }}service/visible{{/ path }}/{{ id }}/1">No</a>
                         {{/ visible }}
                     </td>
                     <td>{{# date }}{{ formatteddate }}{{/ date }}</td>
                     <td>
                         <div class="btn-group" role="group">
-                            <a class="btn btn-sm btn-success" href="{{# path }}service/show{{/ path }}/{{ id }}">Show</a>
-                            <a class="btn btn-sm btn-primary" href="{{# path }}limits/edit{{/ path }}/{{ id }}">Limits</a>
+                            <a class="btn btn-sm btn-success me-1" href="{{# path }}service/show{{/ path }}/{{ id }}">Show</a>
+                            <a class="btn btn-sm btn-primary me-1" href="{{# path }}limits/edit{{/ path }}/{{ id }}">Limits</a>
                             {{# showbookingbutton }}
-                                <a class="btn btn-sm btn-info" href="{{# path }}booking/index{{/ path }}/{{ code }}">Book</a>
+                                <a class="btn btn-sm btn-info me-1" href="{{# path }}booking/index{{/ path }}/{{ code }}">Book</a>
                             {{/ showbookingbutton }}
                             {{^ showbookingbutton }}
-                                <a class="btn btn-sm btn-info disabled">Book</a>
+                                <a class="btn btn-sm btn-info disabled me-1">Book</a>
                             {{/ showbookingbutton }}
-                            <a class="btn btn-sm btn-warning" href="{{# path }}report/list{{/ path }}/{{ id }}">Report</a>
-                            <a class="btn btn-sm btn-dark" href="{{# path }}report/export{{/ path }}/{{ id }}">Export</a>
-                            <a class="btn btn-sm btn-secondary" href="{{# path }}service/duplicate{{/ path }}/{{ id }}">Duplicate</a>
-                            <a class="btn btn-sm btn-danger" href="{{# path }}service/delete{{/ path }}/{{ id }}">Delete</a>
+                            <a class="btn btn-sm btn-warning me-1" href="{{# path }}report/list{{/ path }}/{{ id }}">Report</a>
+                            <a class="btn btn-sm btn-dark me-1" href="{{# path }}report/export{{/ path }}/{{ id }}">Export</a>
+                            <a class="btn btn-sm btn-secondary me-1" href="{{# path }}service/duplicate{{/ path }}/{{ id }}">Duplicate</a>
+                            <a class="btn btn-sm btn-danger me-1" href="{{# path }}service/delete{{/ path }}/{{ id }}">Delete</a>
                         </div>
                     </td>
                 </tr>

@@ -627,7 +627,7 @@ class BookingController extends coreController {
                 ;
         if (!($iscomments or $issupplement)) {
             if ($this->back) {
-                $this->redirect('booking/class', true);
+                $this->redirect('booking/single/' . $serviceid, true);
             } else {
                 $this->redirect('booking/personal');
             }
@@ -641,7 +641,7 @@ class BookingController extends coreController {
 
             // Cancel?
             if (!empty($data['back'])) {
-                $this->redirect('booking/class', true);
+                $this->redirect('booking/single/' . $serviceid, true);
             }
 
             $purchase->comment = empty($data['comment']) ? '' : $data['comment'];
@@ -831,7 +831,7 @@ class BookingController extends coreController {
 
             // Anything other than 'next' jumps back
             if (empty($data['next'])) {
-                $this->redirect('booking/personal', true);
+                $this->redirect('booking/single/' . $serviceid, true);
             }
 
             // If we get here we can process SagePay stuff
@@ -1070,6 +1070,7 @@ class BookingController extends coreController {
 
         $this->View('booking/single', [
             'service' => $service,
+            'purchase' => $purchase,
             'isdestinations' => $isdestinations,
             'destinations' => $destinations,
             'isjoinings' => $isjoinings,

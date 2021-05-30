@@ -29,20 +29,22 @@ const vueApp = new Vue({
         },
         childrenchanged: false,
         meals: {},
+        mealquantities: {},
         comment: '',
     },
     mounted: function() {
         const testrange = this.getNumbers(1,16)
-        window.console.log(testrange)
 
         const configJSON = document.getElementById('jsenv').innerHTML
         this.config = JSON.parse(configJSON)
 
         // Purchase
+        this.getMeals()
         const v = this
         axios.get(this.config.www + '/index.php/api/getpurchase/' + this.config.serviceid)
         .then(response => {
             const purchase = response.data
+            v.purchase = purchase
 
             // Populate form
             //v.purchase = purchase
@@ -56,38 +58,26 @@ const vueApp = new Vue({
                 v.passengersselected = true
             }
 
-            window.console.log('PURCHASE ACQUIRED')
-            window.console.log(purchase)
-            window.console.log(v.form)
-
             // next one
             return axios.get(this.config.www + '/index.php/api/getbookingnumbers')
         })
         .then (response => {
             const numbers = response.data
             v.numbers = numbers
-            window.console.log('NUMBERS ACQUIRED')
-            window.console.log(numbers)
             return axios.get(this.config.www + '/index.php/api/getclasssupplemental')
         })
         .then(response => {
             v.supp = response.data
-            window.console.log('GOT CLASS SUPP')
-            window.console.log(v.supp)
             return axios.get(this.config.www + '/index.php/api/getsteps')
         })
         .then(response => {
             v.stepinfo = response.data
             v.step = v.stepinfo.first
             v.furtheststep = v.step
-            window.console.log('GOT STEPS')
-            window.console.log(v.stepinfo)
             return axios.get(this.config.www + '/index.php/api/getmeals')
         })
         .then(response => {
             v.meals = response.data
-            window.console.log('GOT MEALS')
-            window.console.log(v.meals)
             v.loading = false;
         })
         .catch(error => {
@@ -102,7 +92,6 @@ const vueApp = new Vue({
 
         // Process class options
         classClick(c, name) {
-            window.console.log('CLICKED ' + c)
 
             // Has previously selected been changed?
             let reset = 0
@@ -120,13 +109,7 @@ const vueApp = new Vue({
             this.classselected = c
             const v = this
             axios.get(this.config.www + '/index.php/api/setclass/' + c + '/' + reset)
-            .then(() => {
-                return axios.get(this.config.www + '/index.php/api/getbookingnumbers')
-            })
             .then(response => {
-                window.console.log('GOT CLICK NUMBERS')
-                window.console.log(response.data)
-                v.numbers = response.data
                 iziToast.success({
                     title: 'Travel class selected, ' + name
                 })
@@ -143,11 +126,7 @@ const vueApp = new Vue({
         // Select destination
         destinationClick: function(crs, name) {
             this.destinationselected = crs
-            const v = this
             axios.get(this.config.www + '/index.php/api/setdestination/' + crs)
-            .then(() => {
-                return axios.get(this.config.www + '/index.php/api/getclasssupplemental')
-            })
             .then(response => {
                 iziToast.success({
                     title: 'Destination selected ' + name
@@ -164,15 +143,8 @@ const vueApp = new Vue({
         // Select joining station
         joiningClick: function(crs, name) {
             this.joiningselected = crs
-            const v = this
             axios.get(this.config.www + '/index.php/api/setjoining/' + crs)
-            .then(() => {
-                return axios.get(this.config.www + '/index.php/api/getclasssupplemental')
-            })
             .then(response => {
-                const supp = response.data
-                window.console.log('GOT CLASS SUPP')
-                window.console.log(supp)
                 iziToast.success({
                     title: 'Selected, joining at ' + name
                 })
@@ -190,29 +162,8 @@ const vueApp = new Vue({
             return new Array(stop-start+1).fill(start).map((n,i)=>n+i);
         },
 
-        // Update fares info in class select screens
-        updateFares: function() {
-            window.console.log('GOT HERE')
-            if (this.destinationselected && this.joiningselected) {
-                window.console.log('D = ' + this.destinationselected + ' J = ' + this.joiningselected)
-                axios.get(this.config.www + '/index.php/api/getclasssupplemental')
-                .then(response => {
-                    const supp = response.data
-                    window.console.log('GOT CLASS SUPP')
-                    window.console.log(supp)
-                })
-                .catch(error => {
-                    iziToast.error({
-                        'title': 'Error',
-                        'message': 'Link to server has failed - ' + error.message,
-                    })
-                })
-            }
-        },
-
         // Passengers value changed
         passengersChange: function() {
-            window.console.log('PASSENGER CHANGE ' + this.form.passengers)
             this.numbers.maxchildren = this.form.passengers - 1
             if (this.form.children > (this.form.passengers -1)) {
                 this.form.children = this.form.passengers -1
@@ -234,7 +185,6 @@ const vueApp = new Vue({
 
         // Children value change
         childrenChange: function() {
-            window.console.log('CHILDREN CHANGE ' + this.form.children)
             const adults = this.form.passengers - this.form.children
             this.passengersselected = true
             axios.get(this.config.www + '/index.php/api/setpassengers/' + adults + '/' + this.form.children)
@@ -247,7 +197,6 @@ const vueApp = new Vue({
         },
 
         mealChange: function(i) {
-            window.console.log('MEAL CHANGE ' + i + ' ' + this.meals[i].purchase)
             axios.get(this.config.www + '/index.php/api/setmeal/' + this.meals[i].letter + '/' + this.meals[i].purchase)
             .catch(error => {
                 iziToast.error({
@@ -259,7 +208,6 @@ const vueApp = new Vue({
 
         // Click steps breadcrumb
         stepChange: function(step) {
-            window.console.log('STEP CHANGE ' + step)
             if ((step in this.stepinfo.steps) && (step <= this.furtheststep)) {
                 this.step = step
             }
@@ -272,7 +220,6 @@ const vueApp = new Vue({
         pageNext: function(page) {
             // MAGIC NUMBER: change this if pages change
             const maxpage = 6
-            window.console.log('PAGE NEXT ' + page)
             while (!(page in this.stepinfo.steps) && (page < maxpage)) {
                 page++
             }
@@ -284,6 +231,36 @@ const vueApp = new Vue({
             if (page == maxpage) {
                 this.submitPage()
             }
+        },
+
+        pageBack: function(page) {
+            while (!(page in this.stepinfo.steps) && (page > 0)) {
+                page--
+            }
+            if (page == 0) {
+                this.step = this.stepinfo.first
+            }
+            this.step = page
+        },
+
+        getMeals: function() {
+            const v = this
+            axios.get(this.config.www + '/index.php/api/getmeals')
+            .then(response => {
+                v.meals = response.data
+                v.meals.forEach(meal => {
+                    v.mealquantities[meal.letter] = {
+                        quantity: meal.purchase,
+                        name: meal.name
+                    }
+                })
+            })
+            .catch(error => {
+                iziToast.error({
+                    'title': 'Error',
+                    'message': 'Link to server has failed - ' + error.message,
+                })
+            })
         }
     },
 
@@ -292,13 +269,10 @@ const vueApp = new Vue({
             immediate: true,
             handler(newStep, oldStep) {
                 const v = this
-                window.console.log('STEP WATCH ' + newStep + ' ' + oldStep)
-                if (newStep == 5) {
-                    axios.get(this.config.www + '/index.php/api/getmeals')
+                if (newStep == 3) {
+                    axios.get(this.config.www + '/index.php/api/getclasssupplemental')
                     .then(response => {
-                        v.meals = response.data
-                        window.console.log('GOT MEALS IN WATCH')
-                        window.console.log(v.meals)
+                        v.supp = response.data
                     })
                     .catch(error => {
                         iziToast.error({
@@ -306,6 +280,21 @@ const vueApp = new Vue({
                             'message': 'Link to server has failed - ' + error.message,
                         })
                     })
+                }
+                if (newStep == 4) {
+                    axios.get(this.config.www + '/index.php/api/getbookingnumbers')
+                    .then(response => {
+                        v.numbers = response.data
+                    })
+                    .catch(error => {
+                        iziToast.error({
+                            'title': 'Error',
+                            'message': 'Link to server has failed - ' + error.message,
+                        })
+                    })
+                }
+                if (newStep == 5) {
+                    this.getMeals()
                 }
             }
         }
