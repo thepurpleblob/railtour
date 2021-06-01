@@ -19,6 +19,11 @@ function dd($message, ...$values) {
 use thepurpleblob\core\setup;
 use thepurpleblob\core\install;
 
+error_reporting(E_ALL);
+ini_set('display_errors', 'stdout');
+ini_set('log_errors', 1);
+ini_set('html_errors', 1);
+
 // Dotenv
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
@@ -27,11 +32,6 @@ $dotenv->load();
 setup::database();
 install::action($version);
 Session::session_start();
-
-error_reporting(E_ALL);
-ini_set('display_errors', 'stdout');
-ini_set('log_errors', 1);
-ini_set('html_errors', 1);
 
 // see if the database has been installed at all
 require_once(dirname(__FILE__) . '/core/install.php');

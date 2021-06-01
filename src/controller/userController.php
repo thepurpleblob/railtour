@@ -159,7 +159,7 @@ class userController extends coreController {
                 $user->role = $data['role'];
                 $user->is_active = $data['is_active'];
                 if (!empty($data['password'])) {
-                    $user->password = md5($data['password']);
+                    $user->password = password_hash($data['password'], PASSWORD_DEFAULT);
                 }
                 $user->save();
                 $this->redirect('user/index/User saved');

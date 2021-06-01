@@ -20,14 +20,7 @@ class Session {
 
         // Start the session
         $sessionlife = time() + SESSION_LIFE;
-        setcookie(SESSION_COOKIE, $this->sessionid, [
-            'expires' => $sessionlife,
-            'path' => '/',
-            //'domain' => '',
-            //'secure' => true,
-            'httponly' => true,
-            'samesite' => 'Lax',
-        ]);
+        setcookie(SESSION_COOKIE, $this->sessionid, $sessionlife, '/', '', false, true);
     }
 
     /**
