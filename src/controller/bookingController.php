@@ -876,7 +876,6 @@ class BookingController extends coreController {
      * @throws \Exception
      */
     public function notificationAction() {
-        global $CFG;
 
         // Full strength error logging
         error_reporting(E_ALL);
