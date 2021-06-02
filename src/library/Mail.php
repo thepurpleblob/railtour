@@ -3,6 +3,8 @@
 namespace thepurpleblob\railtour\library;
 
 use Exception;
+use thepurpleblob\railtour\library\Admin;
+use thepurpleblob\railtour\library\Booking;
 
 /**
  * Class Mail
@@ -39,15 +41,14 @@ class Mail {
         }
 
         // format service
-        $bookinglib = $this->controller->getLibrary('Booking');
-        $bookinglib->formatService($this->service);
+        Admin::formatService($this->service);
 
         // format purchase
         $this->purchase->formattedclass = $purchase->class == 'F' ? 'First' : 'Standard';
 
         // Find joining and destination
-        $this->joining = $bookinglib->getJoiningCRS($this->service->id, $this->purchase->joining);
-        $this->destination = $bookinglib->getDestinationCRS($this->service->id, $this->purchase->destination);
+        $this->joining = Booking::getJoiningCRS($this->service->id, $this->purchase->joining);
+        $this->destination = Booking::getDestinationCRS($this->service->id, $this->purchase->destination);
 
         // Create transport
         $transport = new \Swift_SmtpTransport($CFG->smtpd_host);
