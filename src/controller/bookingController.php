@@ -907,7 +907,7 @@ class BookingController extends coreController {
         $mail = $this->getLibrary('Mail');
         $mailpurchase = clone $purchase;
         $mail->initialise($mailpurchase);
-        $mail->setExtrarecipients($_ENV['backup_email']);
+        $mail->setExtrarecipients(explode(',', $_ENV['backup_email']));
 
         // Check VPSSignature for validity
         if (!$sagepay->checkVPSSignature($purchase, $data)) {
