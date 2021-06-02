@@ -28,7 +28,6 @@ class Mail {
      * Initialise email service
      */
     public function initialise($purchase, $service = null) {
-        global $CFG;
 
         // Set the purchase and service
         $this->purchase = $purchase;
@@ -51,7 +50,7 @@ class Mail {
         $this->destination = Booking::getDestinationCRS($this->service->id, $this->purchase->destination);
 
         // Create transport
-        $transport = new \Swift_SmtpTransport($CFG->smtpd_host);
+        $transport = new \Swift_SmtpTransport($_ENV['smtpd_host']);
 
         // Create mailer
         $this->mailer = new \Swift_Mailer($transport);
