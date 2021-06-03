@@ -174,24 +174,30 @@
                         Choose meals
                     </h4>
 
-                    <div class="mb-3">
-                        Tell us which meals you would like. Please select the number of each available
-                        meal that you require.
+                    <div v-show="!classmeals" class="alert alert-info">
+                        Sorry. Meals are not available for your chosen travel class. 
                     </div>
 
-                    <div v-for="(meal, i) in meals">
-                        <div class="row gx-5 gy-4 mb-3">
-                            <div class="col-sm-12 col-md-6">
-                                <div class="card border rounded">
-                                    <div class="card-header"><% meal.name %></div>
-                                    <div class="card-body">
-                                        <p class="card-text">Price each £<% meal.price %></p>
-                                        <p class="card-text">Choose number required</p>
-                                        <select :id="'meal_' + meal.name" @change="mealChange(i)" class="form-select" v-model="meal.purchase">
-                                            <option v-for="(name, value) in meal.choices" :value="value">
-                                                <% name %>
-                                            </option>
-                                        </select>
+                    <div v-show="classmeals">
+                        <div class="mb-3">
+                            Tell us which meals you would like. Please select the number of each available
+                            meal that you require.
+                        </div>
+
+                        <div v-for="(meal, i) in meals">
+                            <div class="row gx-5 gy-4 mb-3">
+                                <div class="col-sm-12 col-md-6">
+                                    <div class="card border rounded">
+                                        <div class="card-header"><% meal.name %></div>
+                                        <div class="card-body">
+                                            <p class="card-text">Price each £<% meal.price %></p>
+                                            <p class="card-text">Choose number required</p>
+                                            <select :id="'meal_' + meal.name" @change="mealChange(i)" class="form-select" v-model="meal.purchase">
+                                                <option v-for="(name, value) in meal.choices" :value="value">
+                                                    <% name %>
+                                                </option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

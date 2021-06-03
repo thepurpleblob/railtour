@@ -30,6 +30,7 @@ const vueApp = new Vue({
         childrenchanged: false,
         meals: {},
         mealquantities: {},
+        classmeals: true,
         comment: '',
     },
     mounted: function() {
@@ -254,6 +255,10 @@ const vueApp = new Vue({
                         name: meal.name
                     }
                 })
+                return axios.get(this.config.www + '/index.php/api/getclassmeals')
+            })
+            .then(response => {
+                v.classmeals = response.data
             })
             .catch(error => {
                 iziToast.error({

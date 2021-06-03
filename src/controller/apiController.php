@@ -305,6 +305,26 @@ class ApiController extends coreController {
     }
 
     /**
+     * Check if meals available for currently selected class
+     */
+    public function getclassmealsAction() {
+        $purchase = Booking::getSessionPurchase($this);
+        $serviceid = $purchase->serviceid;
+        $service = Admin::getService($serviceid);
+
+        $available = true;
+        if (($purchase->class == 'F') && !$service->mealsinfirst) {
+            $available = false;
+        }
+        if (($purchase->class == 'S') && !$service->mealsinstandard) {
+            $available = false;
+        }
+
+        header('Content-type:application/json;charset=utf-8');
+        echo json_encode($available);
+    }
+
+    /**
      * Set meal
      * @param string $letter
      * @param int $number

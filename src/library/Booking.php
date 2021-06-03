@@ -671,12 +671,14 @@ class Booking  {
      * @return boolean
      */
     public static function mealsAvailable($service, $purchase) {
+        /*
         if ($purchase->class = 'F' && !$service->mealsinfirst) {
             return false;
         }
         if ($purchase->class = 'S' && !$service->mealsinstandard) {
             return false;
         }
+        */
         return
             $service->mealavisible ||
             $service->mealbvisible ||
