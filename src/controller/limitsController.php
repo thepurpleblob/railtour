@@ -64,6 +64,7 @@ class LimitsController extends coreController {
                 'mealc' => 'required|integer',
                 'meald' => 'required|integer',
                 'firstsingles' => 'required|integer',
+                'minparty' => 'required|integer',
                 'maxparty' => 'required|integer',
                 'maxpartyfirst' => 'required|integer',
                 'minpartyfirst' => 'required|integer'
@@ -77,6 +78,7 @@ class LimitsController extends coreController {
                 $limits->mealc = $data['mealc'];
                 $limits->meald = $data['meald'];
                 $limits->firstsingles = $data['firstsingles'];
+                $limits->minparty = $data['minparty'];
                 $limits->maxparty = $data['maxparty'];
                 $limits->maxpartyfirst = $data['maxpartyfirst'];
                 $limits->minpartyfirst = $data['minpartyfirst'];
