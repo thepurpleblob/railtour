@@ -368,6 +368,9 @@ class Booking  {
                 $limited = true;
             }
         } else if ($purchase->class == CLASS_STANDARD) {
+            if ($limits->minparty) {
+                $single->minparty = $limits->minparty;
+            }
             if ($count->remainingstandard < $single->maxparty) {
                 $single->maxparty = $count->remainingstandard;
                 $limit = true;

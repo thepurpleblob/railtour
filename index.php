@@ -59,7 +59,7 @@ if (!$action_name = $paths[2]) {
 }
 
 // Set error handling but not for api calls
-if ($controller_name != 'api') {
+if (($controller_name != 'api') && $_ENV['debugging']) {
     $whoops = new \Whoops\Run;
     $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
     $whoops->register();
