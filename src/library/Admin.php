@@ -1033,4 +1033,21 @@ class Admin {
         $service->delete();
     }
 
+    /**
+     * Add stations
+     * Add CRS/Name combos for lookup
+     */
+    public static function loadStations() {
+
+        $filename = $_ENV['dirroot'] . '/src/assets/json/stations.json';
+        $stations = json_decode(file_get_contents($filename));
+        //dd('STATIONS',$stations);
+        foreach ($stations->locations as $station) {
+            $s = ORM::forTable('station')->create();
+            $s->crs = $station->crs;
+            $s->name = $station->name;
+            $s->save();
+        }
+    }
+
 }

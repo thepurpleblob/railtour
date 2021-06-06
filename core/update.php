@@ -3,6 +3,7 @@
 namespace thepurpleblob\core;
 
 use \ORM;
+use thepurpleblob\railtour\library\Admin;
 
 /**
  * Check for schema updates
@@ -65,6 +66,10 @@ class update {
         if ($dbversion < 2021042200) {
             $db->exec('ALTER TABLE session
                 ADD flash int(1) NOT NULL DEFAULT "0"');
+        }
+
+        if ($dbversion < 2021050601) {
+            Admin::loadStations();
         }
 
         // Make config version up to date
