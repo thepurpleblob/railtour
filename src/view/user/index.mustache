@@ -30,7 +30,10 @@
                         <td>{{ firstname }}</td>
                         <td>{{ lastname }}</td>
                         <td>{{ role }}</td>
-                        <td>{{# yesno }}{{ is_active }}{{/ yesno }}</td>
+                        <td>
+                            {{# is_active }}<span class="badge bg-success">Yes</span>{{/ is_active }}
+                            {{^ is_active }}<span class="badge bg-secondary">No</span>{{/ is_active }}
+                        </td>
                         <td>
                             <a class="btn btn-primary btn-sm" href="{{# path }}user/edit/{{/ path }}/{{ username }}">Edit</a>
                             {{^ editable }}
