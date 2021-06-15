@@ -360,7 +360,7 @@ class Booking  {
             if ($limits->minpartyfirst) {
                 $single->minparty = $limits->minpartyfirst;
             }
-            if ($limits->maxpartfirst) {
+            if ($limits->maxpartyfirst) {
                 $single->maxparty = $limits->maxpartyfirst;
             }
             if ($count->remainingfirst < $single->maxparty) {
