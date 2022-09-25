@@ -45,6 +45,18 @@
                 {{/ service.eticketoptional }}    
             {{/ service.eticketenabled }}
 
+            <div class="alert alert-info">
+                Here at <b>SRPS Railtours</b> we take your privacy seriously and will only use your personal information
+                to administer your account and to provide products you have requested from us. We will not pass on your
+                details to any third party without your consent.
+                <p></p>
+                However, we would like to contact you with details of other tours and offers we provide. Please indicate 
+                below how you would like us to contact you.
+            </div>
+
+            {{{ form.contactemail }}}
+            {{{ form.contactpost }}}
+
             <div>
                 <input type="submit" name="next" value="Final step" class="btn btn-primary" />
                 <input type="submit" name="back" value="Back" class="btn btn-warning" formnovalidate />

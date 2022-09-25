@@ -336,7 +336,9 @@ class BookingController extends coreController {
                 $purchase->phone = $data['phone'];
                 if (isset($data['email'])) {
                     $purchase->email = strtolower($data['email']);
-                }    
+                }
+                $purchase->contactemail = $data['contactemail'];
+                $purchase->contactpost = $data['contactpost']; 
 
                 // eticket is optional
                 if (!$service->eticketenabled) {
@@ -362,9 +364,12 @@ class BookingController extends coreController {
         $form->postcode = Form::text('postcode', 'Post code', $purchase->postcode, FORM_REQUIRED);
         $form->phone = Form::text('phone', 'Telephone', $purchase->phone, FORM_OPTIONAL, null, 'tel');
         $form->email = Form::text('email', 'Email', $purchase->email, $purchase->bookedby ? FORM_OPTIONAL : FORM_REQUIRED, null, 'email');
+        $form->contactemail = Form::yesno('contactemail', 'By email', $purchase->contactemail);
+        $form->contactpost = Form::yesno('contactpost', 'By post', $purchase->contactpost);
 
         // Do not show email field for telephone bookings if it is empty
-        $showemail = (!$purchase->bookedby) || (!empty($purchase->email)); 
+        // $showemail = (!$purchase->bookedby) || (!empty($purchase->email)); 
+        $showemail = true;
 
         // display form
         $this->View('booking/personal', array(
@@ -409,6 +414,8 @@ class BookingController extends coreController {
             'class' => $purchase->class == 'F' ? 'First' : 'Standard',
             'fare' => $fare,
             'formatteddate'=> date('d/m/Y', strtotime($service->date)),
+            'formattedcontactemail' => $purchase->contactemail ? 'Yes' : 'No',
+            'formattedcontactpost' => $purchase->contactpost ? 'Yes' : 'No',
         ));
     }
 

@@ -72,6 +72,14 @@ class update {
             Admin::loadStations();
         }
 
+        if ($dbversion < 2022092503) {
+            $db->exec(
+                'ALTER TABLE purchase
+                ADD contactemail int(1) NOT NULL DEFAULT "0",
+                ADD contactpost int(1) NOT NULL DEFAULT "0"'
+            );
+        }
+
         // Make config version up to date
         $config->name = 'version';
         $config->value = $version;
