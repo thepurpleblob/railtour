@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/thepurpleblob/railtour#readme",
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "izitoast": "^1.4.0",
     "vue": "^2.6.12",
     "vue2-editor": "^2.10.2"
